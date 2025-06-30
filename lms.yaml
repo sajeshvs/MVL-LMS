@@ -1,0 +1,17 @@
+tables:
+  - name: mvl_course
+    primaryName: title
+    columns:
+      - logicalName: title        ; dataType: String(200)
+      - logicalName: summary      ; dataType: Multiline
+      - logicalName: duration     ; dataType: Whole
+  - name: mvl_module
+    columns:
+      - logicalName: mvl_course   ; dataType: Lookup(mvl_course)
+      - logicalName: order        ; dataType: Whole
+      - logicalName: contenturl   ; dataType: Url
+  - name: mvl_enrollment
+    columns:
+      - logicalName: mvl_course   ; dataType: Lookup(mvl_course)
+      - logicalName: systemuser   ; dataType: Lookup(systemuser)
+      - logicalName: progress     ; dataType: Decimal
