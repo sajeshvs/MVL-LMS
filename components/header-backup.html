@@ -1,0 +1,189 @@
+<div class="bg-gradient-to-r from-slate-50 to-blue-50 dark:from-gray-800 dark:to-gray-700 shadow-lg border-b-4 border-mvl-blue header-container">
+    <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 2xl:px-12">
+        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center py-4 lg:py-0 lg:h-20 xl:h-24">
+            <!-- Logo Section - Fixed width container to prevent overflow -->            <div class="flex items-center justify-between w-full lg:w-auto lg:flex-shrink-0 header-logo-section mb-4 lg:mb-0">
+                <!-- Logo Container with fixed dimensions -->
+                <div class="flex items-center space-x-3 sm:space-x-4 lg:space-x-6 mvl-logo-container w-full lg:w-auto max-w-none lg:max-w-lg xl:max-w-xl">
+                    <!-- MVL Logo - Guaranteed Visible Design -->
+                    <div class="mvl-logo-guaranteed flex items-center justify-center flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24">
+                        <!-- Multi-layer visibility approach -->
+                        <!-- Layer 1: CSS-only logo (always visible) -->
+                        <div class="mvl-css-logo absolute w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl shadow-lg border-2 border-white flex items-center justify-center">
+                            <div class="text-white font-bold text-xs sm:text-sm lg:text-base xl:text-lg">MVL</div>
+                        </div>
+                        
+                        <!-- Layer 2: Try PNG logo (on top if loads) -->
+                        <img src="assets/img/mvl-logo.png" alt="MVL Logo" 
+                             class="relative z-10 w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 xl:w-24 xl:h-24 object-contain rounded-xl shadow-lg" 
+                             style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: 2px solid white;"
+                             onerror="this.style.display='none'; console.log('PNG logo failed, CSS fallback visible');"
+                             onload="console.log('PNG logo loaded successfully');">
+                    </div>
+                    <!-- Text Container with fixed width to prevent overflow -->
+                    <div class="border-l-2 border-mvl-blue pl-3 sm:pl-4 lg:pl-6 mvl-text-container flex-1 min-w-0">
+                        <h1 class="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold bg-gradient-to-r from-mvl-blue to-blue-600 bg-clip-text text-transparent leading-tight">MVL-LMS</h1>
+                        <p class="text-xs sm:text-sm lg:text-base text-gray-600 dark:text-gray-300 font-medium hidden sm:block">CMMC 2.0 Learning Management System</p>
+                    </div>
+                </div>
+                <!-- Mobile menu button - Fixed position -->
+                <button class="lg:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0 ml-4"
+                        @click="$store.app.mobileMenuOpen = !$store.app.mobileMenuOpen">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>            <!-- Desktop Navigation & User Controls - Fixed container dimensions -->
+            <div class="hidden lg:flex items-center justify-end flex-shrink-0 header-nav-section lg:w-auto lg:min-w-fit">
+                <!-- Navigation - Fixed spacing and dimensions -->
+                <nav class="flex items-center space-x-1 xl:space-x-2 mr-4 xl:mr-6">
+                    <a href="index.html" 
+                       class="nav-link flex items-center space-x-1 xl:space-x-2 px-3 xl:px-4 py-2 rounded-lg font-medium transition-all text-sm xl:text-base whitespace-nowrap"
+                       data-page="index">
+                        <svg class="w-4 h-4 xl:w-5 xl:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v14l-4-2-4 2V5z"></path>
+                        </svg>
+                        <span class="hidden xl:inline">Dashboard</span>
+                        <span class="xl:hidden">Home</span>
+                    </a>
+                    <a href="courses.html" 
+                       class="nav-link flex items-center space-x-1 xl:space-x-2 px-3 xl:px-4 py-2 rounded-lg font-medium transition-all text-sm xl:text-base whitespace-nowrap"
+                       data-page="courses"
+                       onclick="console.log('Courses link clicked!'); return true;">
+                        <svg class="w-4 h-4 xl:w-5 xl:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        <span>Courses</span>
+                    </a>
+                    <a href="admin.html" 
+                       class="nav-link flex items-center space-x-1 xl:space-x-2 px-3 xl:px-4 py-2 rounded-lg font-medium transition-all text-sm xl:text-base whitespace-nowrap"
+                       data-page="admin">
+                        <svg class="w-4 h-4 xl:w-5 xl:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>Admin</span>
+                    </a>
+                </nav>
+                
+                <!-- User & Theme Toggle - Fixed container with proper boundaries -->
+                <div class="flex items-center space-x-2 xl:space-x-3 border-l border-gray-300 dark:border-gray-600 pl-4 xl:pl-6">
+                    <!-- User Info - Fixed size avatar and text -->
+                    <div class="hidden xl:flex items-center space-x-2 min-w-fit">
+                        <div class="w-8 h-8 xl:w-10 xl:h-10 bg-mvl-blue rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-white text-sm xl:text-base font-semibold">U</span>
+                        </div>
+                        <span class="text-sm xl:text-base text-gray-700 dark:text-gray-300 whitespace-nowrap">User</span>
+                    </div>
+                    
+                    <!-- Theme Toggle - Fixed size button -->
+                    <button @click="$store.app.toggleTheme()" 
+                            class="p-2 xl:p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors flex-shrink-0 w-10 h-10 xl:w-12 xl:h-12 flex items-center justify-center">
+                        <svg x-show="$store.app.theme === 'light'" class="w-5 h-5 xl:w-6 xl:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                        <svg x-show="$store.app.theme === 'dark'" class="w-5 h-5 xl:w-6 xl:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Navigation Menu -->
+            <div class="lg:hidden" x-show="$store.app.mobileMenuOpen" x-transition>
+                <div class="pt-4 pb-2 border-t border-gray-200 dark:border-gray-700">
+                    <nav class="flex flex-col space-y-2">
+                        <a href="index.html" 
+                           class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-all"
+                           data-page="index">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v14l-4-2-4 2V5z"></path>
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                        <a href="courses.html" 
+                           class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-all"
+                           data-page="courses">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                            <span>Courses</span>
+                        </a>
+                        <a href="admin.html" 
+                           class="nav-link flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-all"
+                           data-page="admin">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <span>Admin</span>
+                        </a>
+                    </nav>
+                    
+                    <!-- Mobile User Section -->
+                    <div class="flex items-center justify-between pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-mvl-blue rounded-full flex items-center justify-center">
+                                <span class="text-white text-sm font-semibold">U</span>
+                            </div>
+                            <span class="text-sm text-gray-700 dark:text-gray-300">User</span>
+                        </div>
+                        
+                        <button @click="$store.app.toggleTheme()" 
+                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg x-show="$store.app.theme === 'light'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                            <svg x-show="$store.app.theme === 'dark'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Set active navigation state based on current page
+document.addEventListener('DOMContentLoaded', function() {
+    const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+        const page = link.getAttribute('data-page');
+        if (page === currentPage) {
+            link.className = 'nav-link flex items-center space-x-2 px-3 py-2 rounded-lg bg-mvl-blue text-white font-semibold shadow-md transition-all hover:bg-blue-700';
+        } else {
+            link.className = 'nav-link flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-blue-100 dark:hover:bg-gray-600 hover:text-mvl-blue dark:hover:text-blue-400 font-medium transition-all';
+        }
+    });
+    
+    // Header overflow protection
+    function checkHeaderOverflow() {
+        const header = document.querySelector('.header-container');
+        const logoSection = document.querySelector('.header-logo-section');
+        const navSection = document.querySelector('.header-nav-section');
+        
+        if (header && logoSection && navSection) {
+            const headerWidth = header.offsetWidth;
+            const logoWidth = logoSection.offsetWidth;
+            const navWidth = navSection.offsetWidth;
+            const totalNeeded = logoWidth + navWidth + 100; // 100px buffer
+            
+            // If content overflows, add compact class
+            if (totalNeeded > headerWidth) {
+                header.classList.add('header-compact');
+            } else {
+                header.classList.remove('header-compact');
+            }
+        }
+    }
+    
+    // Check on load and resize
+    checkHeaderOverflow();
+    window.addEventListener('resize', checkHeaderOverflow);
+});
+</script>

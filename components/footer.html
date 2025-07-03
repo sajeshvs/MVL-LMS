@@ -1,0 +1,17 @@
+<div class="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="editable" 
+             id="footer-content"
+             :contenteditable="$store.app.edit"
+             @blur="$store.app.saveContent('footer-content', $event.target.innerHTML)">
+            <p class="text-gray-600 dark:text-gray-300 leading-relaxed">
+                MVL is an industry leading US Government Prime Contractor with an International footprint that provides Design and Build services to the defense, construction, and engineering industries. MVL's construction management team works with clients to help them exceed industry standards and improve performance.
+            </p>
+        </div>
+        <div class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <p class="text-center text-gray-500 dark:text-gray-400 text-sm">
+                © 2024 MVL Group. All rights reserved. | CMMC 2.0 Training Platform
+            </p>
+        </div>
+    </div>
+</div>
