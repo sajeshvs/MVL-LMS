@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" :class="{ 'dark': $store.app.theme === 'dark' }" x-data x-cloak>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL Header Showcase - Beautiful Design</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/app.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
+
+    <!-- Header -->
+    <header id="header-container"></header>
+
+    <!-- Showcase Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h1 class="text-3xl font-bold text-blue-600 mb-6">🎨 MVL Header Design Showcase</h1>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-blue-800 dark:text-blue-300 mb-3">✨ Design Features</h2>
+                    <ul class="text-blue-700 dark:text-blue-300 space-y-2 text-sm">
+                        <li>🌈 <strong>Colorful Logo:</strong> Recreates the MVL stripes (red, orange, yellow, green, blue)</li>
+                        <li>🎯 <strong>Brand Identity:</strong> Clean "MVL" text with proper spacing</li>
+                        <li>📱 <strong>Responsive:</strong> Mobile-first design with collapsible menu</li>
+                        <li>🌙 <strong>Dark/Light Mode:</strong> Seamless theme switching</li>
+                        <li>👤 <strong>User Controls:</strong> Profile dropdown with avatar</li>
+                        <li>🧭 <strong>Navigation:</strong> Clean menu with hover effects</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-green-800 dark:text-green-300 mb-3">🛠️ Technical Implementation</h2>
+                    <ul class="text-green-700 dark:text-green-300 space-y-2 text-sm">
+                        <li>🎨 <strong>CSS Stripes:</strong> Individual colored bars matching logo</li>
+                        <li>⚡ <strong>Alpine.js:</strong> Interactive dropdowns and toggles</li>
+                        <li>🎛️ <strong>Tailwind CSS:</strong> Utility-first styling</li>
+                        <li>🔄 <strong>Transitions:</strong> Smooth animations and hover effects</li>
+                        <li>📐 <strong>Layout:</strong> Flexbox with proper spacing</li>
+                        <li>♿ <strong>Accessibility:</strong> Proper ARIA and semantic HTML</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg">
+                <h3 class="text-lg font-semibold text-yellow-800 dark:text-yellow-300 mb-2">🎯 Header Components</h3>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-sm">
+                    <div class="text-yellow-700 dark:text-yellow-300">
+                        <strong>Logo Section:</strong>
+                        <ul class="mt-1 space-y-1">
+                            <li>• Colorful stripes</li>
+                            <li>• MVL text</li>
+                            <li>• Brand title</li>
+                        </ul>
+                    </div>
+                    <div class="text-yellow-700 dark:text-yellow-300">
+                        <strong>Navigation:</strong>
+                        <ul class="mt-1 space-y-1">
+                            <li>• Dashboard</li>
+                            <li>• Courses</li>
+                            <li>• Admin</li>
+                        </ul>
+                    </div>
+                    <div class="text-yellow-700 dark:text-yellow-300">
+                        <strong>User Controls:</strong>
+                        <ul class="mt-1 space-y-1">
+                            <li>• Dark/Light toggle</li>
+                            <li>• Profile dropdown</li>
+                            <li>• User avatar</li>
+                        </ul>
+                    </div>
+                    <div class="text-yellow-700 dark:text-yellow-300">
+                        <strong>Mobile:</strong>
+                        <ul class="mt-1 space-y-1">
+                            <li>• Hamburger menu</li>
+                            <li>• Collapsible nav</li>
+                            <li>• Touch-friendly</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg">
+                <h3 class="text-lg font-semibold text-purple-800 dark:text-purple-300 mb-2">🔧 Try These Features</h3>
+                <div class="text-purple-700 dark:text-purple-300 space-y-2 text-sm">
+                    <p>• Click the <strong>sun/moon icon</strong> to toggle dark/light mode</p>
+                    <p>• Click the <strong>user avatar</strong> to see the profile dropdown</p>
+                    <p>• Resize the browser window to see the <strong>responsive behavior</strong></p>
+                    <p>• Hover over navigation items to see the <strong>smooth transitions</strong></p>
+                    <p>• The colorful stripes match the official <strong>MVL logo design</strong></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script defer>
+        (async () => {
+            const host = document.getElementById('header-container');
+            host.innerHTML = await (await fetch('components/header.html')).text();
+        })();
+    </script>
+</body>
+</html>

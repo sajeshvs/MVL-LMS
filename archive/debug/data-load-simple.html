@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Load Test</title>
+    <script src="assets/js/curriculum-data.js"></script>
+</head>
+<body style="padding: 20px; font-family: Arial, sans-serif;">
+    <h1>Curriculum Data Load Test</h1>
+    
+    <div id="status">Loading...</div>
+    
+    <script>
+        function checkData() {
+            const statusDiv = document.getElementById('status');
+            
+            if (window.LESSONS_DATA) {
+                const keys = Object.keys(window.LESSONS_DATA);
+                statusDiv.innerHTML = `
+                    <p><strong>✅ LESSONS_DATA loaded successfully!</strong></p>
+                    <p>Total lessons: ${keys.length}</p>
+                    <p>First 10 keys: ${keys.slice(0, 10).join(', ')}</p>
+                    <p>AC.3.1.1 exists: ${window.LESSONS_DATA['AC.3.1.1'] ? '✅ Yes' : '❌ No'}</p>
+                    ${window.LESSONS_DATA['AC.3.1.1'] ? `<p>AC.3.1.1 title: ${window.LESSONS_DATA['AC.3.1.1'].title}</p>` : ''}
+                `;
+            } else {
+                statusDiv.innerHTML = '<p><strong>❌ LESSONS_DATA not available</strong></p>';
+            }
+        }
+        
+        // Check immediately
+        checkData();
+        
+        // Check again after a short delay
+        setTimeout(checkData, 1000);
+    </script>
+</body>
+</html>

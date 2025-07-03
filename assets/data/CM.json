@@ -1,0 +1,280 @@
+{
+  "id": "CM",
+  "title": "Configuration Management",
+  "lessons": {
+
+    /* ─────────────────────────── 3.4.1 ─────────────────────────── */
+    "3.4.1": {
+      "status": "Incomplete",
+      "readTime": "5 min read",
+      "title": "Baseline Configuration & Inventory",
+      "officialRequirement": "Establish and maintain baseline configurations and inventories of organizational systems (including hardware, software, firmware, and documentation).",
+      "why": "You can’t secure what you don’t know you own. Baselines let MVL spot drift, rollback fast, and prove to DoD assessors that every asset is accounted for.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "**Microsoft Intune** → collects hardware & software inventory every 24 h into Log Analytics.",
+          "**Azure Policy ‘Deploy-If-Not-Exists’** stamps each VM with a CMDB tag: `env`, `owner`, `baselineId`.",
+          "**System Center Configuration Manager (SCCM)** exports monthly snapshot CSV; stored in Acronis vault as immutable evidence.",
+          "Baseline golden images are captured as **Azure Compute Gallery** images (`win10-gcci-baseline-v2025.04`).",
+          "PowerShell DSC config files live in a GitHub repo (`mvl-baselines`) with signed commits and PR review.",
+          "Sentinel analytic **“Baseline Drift”** fires when a VM deviates from JSON baseline by > 2 key settings."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Your Surface rebuilds in 35 min from the **Autopilot** baseline if you run into issues—no more day-long re-images.",
+          "Installing unapproved software removes it at next Intune scan; open a Service Desk request if you truly need it.",
+          "If your machine is missing in CMDB for > 24 h, the SOC pings you to confirm it isn’t lost or stolen."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "Reduces mis-configuration incidents by **80 %** (Gartner 2024 study).",
+          "Keeps MVL’s SPRS scoring evidence ready—auditors view the inventory export and baseline hash.",
+          "Shortens mean-time-to-restore from config error: VM redeploy from gallery in < 10 min."
+        ]
+      },
+      "mvlTips": [
+        "Baseline IDs follow format **BL-YYMM-##**; latest = `BL-2506-01`.",
+        "Weekly **Power BI ‘Baseline Drift’ report** shows top 10 non-compliant devices to the CAB.",
+        "Image change control ticket type = `CM-BASELINE`; auto-adds CISO as reviewer."
+      ],
+      "steps": [
+        "Capture gold images; publish to Azure Compute Gallery.",
+        "Push Intune inventory policy to all device groups.",
+        "Tag Azure resources with baseline metadata via Policy.",
+        "Enable SCCM inventory → export job → Acronis vault.",
+        "Configure Sentinel ‘Baseline Drift’ analytic & dashboard.",
+        "Document procedure in Playbook CM-01."
+      ],
+      "quiz": {
+        "q": "Where does MVL store its immutable monthly baseline snapshot?",
+        "answers": [
+          "SharePoint",
+          "Acronis Cyber Protect vault",
+          "Local NAS",
+          "Dropbox"
+        ],
+        "correctIndex": 1,
+        "explanation": "Snapshots land in the Acronis vault, providing write-once, tamper-evident storage."
+      },
+      "resources": [
+        { "label": "NIST SP 800-171 3.4.1", "url": "https://csrc.nist.gov" },
+        { "label": "Azure Policy Docs", "url": "https://learn.microsoft.com/azure/governance/policy" }
+      ]
+    },
+
+    /* ─────────────────────────── 3.4.2 ─────────────────────────── */
+    "3.4.2": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Secure Configuration Settings",
+      "officialRequirement": "Establish and enforce security configuration settings for information technology products employed in organizational systems.",
+      "why": "Factory defaults equal ‘hack me’. Hardening templates (CIS, STIG) bake security into every build and keep MVL audit-ready.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "**Intune Security Baselines** (M365 + Edge) applied to Windows 11 Surfaces (baseline `MVL-WIN11-SB-01`).",
+          "**Group Policy** for on-prem servers imports **CIS Level 1** `.inf` files via LGPO.",
+          "**Azure Policy Initiative ‘SEC-CFG’** enforces CIS benchmarks on Linux VMs (SSH, root login disabled).",
+          "**Compliance Score** visible in Azure Security Center; alert < 90 % triggers CAB ticket.",
+          "Baseline deviations auto-remediated via **PowerShell DSC** with ‘ApplyAndAutoCorrect’.",
+          "Exceptions require CAB approval, logged in ServiceNow with expiry date."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "You may notice USB is blocked by default and TLS 1.3 is forced—this is part of the baseline.",
+          "If an app breaks after a new policy, ping IT; they’ll create a temporary exception if justified."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "Maintains **≥ 90 %** Azure Secure Score, feeding directly into cyber-insurance premium model.",
+          "CMMC auditors require proof of benchmark adoption—Azure Policy export serves as artefact.",
+          "Reduces critical vulnerability count by **40 %** (CIS benchmarks eliminate weak ciphers, SMBv1, etc.)."
+        ]
+      },
+      "mvlTips": [
+        "Edge browser shows ‘Managed by your organization’—click to view enforced policies.",
+        "Quarterly desktop scan with **CIS-CAT** validates Intune baseline results."
+      ],
+      "steps": [
+        "Import CIS templates into Intune & GPO.",
+        "Assign Azure Policy initiative to all subscriptions.",
+        "Enable DSC auto-remediation; test rollback.",
+        "Document exception workflow in CAB playbook."
+      ],
+      "quiz": {
+        "q": "Which MVL tool auto-remediates Windows deviations from the hardening baseline?",
+        "answers": [
+          "PowerShell DSC",
+          "Azure Sentinel",
+          "Zscaler ZPA",
+          "GitHub Actions"
+        ],
+        "correctIndex": 0
+      },
+      "resources": [
+        { "label": "CIS Benchmark Library", "url": "https://www.cisecurity.org" }
+      ]
+    },
+
+    /* ─────────────────────────── 3.4.3 ─────────────────────────── */
+    "3.4.3": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Track & Approve Configuration Changes",
+      "officialRequirement": "Track, review, approve/disapprove, and log changes to organizational systems.",
+      "why": "Unreviewed changes caused 3 major outages in FY-23. Change control + logging means we can roll back—and auditors can see we’re disciplined.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "**Azure DevOps Pipelines** deploy IaaS and PaaS via Infrastructure-as-Code; every run is tied to a pull-request and work-item.",
+          "**ServiceNow Change Module** handles traditional changes; category ‘Standard’, ‘Normal’, ‘Emergency’.",
+          "GitHub branch protection forces 2-reviewer approval for DSC or ARM changes.",
+          "**Sentinel ‘Change-Control Mismatch’** analytic cross-checks Azure Activity Log with ServiceNow records every hour.",
+          "Failed compliance writes a P1 ticket to the DevOps backlog."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Need a firewall rule or Intune tweak? Submit a ServiceNow Change; expect peer review and CAB in < 48 h (Standard).",
+          "Emergency outages can go live faster, but SOC post-reviews within 24 h."
+        ]
+      },
+      "managementPerspective": {
+        "content": [
+          "Change success rate sits at **98.1 %** post-automation (up from 92 %).",
+          "Tracks to ISO 27001 A.12.1.2 (Change Mgmt) and CMMC evidence simultaneously."
+        ]
+      },
+      "mvlTips": [
+        "CAB meets each Wednesday 10:00 Gulf Time; agenda auto-generated from ServiceNow queue."
+      ],
+      "steps": [
+        "Enforce DevOps branch protection rules.",
+        "Sync ServiceNow API into Sentinel workbook.",
+        "Publish change calendar to all staff."
+      ],
+      "quiz": {
+        "q": "What checks that every Azure change has a matching ServiceNow record?",
+        "answers": [
+          "Intune",
+          "Sentinel analytic 'Change-Control Mismatch'",
+          "Edge browser policy",
+          "Acronis"
+        ],
+        "correctIndex": 1
+      }
+    },
+
+    /* ─────────────────────────── 3.4.4 ─────────────────────────── */
+    "3.4.4": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Analyze Security Impact of Changes",
+      "officialRequirement": "Analyze the security impact of changes prior to implementation.",
+      "why": "A single mis-scoped NSG can expose CUI. Impact analysis keeps nasty surprises off prod.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "**Terraform Plan** runs in DevOps PR, output checked by **Checkov** for policy violations.",
+          "Intune policy preview uses **Settings Catalog report** to show conflicts.",
+          "**Azure Change Analysis** extension shows before/after diff for Web Apps in change ticket."
+        ]
+      },
+      "quiz": {
+        "q": "Which tool scans MVL’s IaC plans for security policy violations pre-merge?",
+        "answers": [
+          "Checkov",
+          "Sysmon",
+          "Power BI",
+          "Excel"
+        ],
+        "correctIndex": 0
+      }
+    },
+
+    /* ─────────────────────────── 3.4.5 ─────────────────────────── */
+    "3.4.5": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Define & Enforce Least Functionality",
+      "officialRequirement": "Define, document, approve, and enforce physical and logical access restrictions associated with changes to the system.",
+      "why": "Bloatware = attack surface. We strip services to only what each role actually needs.",
+      "itPerspective": {
+        "content": [
+          "Windows Surfaces ship with **Intune App Locker** allowing Office, Teams, Edge, Zoom only.",
+          "Servers: DSC disables Telnet, SMB 1.0, legacy IIS modules.",
+          "**Azure Policy** ‘Allowed SKUs’ denies VM families larger than needed."
+        ]
+      }
+    },
+
+    /* ─────────────────────────── 3.4.6 ─────────────────────────── */
+    "3.4.6": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Use Authorized & Supported Software",
+      "officialRequirement": "Only employ software from authorized, verified, and maintained sources.",
+      "why": "Shadow IT packages carry malware. Whitelisting keeps supply-chain risk down.",
+      "itPerspective": {
+        "content": [
+          "Company Portal is the single software catalog; packages signed & vetted.",
+          "Mac devices (design team) use **Jamf App Catalog** with notarized apps only.",
+          "Sentinel UEBA rule flags execution of binaries from `C:\\Users\\Public\\Downloads`."
+        ]
+      }
+    },
+
+    /* ─────────────────────────── 3.4.7 ─────────────────────────── */
+    "3.4.7": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Restrict Ports, Protocols & Services",
+      "officialRequirement": "Restrict, disable, or prevent use of nonessential capabilities, ports, protocols, and/or services.",
+      "why": "Every open port is a target. Least-services keeps attack surface small.",
+      "itPerspective": {
+        "content": [
+          "Azure NSG ‘Deny All Inbound’ default; exposed ports go through Application Gateway WAF.",
+          "Intune Firewall baseline closes SMB 1.0, NetBIOS, RDP (unless Bastion path).",
+          "**Zscaler ZPA** service-discovery tags build per-app whitelists—deny-by-default."
+        ]
+      }
+    },
+
+    /* ─────────────────────────── 3.4.8 ─────────────────────────── */
+    "3.4.8": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Apply Deny-By-Exception Rules",
+      "officialRequirement": "Apply deny-by-exception (whitelisting) policies for communications traffic.",
+      "why": "Instead of chasing bad IPs, we permit only known-good—true zero-trust.",
+      "itPerspective": {
+        "content": [
+          "**Zscaler Policy**: default-deny; applications must be added to allow list by AppID.",
+          "**Windows Defender Application Control** policies set executables to whitelisted hashes.",
+          "Cloud egress passes through **Azure Firewall**; only approved public endpoints allowed for prod subnets."
+        ]
+      },
+      "quiz": {
+        "q": "What cloud service enforces MVL’s default-deny outbound model?",
+        "answers": [
+          "Azure Firewall",
+          "SMB",
+          "GitHub",
+          "Sysmon"
+        ],
+        "correctIndex": 0
+      }
+    }
+
+  }
+}

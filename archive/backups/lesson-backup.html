@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en" :class="{ 'dark': $store.app.theme === 'dark' }" x-data>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - CMMC Lesson</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/heroicons@2.0.16/24/outline/index.js" type="module"></script>    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">    <!-- Header -->
+    <header id="header-container"></header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="lessonData()">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-4">
+                <li>
+                    <a href="courses.html" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300">Courses</a>
+                </li>
+                <li>
+                    <svg class="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a :href="`course.html?id=${domain}`" class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300" x-text="courseName">Course</a>
+                </li>
+                <li>
+                    <svg class="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </li>
+                <li>
+                    <span class="text-gray-900 dark:text-white font-medium" x-text="`${domain}.${requirement}`">Lesson</span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Lesson Header -->
+        <section class="mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" x-text="`${domain}.${requirement}`">AC.3.1.1</span>
+                        <span x-show="isComplete"
+                              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Complete
+                        </span>
+                    </div>
+                    <button @click="markComplete()" 
+                            x-show="!isComplete"
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Mark as Complete</span>
+                    </button>
+                </div>
+                
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4" x-text="lesson.title">Lesson Title</h1>
+                
+                <!-- Lesson Meta -->
+                <div class="flex items-center space-x-6 text-gray-600 dark:text-gray-300 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>5 min read</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        <span x-text="courseName">Course Name</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Quiz included</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lesson Content -->
+        <section class="space-y-8">
+            <!-- Requirement Text -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Official Requirement</h2>
+                <div class="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-400 p-6 rounded-r-lg">
+                    <p class="text-gray-800 dark:text-gray-200 text-lg leading-relaxed" x-text="lesson.text">Official requirement text will appear here</p>
+                </div>
+            </div>            <!-- Why This Matters -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Why This Matters</h2>
+                <div class="editable prose dark:prose-invert max-w-none"
+                     id="lesson-why"
+                     :contenteditable="$store.app.edit"
+                     @blur="$store.app.saveContent('lesson-why', $event.target.innerHTML)">
+                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed" x-text="lesson.why">Explanation of why this requirement is important</p>
+                </div>
+            </div>
+
+            <!-- Multi-Perspective Content -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- IT Professional Perspective -->
+                <div x-show="lesson.itPerspective" class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl shadow-lg p-6 border border-blue-200 dark:border-blue-700">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-blue-900 dark:text-blue-100" x-text="lesson.itPerspective?.title || 'IT Professional View'">IT Professional View</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <template x-for="(item, index) in lesson.itPerspective?.content || []" :key="index">
+                            <li class="flex items-start space-x-2">
+                                <div class="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                                <span class="text-sm text-blue-800 dark:text-blue-200" x-text="item"></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+
+                <!-- Employee Perspective -->
+                <div x-show="lesson.employeePerspective" class="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl shadow-lg p-6 border border-green-200 dark:border-green-700">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-green-900 dark:text-green-100" x-text="lesson.employeePerspective?.title || 'Employee View'">Employee View</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <template x-for="(item, index) in lesson.employeePerspective?.content || []" :key="index">
+                            <li class="flex items-start space-x-2">
+                                <div class="w-1.5 h-1.5 bg-green-600 rounded-full mt-2 flex-shrink-0"></div>
+                                <span class="text-sm text-green-800 dark:text-green-200" x-text="item"></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+
+                <!-- Management Perspective -->
+                <div x-show="lesson.managementPerspective" class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl shadow-lg p-6 border border-purple-200 dark:border-purple-700">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-bold text-purple-900 dark:text-purple-100" x-text="lesson.managementPerspective?.title || 'Management View'">Management View</h3>
+                    </div>
+                    <ul class="space-y-3">
+                        <template x-for="(item, index) in lesson.managementPerspective?.content || []" :key="index">
+                            <li class="flex items-start space-x-2">
+                                <div class="w-1.5 h-1.5 bg-purple-600 rounded-full mt-2 flex-shrink-0"></div>
+                                <span class="text-sm text-purple-800 dark:text-purple-200" x-text="item"></span>
+                            </li>
+                        </template>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- MVL-Specific Tips -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">How MVL Does It</h2>
+                <div class="editable"
+                     id="lesson-mvl-tips"
+                     :contenteditable="$store.app.edit"
+                     @blur="$store.app.saveContent('lesson-mvl-tips', $event.target.innerHTML)">
+                    <div class="space-y-4">
+                        <template x-for="(tip, index) in lesson.mvlTips" :key="index">
+                            <div class="flex items-start space-x-3">
+                                <div class="flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mt-1">
+                                    <svg class="w-3 h-3 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                                <p class="text-gray-700 dark:text-gray-300" x-text="tip">MVL tip content</p>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Implementation Steps -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Implementation Steps</h2>
+                <div class="editable"
+                     id="lesson-steps"
+                     :contenteditable="$store.app.edit"
+                     @blur="$store.app.saveContent('lesson-steps', $event.target.innerHTML)">
+                    <ol class="space-y-4">
+                        <template x-for="(step, index) in lesson.steps" :key="index">
+                            <li class="flex items-start space-x-3">
+                                <span class="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold" x-text="index + 1">1</span>
+                                <p class="text-gray-700 dark:text-gray-300" x-text="step">Implementation step</p>
+                            </li>
+                        </template>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- Knowledge Check Quiz -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8" x-show="lesson.quiz">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Knowledge Check</h2>
+                <div class="space-y-6">
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4" x-text="lesson.quiz?.q">Quiz question</h3>
+                        
+                        <div class="space-y-3">
+                            <template x-for="(answer, index) in lesson.quiz?.answers || []" :key="index">
+                                <label class="flex items-center space-x-3 p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-600"
+                                       :class="quizSubmitted ? (index === lesson.quiz.correctIndex ? 'border-green-500 bg-green-50 dark:bg-green-900/30' : (selectedAnswer === index ? 'border-red-500 bg-red-50 dark:bg-red-900/30' : '')) : (selectedAnswer === index ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30' : '')">
+                                    <input type="radio" 
+                                           :name="`quiz-${domain}-${requirement}`"
+                                           :value="index"
+                                           x-model="selectedAnswer"
+                                           :disabled="quizSubmitted"
+                                           class="text-blue-600 focus:ring-blue-500">
+                                    <span class="text-gray-700 dark:text-gray-300" x-text="answer">Answer option</span>
+                                    <span x-show="quizSubmitted && index === lesson.quiz.correctIndex" 
+                                          class="ml-auto text-green-600 dark:text-green-400">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                    <span x-show="quizSubmitted && selectedAnswer === index && index !== lesson.quiz.correctIndex" 
+                                          class="ml-auto text-red-600 dark:text-red-400">
+                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                </label>
+                            </template>
+                        </div>
+                        
+                        <div class="mt-6 flex items-center justify-between">
+                            <button @click="submitQuiz()" 
+                                    x-show="!quizSubmitted && selectedAnswer !== null"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                                Submit Answer
+                            </button>
+                              <div x-show="quizSubmitted" class="flex items-center space-x-4">
+                                <div x-show="quizCorrect" class="flex items-center space-x-2 text-green-600 dark:text-green-400">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="font-semibold">Correct! Well done!</span>
+                                </div>
+                                <div x-show="!quizCorrect" class="flex items-center space-x-2 text-red-600 dark:text-red-400">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="font-semibold">Incorrect. Try again!</span>
+                                </div>
+                                <button @click="resetQuiz()" 
+                                        x-show="!quizCorrect"
+                                        class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm">
+                                    Retry Quiz
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Quiz Explanation -->
+                        <div x-show="quizSubmitted && lesson.quiz.explanation" class="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                            <h4 class="font-semibold text-blue-900 dark:text-blue-100 mb-2">Explanation:</h4>
+                            <p class="text-blue-800 dark:text-blue-200 text-sm" x-text="lesson.quiz.explanation">Quiz explanation will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-4">Additional Resources</h2>
+                <div class="editable"
+                     id="lesson-resources"
+                     :contenteditable="$store.app.edit"
+                     @blur="$store.app.saveContent('lesson-resources', $event.target.innerHTML)">
+                    <div class="space-y-3">
+                        <template x-for="(resource, index) in lesson.resources" :key="index">
+                            <a :href="resource.url" 
+                               target="_blank"
+                               class="flex items-center space-x-3 p-4 border border-gray-200 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                </svg>
+                                <span class="text-gray-700 dark:text-gray-300 font-medium" x-text="resource.label">Resource label</span>
+                            </a>
+                        </template>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <section class="mt-12 flex items-center justify-between">
+            <a :href="`course.html?id=${domain}`" 
+               class="flex items-center space-x-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                <span>Back to Course</span>
+            </a>
+            
+            <div class="flex items-center space-x-4">
+                <button @click="markComplete()" 
+                        x-show="!isComplete"
+                        class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                    Complete Lesson
+                </button>
+                <a href="courses.html" 
+                   class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+                    Next Lesson
+                </a>
+            </div>
+        </section>
+    </main>    <!-- Footer -->
+    <footer id="footer-container"></footer>
+
+    <script defer>
+        ;(async () => {
+            const [headerTpl, footerTpl] = await Promise.all([
+                fetch('components/header.html').then(r=>r.text()),
+                fetch('components/footer.html').then(r=>r.text())
+            ]);
+            document.getElementById('header-container').innerHTML = headerTpl;
+            document.getElementById('footer-container').innerHTML = footerTpl;
+        })();
+    </script>
+
+    <script>
+        function lessonData() {
+            return {
+                domain: '',
+                requirement: '',
+                courseName: '',
+                lesson: {},
+                isComplete: false,
+                selectedAnswer: null,
+                quizSubmitted: false,
+                quizCorrect: false,
+                
+                init() {
+                    this.domain = getUrlParameter('domain') || 'AC';
+                    this.requirement = getUrlParameter('pr') || '3.1.1';
+                    this.loadLessonData();
+                    this.checkCompletion();                },                  loadLessonData() {
+                    // Use the globally available curriculum data
+                    const rawLesson = (window.LESSONS_DATA?.[this.domain])?.[this.requirement] || this.getDefaultLesson();
+                    
+                    // Create a copy of the lesson data
+                    this.lesson = JSON.parse(JSON.stringify(rawLesson));
+                    
+                    // Randomize quiz answers if quiz exists
+                    if (this.lesson.quiz && this.lesson.quiz.answers) {
+                        this.randomizeQuizAnswers();
+                    }
+                    
+                    console.log('Loaded lesson:', this.lesson);
+                    
+                    // Set course title mapping
+                    const courseTitles = {
+                        'AC': 'Access Control',
+                        'AT': 'Awareness & Training',
+                        'AU': 'Audit & Accountability',
+                        'CM': 'Configuration Management',
+                        'IA': 'Identification & Authentication',
+                        'IR': 'Incident Response',
+                        'MA': 'Maintenance',
+                        'MP': 'Media Protection',
+                        'PS': 'Personnel Security',
+                        'PE': 'Physical Protection',
+                        'RA': 'Risk Assessment',
+                        'CA': 'Security Assessment',
+                        'SC': 'System & Communications Protection',
+                        'SI': 'System & Information Integrity'
+                    };
+                    
+                    this.courseName = courseTitles[this.domain] || 'Unknown Course';
+                },
+                
+                randomizeQuizAnswers() {
+                    // Create array of answers with their original indices
+                    const answersWithIndices = this.lesson.quiz.answers.map((answer, index) => ({
+                        text: answer,
+                        originalIndex: index
+                    }));
+                    
+                    // Shuffle the answers using Fisher-Yates algorithm
+                    for (let i = answersWithIndices.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [answersWithIndices[i], answersWithIndices[j]] = [answersWithIndices[j], answersWithIndices[i]];
+                    }
+                    
+                    // Update the quiz with shuffled answers and new correct index
+                    this.lesson.quiz.answers = answersWithIndices.map(item => item.text);
+                    
+                    // Find the new position of the correct answer
+                    this.lesson.quiz.correctIndex = answersWithIndices.findIndex(
+                        item => item.originalIndex === parseInt(this.lesson.quiz.correctIndex)
+                    );
+                    
+                    console.log('Quiz answers randomized. New correct index:', this.lesson.quiz.correctIndex);
+                },
+                  getDefaultLesson() {
+                    return {
+                        title: 'Sample Lesson Title',
+                        text: 'This is a sample lesson requirement text.',
+                        why: 'This explains why the requirement is important.',
+                        mvlTips: [
+                            'Sample MVL tip - how MVL implements this control',
+                            'Another example of MVL-specific implementation',
+                            'Best practices MVL has learned from experience'
+                        ],
+                        steps: [
+                            'Sample implementation step 1',
+                            'Configure the necessary system settings',
+                            'Test and validate the implementation',
+                            'Document the process and train users'
+                        ],
+                        resources: [
+                            { label: 'Sample Resource Link', url: 'https://example.com' },
+                            { label: 'Documentation Reference', url: 'https://docs.example.com' }
+                        ],
+                        quiz: {
+                            q: 'Sample quiz question?',
+                            answers: ['Option A', 'Option B', 'Option C', 'Option D'],
+                            correctIndex: 0,
+                            explanation: 'This is why the correct answer is correct.'                        }
+                    };
+                },
+                
+                checkCompletion() {
+                    this.isComplete = Alpine.store('app').isLessonComplete(this.domain, this.requirement);
+                },
+                
+                markComplete() {
+                    Alpine.store('app').markLessonComplete(this.domain, this.requirement);
+                    this.isComplete = true;
+                },
+                  submitQuiz() {
+                    if (this.selectedAnswer !== null && this.selectedAnswer !== undefined) {
+                        this.quizSubmitted = true;
+                        // Convert selectedAnswer to number for comparison
+                        const selectedIndex = parseInt(this.selectedAnswer);
+                        const correctIndex = parseInt(this.lesson.quiz.correctIndex);
+                        this.quizCorrect = selectedIndex === correctIndex;
+                        
+                        console.log(`Quiz submitted: Selected=${selectedIndex}, Correct=${correctIndex}, IsCorrect=${this.quizCorrect}`);
+                        
+                        if (this.quizCorrect) {
+                            // Auto-complete lesson if quiz is correct
+                            setTimeout(() => {
+                                this.markComplete();
+                                Alpine.store('app').showToast('Lesson completed! Great job!', 'success');
+                            }, 1000);
+                        } else {
+                            Alpine.store('app').showToast('Incorrect answer. Review the material and try again.', 'error');
+                        }
+                    }
+                },
+                  resetQuiz() {
+                    this.quizSubmitted = false;
+                    this.quizCorrect = false;
+                    this.selectedAnswer = null;
+                    console.log('Quiz reset');
+                    Alpine.store('app').showToast('Quiz reset. Try again!', 'info');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

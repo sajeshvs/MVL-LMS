@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Debug Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Debug Header -->
+    <div class="bg-yellow-100 p-4 border-b">
+        <h1 class="text-xl font-bold">Logo Debug Console</h1>
+        <p>This page will help identify why the logo isn't showing</p>
+    </div>
+
+    <!-- Force visible logo test -->
+    <div class="bg-white p-6 m-4 rounded-lg shadow">
+        <h2 class="text-lg font-bold mb-4">Force Test Logo (Should Always Be Visible)</h2>
+        <div style="
+            width: 80px !important; 
+            height: 80px !important; 
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important; 
+            border: 4px solid white !important; 
+            border-radius: 20px !important; 
+            display: block !important; 
+            position: relative !important;
+            z-index: 99999 !important;
+            color: white !important;
+            font-weight: bold !important;
+            font-size: 24px !important;
+            text-align: center !important;
+            line-height: 72px !important;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3) !important;
+            margin: 20px auto !important;
+        ">MVL</div>
+    </div>
+
+    <!-- Header Component Test -->
+    <header id="header-container"></header>
+
+    <!-- Debug Information -->
+    <div class="bg-white p-6 m-4 rounded-lg shadow">
+        <h2 class="text-lg font-bold mb-4">Debug Information</h2>
+        <div id="debug-info"></div>
+    </div>
+
+    <script defer>
+        // Load header
+        ;(async () => {
+            try {
+                const headerTpl = await fetch('components/header.html').then(r=>r.text());
+                document.getElementById('header-container').innerHTML = headerTpl;
+                
+                // Debug information
+                setTimeout(() => {
+                    const debugInfo = document.getElementById('debug-info');
+                    const logoElements = document.querySelectorAll('[title="MVL Logo"], .mvl-logo-inline, .force-logo');
+                    
+                    let debugText = `<p><strong>Found ${logoElements.length} logo elements:</strong></p><ul>`;
+                    
+                    logoElements.forEach((logo, index) => {
+                        const styles = window.getComputedStyle(logo);
+                        debugText += `<li>Logo ${index + 1}: 
+                            Display: ${styles.display}, 
+                            Visibility: ${styles.visibility}, 
+                            Opacity: ${styles.opacity}, 
+                            Width: ${styles.width}, 
+                            Height: ${styles.height},
+                            Z-index: ${styles.zIndex}
+                        </li>`;
+                    });
+                    
+                    debugText += '</ul>';
+                    
+                    if (logoElements.length === 0) {
+                        debugText += '<p style="color: red; font-weight: bold;">❌ NO LOGO ELEMENTS FOUND! The header component may not be loading properly.</p>';
+                    }
+                    
+                    debugInfo.innerHTML = debugText;
+                }, 1000);
+                
+            } catch (error) {
+                document.getElementById('debug-info').innerHTML = `<p style="color: red;">Error loading header: ${error.message}</p>`;
+            }
+        })();
+    </script>
+</body>
+</html>

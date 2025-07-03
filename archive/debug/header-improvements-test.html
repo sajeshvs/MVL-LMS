@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" :class="{ 'dark': $store.app.theme === 'dark' }" x-data x-cloak>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL Header Test - Responsive Logo & Layout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',   // use with border-mvl-blue / text-mvl-blue etc.
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/app.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">    <!-- Header -->
+    <header id="header-container"></header>
+
+    <!-- Test Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h1 class="text-3xl font-bold text-blue-600 mb-6">Header Improvements Test</h1>
+            
+            <div class="space-y-4">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-green-800 mb-2">✅ Logo Scale Up</h2>
+                    <p class="text-green-700">Logo increased from h-14 (56px) to h-20 (80px) for better visibility</p>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-blue-800 mb-2">✅ Blue Underline Offset</h2>
+                    <p class="text-blue-700">Header padding updated from pl-20 to pl-24 to match new logo size (80px + 16px gap = 96px ≈ pl-24)</p>
+                </div>
+                
+                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-purple-800 mb-2">✅ Title Block Alignment</h2>
+                    <p class="text-purple-700">Title container now uses <code class="bg-purple-100 px-1 rounded">flex flex-col justify-center</code> for perfect vertical alignment and <code class="bg-purple-100 px-1 rounded">border-mvl-blue</code> for consistent colors</p>
+                </div>
+                
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-orange-800 mb-2">✅ Responsive Design</h2>
+                    <ul class="text-orange-700 space-y-1">
+                        <li><strong>Large screens (lg):</strong> h-20 logo, pl-24 padding</li>
+                        <li><strong>Medium screens (md):</strong> h-16 logo, pl-20 padding</li>
+                        <li><strong>Small screens (sm):</strong> h-14 logo, pl-4 padding, stacked layout</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h2 class="text-lg font-semibold text-gray-800 mb-2">🔧 Implementation Details</h2>
+                    <ul class="text-gray-700 space-y-1 text-sm font-mono">
+                        <li>Logo: <code>class="h-20 lg:h-20 md:h-16 sm:h-14 w-auto object-contain"</code></li>
+                        <li>Header: <code>class="... border-mvl-blue pl-24 md:pl-20 sm:pl-4"</code></li>
+                        <li>Title: <code>class="border-l border-mvl-blue ... flex flex-col justify-center"</code></li>
+                        <li>Mobile: <code>class="... sm:flex-col sm:border-l-0 sm:ml-0 sm:pl-0"</code></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <h3 class="text-lg font-semibold text-yellow-800 mb-2">📱 Resize Test</h3>
+                <p class="text-yellow-700">Try resizing your browser window to see the responsive behavior in action. The logo should scale appropriately and the layout should adapt for mobile screens.</p>
+            </div>
+        </div>
+    </main>    <script defer>
+        (async () => {
+            const host = document.getElementById('header-container');
+            host.innerHTML = await (await fetch('components/header.html')).text();
+        })();
+    </script>
+</body>
+</html>

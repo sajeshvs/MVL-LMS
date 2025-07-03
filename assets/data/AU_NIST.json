@@ -1,0 +1,89 @@
+{
+  "familyName": "Audit and Accountability",
+  "familyId": "AU",
+  "controls": [
+    {
+      "id": "03.03.01",
+      "title": "Event Logging",
+      "requirement": "a. Specify the following event types selected for logging within the system: [Assignment: organization-defined event types].\nb. Review and update the event types selected for logging [Assignment: organization-defined frequency].",
+      "discussion": "An event is any observable occurrence in a system, including unlawful or unauthorized system activity. Organizations identify event types for which a logging functionality is needed. This includes events that are relevant to the security of systems and the environments in which those systems operate to meet specific and ongoing auditing needs. Event types can include password changes, the execution of privileged functions, failed logons or accesses related to systems, administrative privilege usage, or third-party credential usage. In determining event types that require logging, organizations consider the system monitoring and auditing that are appropriate for each of the security requirements. When defining event types, organizations consider the logging necessary to cover related events, such as the steps in distributed, transaction-based processes (e.g., processes that are distributed across multiple organizations) and actions that occur in service-oriented or cloud-based architectures.\n\nMonitoring and auditing requirements can be balanced with other system needs. For example, organizations may determine that systems must have the capability to log every file access — both successful and unsuccessful — but only activate that capability under specific circumstances due to the potential burden on system performance. The event types that are logged by organizations may change over time. Reviewing and updating the set of logged event types are necessary to ensure that the current set of event types remains relevant.",
+      "relatedControls": ["AU-02"],
+      "references": [
+        {
+          "title": "SP 800-92 - Guide to Computer Security Log Management",
+          "url": "https://doi.org/10.6028/NIST.SP.800-92"
+        }
+      ]
+    },
+    {
+      "id": "03.03.02",
+      "title": "Audit Record Content",
+      "requirement": "a. Include the following content in audit records:\n1. What type of event occurred\n2. When the event occurred\n3. Where the event occurred\n4. Source of the event\n5. Outcome of the event\n6. Identity of the individuals, subjects, objects, or entities associated with the event\nb. Provide additional information for audit records as needed.",
+      "discussion": "Audit record content that may be necessary to support the auditing function includes time stamps, source and destination addresses, user or process identifiers, event descriptions, file names, and the access control or flow control rules that are invoked. Event outcomes can include indicators of event success or failure and event-specific results (e.g., the security state of the system after the event occurred). Detailed information that organizations consider in audit records may include a full text recording of privileged commands or the individual identities of group account users.",
+      "relatedControls": ["AU-03", "AU-03(01)"],
+      "references": []
+    },
+    {
+      "id": "03.03.03",
+      "title": "Audit Record Generation",
+      "requirement": "a. Generate audit records for the selected event types and audit record content specified in 03.03.01 and 03.03.02.\nb. Retain audit records for a time period consistent with the records retention policy.",
+      "discussion": "Audit records can be generated at various levels of abstraction, including at the packet level as information traverses the network. Selecting the appropriate level of abstraction is a critical aspect of an audit logging capability and can facilitate the identification of root causes to problems. The ability to add information generated in audit records is dependent on system functionality to configure the audit record content. Organizations may consider additional information in audit records, including the access control or flow control rules invoked and the individual identities of group account users. Organizations may also consider limiting additional audit record information to only information that is explicitly needed for audit requirements.",
+      "relatedControls": ["AU-11", "AU-12"],
+      "references": [
+        {
+          "title": "SP 800-92 - Guide to Computer Security Log Management",
+          "url": "https://doi.org/10.6028/NIST.SP.800-92"
+        }
+      ]
+    },
+    {
+      "id": "03.03.04",
+      "title": "Response to Audit Logging Process Failures",
+      "requirement": "a. Alert organizational personnel or roles within [Assignment: organization-defined time period] in the event of an audit logging process failure.\nb. Take the following additional actions: [Assignment: organization-defined additional actions].",
+      "discussion": "Audit logging process failures include software and hardware errors, failures in audit log capturing mechanisms, and reaching or exceeding audit log storage capacity. Response actions include overwriting the oldest audit records, shutting down the system, and stopping the generation of audit records. Organizations may choose to define additional actions for audit logging process failures based on the type of failure, the location of the failure, the severity of the failure, or a combination of such factors. When the audit logging process failure is related to storage, the response is carried out for the audit log storage repository (i.e., the distinct system component where the audit logs are stored), the system on which the audit logs reside, the total audit log storage capacity of the organization (i.e., all audit log storage repositories combined), or all three. Organizations may decide to take no additional actions after alerting designated roles or personnel.",
+      "relatedControls": ["AU-05"],
+      "references": []
+    },
+    {
+      "id": "03.03.05",
+      "title": "Audit Record Review, Analysis, and Reporting",
+      "requirement": "a. Review and analyze system audit records [Assignment: organization-defined frequency] for indications and the potential impact of inappropriate or unusual activity.\nb. Report findings to organizational personnel or roles.\nc. Analyze and correlate audit records across different repositories to gain organization-wide situational awareness.",
+      "discussion": "Audit record review, analysis, and reporting cover information security logging performed by organizations and can include logging that results from the monitoring of account usage, remote access, wireless connectivity, configuration settings, the use of maintenance tools and nonlocal maintenance, system component inventory, mobile device connection, equipment delivery and removal, physical access, temperature and humidity, communications at system interfaces, and the use of mobile code. Findings can be reported to organizational entities, such as the incident response team, help desk, and security or privacy offices. If organizations are prohibited from reviewing and analyzing audit records or unable to conduct such activities, the review or analysis may be carried out by other organizations granted such authority. The scope, frequency, and/or depth of the audit record review, analysis, and reporting may be adjusted to meet organizational needs based on new information received. Correlating audit record review, analysis, and reporting processes helps to ensure that audit records collectively create a more complete view of events.",
+      "relatedControls": ["AU-06", "AU-06(03)"],
+      "references": [
+        {
+          "title": "SP 800-86 - Guide to Integrating Forensic Techniques into Incident Response",
+          "url": "https://doi.org/10.6028/NIST.SP.800-86"
+        },
+        {
+          "title": "SP 800-101 - Guidelines for Mobile Device Forensics",
+          "url": "https://doi.org/10.6028/NIST.SP.800-101"
+        }
+      ]
+    },
+    {
+      "id": "03.03.06",
+      "title": "Audit Record Reduction and Report Generation",
+      "requirement": "a. Implement an audit record reduction and report generation capability that supports audit record review, analysis, reporting requirements, and after-the-fact investigations of incidents.\nb. Preserve the original content and time ordering of audit records.",
+      "discussion": "Audit records are generated in 03.03.03. Audit record reduction and report generation occur after audit record generation. Audit record reduction is a process that manipulates collected audit information and organizes it in a summary format that is more meaningful to analysts. Audit record reduction and report generation capabilities do not always come from the same system or organizational entities that conduct auditing activities. An audit record reduction capability can include, for example, modern data mining techniques with advanced data filters to identify anomalous behavior in audit records. The report generation capability provided by the system can help generate customizable reports. The time ordering of audit records can be a significant issue if the granularity of the time stamp in the record is insufficient.",
+      "relatedControls": ["AU-07"],
+      "references": []
+    },
+    {
+      "id": "03.03.07",
+      "title": "Time Stamps",
+      "requirement": "a. Use internal system clocks to generate time stamps for audit records.\nb. Record time stamps for audit records that meet [Assignment: organization-defined granularity of time measurement] and that use Coordinated Universal Time (UTC), have a fixed local time offset from UTC, or include the local time offset as part of the time stamp.",
+      "discussion": "Time stamps generated by the system include the date and time. Time is often expressed in Coordinated Universal Time (UTC) — a modern continuation of Greenwich Mean Time (GMT) — or local time with an offset from UTC. The granularity of time measurements refers to the degree of synchronization between system clocks and reference clocks (e.g., clocks synchronizing within hundreds or tens of milliseconds). Organizations may define different time granularities for system components. Time service can be critical to other security capabilities (e.g., access control and identification and authentication), depending on the nature of the mechanisms used to support those capabilities.",
+      "relatedControls": ["AU-08"],
+      "references": []
+    },
+    {
+      "id": "03.03.08",
+      "title": "Protection of Audit Information",
+      "requirement": "a. Protect audit information and audit logging tools from unauthorized access, modification, and deletion.\nb. Authorize access to management of audit logging functionality to only a subset of privileged users or roles.",
+      "discussion": "Audit information includes the information needed to successfully audit system activity, such as audit records, audit log settings, audit reports, and personally identifiable information. Audit logging tools are programs and devices used to conduct audit and logging activities. The protection of audit information focuses on technical protection and limits the ability to access and execute audit logging tools to authorized individuals. The physical protection of audit information is addressed by media and physical protection requirements.\n\nIndividuals or roles with privileged access to a system and who are also the subject of an audit by that system may affect the reliability of the audit information by inhibiting audit activities or modifying audit records. Requiring privileged access to be further defined between audit-related privileges and other privileges limits the number of users or roles with audit-related privileges.",
+      "relatedControls": ["AU-09", "AU-09(04)"],
+      "references": []
+    }
+  ]
+}

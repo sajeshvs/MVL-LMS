@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - CMMC Lesson</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <style>
+        /* Custom styles for lesson content */
+        .lesson-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .section-header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .section-content {
+            padding: 1.5rem;
+        }
+        .implementation-step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #3b82f6;
+        }
+        .quiz-option {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        .quiz-option.correct {
+            background: #dcfce7;
+            border-color: #16a34a;
+        }
+        .quiz-option.incorrect {
+            background: #fef2f2;
+            border-color: #dc2626;
+        }
+        .breadcrumb-link {
+            color: #6b7280;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .breadcrumb-link:hover {
+            color: #374151;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header Navigation -->
+    <header class="bg-gradient-to-r from-slate-50 to-blue-50 shadow-lg border-b-4 border-blue-600">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex items-center space-x-6">
+                    <div class="border-l-2 border-blue-600 pl-6">
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">MVL-LMS</h1>
+                        <p class="text-sm text-gray-600 font-medium">CMMC 2.0 Learning Management System</p>
+                    </div>
+                </div>
+                <nav class="flex space-x-6">
+                    <a href="index.html" class="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 font-medium">
+                        Dashboard
+                    </a>
+                    <a href="courses.html" class="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 font-medium">
+                        Courses
+                    </a>
+                    <a href="admin.html" class="flex items-center space-x-2 px-3 py-2 rounded-lg text-gray-700 hover:bg-blue-100 font-medium">
+                        Admin
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="lessonData()">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-4">
+                <li>
+                    <a href="courses.html" class="breadcrumb-link">Courses</a>
+                </li>
+                <li>
+                    <svg class="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a :href="`course.html?id=${domain}`" class="breadcrumb-link" x-text="courseName">Course</a>
+                </li>
+                <li>
+                    <svg class="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </li>
+                <li>
+                    <span class="text-gray-900 font-medium" x-text="lessonId">Lesson</span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Lesson Header -->
+        <section class="lesson-section">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-500 bg-opacity-30 text-blue-100" x-text="lessonId">AC.L2-3.1.1</span>
+                        <span x-show="isComplete"
+                              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Complete
+                        </span>
+                    </div>
+                    <button @click="markComplete()" 
+                            x-show="!isComplete"
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Mark as Complete</span>
+                    </button>
+                </div>
+                
+                <h1 class="text-4xl font-bold mb-4" x-text="lesson.title">Limit System Access to Authorized Users</h1>
+                
+                <div class="flex items-center space-x-6 text-blue-100 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span x-text="lesson.readTime">5 min read</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        <span x-text="courseName">Access Control</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Quiz included</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Official Requirement Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                🔑 Official Requirement
+            </div>
+            <div class="section-content">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-blue-900 mb-2" x-text="lessonId">CMMC v2 – AC.L2-3.1.1</h3>
+                    <p class="text-blue-800 text-lg italic" x-text="lesson.officialRequirement">
+                        "Limit system access to authorized users, processes acting on behalf of authorized users, or devices (including other systems)."
+                    </p>
+                </div>
+            </div>
+        </section>        <!-- Why This Matters Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                🎯 Why This Matters
+            </div>
+            <div class="section-content">
+                <div class="space-y-3" x-html="whyMattersContent">
+                    <!-- Dynamic content loaded from curriculum data -->
+                </div>
+            </div>
+        </section>
+
+        <!-- How MVL Does It Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                🏢 How MVL Does It
+            </div>
+            <div class="section-content">
+                <div class="space-y-3" x-html="howMVLDoesContent">
+                    <!-- Dynamic content loaded from curriculum data -->
+                </div>
+            </div>
+        </section><!-- Implementation Steps Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                🛠️ Implementation Steps
+            </div>
+            <div class="section-content">
+                <div class="space-y-4" x-html="getImplementationSteps()">
+                    <!-- Dynamic content loaded from curriculum data -->
+                </div>
+            </div>
+        </section>        <!-- Knowledge Check Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                🧠 Knowledge Check (5-Question Quiz)
+            </div>
+            <div class="section-content" x-data="quizData()">
+                <div class="space-y-6" x-html="quizContent">
+                    <!-- Dynamic quiz content loaded from curriculum data -->
+                </div>
+
+                <!-- Quiz Results -->
+                <div x-show="allAnswered()" class="mt-6 p-4 rounded-lg" :class="getQuizResultClass()">
+                    <div class="flex items-center space-x-2">
+                        <svg x-show="getScore() >= 4" class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg x-show="getScore() < 4" class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="font-semibold" x-text="getScoreText()"></span>
+                    </div>
+                </div>
+            </div>
+        </section>        <!-- Additional Resources Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                📚 Additional Resources
+            </div>
+            <div class="section-content">
+                <div class="space-y-3" x-html="additionalResourcesContent">
+                    <!-- Dynamic content loaded from curriculum data -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <section class="flex justify-between items-center mt-8">
+            <a href="course.html?id=AC" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Course
+            </a>
+            
+            <button @click="markComplete(); nextLesson()" 
+                    class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                <span x-text="isComplete ? 'Next Lesson' : 'Complete & Continue'">Complete & Continue</span>
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <p class="text-center text-gray-500 text-sm">
+                © 2024 MVL Group. All rights reserved. | CMMC 2.0 Training Platform
+            </p>
+        </div>
+    </footer>
+
+    <!-- Load curriculum data and app functionality -->
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+
+    <script>
+        function lessonData() {
+            return {
+                domain: 'AC',
+                requirement: '3.1.1',
+                lessonId: 'AC.L2-3.1.1',
+                courseName: 'Access Control',
+                isComplete: false,                lesson: {
+                    title: 'Limit System Access to Authorized Users',
+                    readTime: '5 min read',
+                    officialRequirement: 'Limit system access to authorized users, processes acting on behalf of authorized users, or devices (including other systems).',
+                    whyMatters: 'Loading...',
+                    howMVLDoes: 'Loading...'
+                },
+                  // Make these reactive properties                get whyMattersContent() {
+                    const lessonKey = this.findLessonKey();
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                        const lessonData = window.LESSONS_DATA[lessonKey];
+                        
+                        // New enhanced format (array)
+                        if (lessonData.whyMatters && Array.isArray(lessonData.whyMatters)) {
+                            return lessonData.whyMatters.map(item => `
+                                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                    <p class="text-gray-700">${item}</p>
+                                </div>
+                            `).join('');
+                        }
+                        
+                        // Legacy format (string in 'why' field)
+                        if (lessonData.why && typeof lessonData.why === 'string') {
+                            return `
+                                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                    <p class="text-gray-700">${lessonData.why}</p>
+                                </div>
+                            `;
+                        }
+                    }
+                    
+                    // Fallback content
+                    return `
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <p class="text-gray-700">This control is essential for CMMC Level 2 certification and protecting sensitive government information.</p>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <p class="text-gray-700">Helps prevent unauthorized access and ensures compliance with federal cybersecurity requirements.</p>
+                        </div>
+                    `;
+                },                
+                get howMVLDoesContent() {
+                    const lessonKey = this.findLessonKey();
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                        const lessonData = window.LESSONS_DATA[lessonKey];
+                        
+                        // New enhanced format (array)
+                        if (lessonData.howMVLDoes && Array.isArray(lessonData.howMVLDoes)) {
+                            return lessonData.howMVLDoes.map(item => `
+                                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                    <p class="text-gray-700">${item}</p>
+                                </div>
+                            `).join('');
+                        }
+                        
+                        // Legacy format - generate from available perspective data
+                        if (lessonData.itPerspective || lessonData.employeePerspective) {
+                            let content = '';
+                            if (lessonData.itPerspective && lessonData.itPerspective.content) {
+                                // Extract key points from IT perspective
+                                const itContent = lessonData.itPerspective.content;
+                                const toolsMatch = itContent.match(/\*\*Tools Used:\*\*(.+?)$/m);
+                                if (toolsMatch) {
+                                    content += `
+                                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                            <p class="text-gray-700">MVL uses integrated security tools: ${toolsMatch[1].trim()}</p>
+                                        </div>
+                                    `;
+                                }
+                            }
+                            if (content) return content;
+                        }
+                    }
+                    
+                    // Fallback content
+                    return `
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <p class="text-gray-700">MVL implements this control using our integrated security stack in the GCC High environment</p>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <p class="text-gray-700">Leverages Microsoft 365, Azure AD, Zscaler ZPA, and Defender for Business for comprehensive protection</p>
+                        </div>
+                    `;
+                },
+                  getQuizContent() {
+                    console.log('🎯 getQuizContent called');
+                    const lessonKey = this.findLessonKey();
+                    console.log('🔑 Quiz lesson key:', lessonKey);
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                        const lessonData = window.LESSONS_DATA[lessonKey];
+                        console.log('📚 Lesson data found for quiz');
+                        
+                        // New enhanced format (array of questions)
+                        if (lessonData.quiz && Array.isArray(lessonData.quiz)) {
+                            console.log('✅ Enhanced quiz array found:', lessonData.quiz.length);
+                            this.correctAnswers = {};
+                            
+                            const quizHTML = lessonData.quiz.map((q, index) => {
+                                const questionNum = index + 1;
+                                // Extract correct answer from options (look for ✅ emoji)
+                                let correctAnswer = 'A';
+                                q.options.forEach((option, optIndex) => {
+                                    if (option.includes('✅')) {
+                                        correctAnswer = String.fromCharCode(65 + optIndex); // A, B, C, D
+                                    }
+                                });
+                                this.correctAnswers[questionNum] = correctAnswer;
+                                
+                                const options = q.options.map((option, optIndex) => {
+                                    const letter = String.fromCharCode(65 + optIndex);
+                                    return `
+                                        <div class="quiz-option" @click="selectAnswer(${questionNum}, '${letter}')" :class="getAnswerClass(${questionNum}, '${letter}')">
+                                            <strong>${letter}.</strong> ${option.replace('✅', '').trim()}
+                                        </div>
+                                    `;
+                                }).join('');
+                                
+                                return `
+                                    <div class="quiz-question">
+                                        <h4 class="font-semibold text-gray-900 mb-3">${questionNum}. ${q.question}</h4>
+                                        <div class="space-y-2">
+                                            ${options}
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('');
+                            
+                            console.log('✅ Enhanced quiz HTML generated successfully');
+                            return quizHTML;
+                        }
+                        
+                        // Legacy format (single quiz object)
+                        if (lessonData.quiz && lessonData.quiz.question) {
+                            console.log('✅ Legacy quiz object found, converting');
+                            const quiz = lessonData.quiz;
+                            this.correctAnswers = { 1: String.fromCharCode(65 + quiz.correct) }; // Convert number to letter
+                            
+                            const options = quiz.options.map((option, index) => {
+                                const letter = String.fromCharCode(65 + index);
+                                return `
+                                    <div class="quiz-option" @click="selectAnswer(1, '${letter}')" :class="getAnswerClass(1, '${letter}')">
+                                        <strong>${letter}.</strong> ${option}
+                                    </div>
+                                `;
+                            }).join('');
+                            
+                            return `
+                                <div class="quiz-question">
+                                    <h4 class="font-semibold text-gray-900 mb-3">1. ${quiz.question}</h4>
+                                    <div class="space-y-2">
+                                        ${options}
+                                    </div>
+                                </div>
+                            `;
+                        }
+                        
+                        console.log('⚠️ No valid quiz format found in lesson data');
+                    }
+                    
+                    console.log('⚠️ Using fallback quiz content');
+                    // Set up fallback correct answers
+                    this.correctAnswers = { 1: 'A' };
+                    
+                    // Fallback quiz content
+                    return `
+                        <div class="quiz-question">
+                            <h4 class="font-semibold text-gray-900 mb-3">1. This control is essential for CMMC Level 2 certification.</h4>
+                            <div class="space-y-2">
+                                <div class="quiz-option" @click="selectAnswer(1, 'A')" :class="getAnswerClass(1, 'A')">
+                                    <strong>A.</strong> True
+                                </div>
+                                <div class="quiz-option" @click="selectAnswer(1, 'B')" :class="getAnswerClass(1, 'B')">
+                                    <strong>B.</strong> False
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                },                
+                get additionalResourcesContent() {
+                    const lessonKey = this.findLessonKey();
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                        const lessonData = window.LESSONS_DATA[lessonKey];
+                        
+                        // New enhanced format (additionalResources array)
+                        if (lessonData.additionalResources && Array.isArray(lessonData.additionalResources)) {
+                            return lessonData.additionalResources.map(resource => `
+                                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                    <p class="text-gray-700">${resource}</p>
+                                </div>
+                            `).join('');
+                        }
+                        
+                        // Legacy format (resources array with objects)
+                        if (lessonData.resources && Array.isArray(lessonData.resources)) {
+                            return lessonData.resources.map(resource => {
+                                if (typeof resource === 'object' && resource.title) {
+                                    return `
+                                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                            <h4 class="font-semibold text-gray-900">${resource.title}</h4>
+                                            <p class="text-gray-600 text-sm">${resource.description}</p>
+                                            <a href="${resource.url}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">${resource.title} →</a>
+                                        </div>
+                                    `;
+                                } else {
+                                    return `
+                                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                            <p class="text-gray-700">${resource}</p>
+                                        </div>
+                                    `;
+                                }
+                            }).join('');
+                        }
+                    }
+                    
+                    // Fallback content
+                    return `
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <h4 class="font-semibold text-gray-900">NIST SP 800-171 Reference</h4>
+                            <p class="text-gray-600 text-sm">Official NIST guidance for this control requirement</p>
+                            <a href="https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">View NIST SP 800-171 →</a>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <h4 class="font-semibold text-gray-900">CMMC Assessment Guide</h4>
+                            <p class="text-gray-600 text-sm">Official CMMC assessment procedures and evidence requirements</p>
+                            <a href="https://www.acq.osd.mil/cmmc/" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">View CMMC Resources →</a>
+                        </div>
+                    `;                },
+
+                init() {
+                    console.log('Initializing lesson data...');
+                    this.loadLessonFromUrl();
+                    
+                    // Wait for curriculum data to be available
+                    this.waitForCurriculumData().then(() => {
+                        this.loadLessonData();
+                        this.checkCompletion();
+                    });
+                },
+
+                async waitForCurriculumData(maxAttempts = 50) {
+                    for (let i = 0; i < maxAttempts; i++) {
+                        if (window.LESSONS_DATA && Object.keys(window.LESSONS_DATA).length > 0) {
+                            console.log('Curriculum data is ready');
+                            return true;
+                        }
+                        console.log(`Waiting for curriculum data... attempt ${i + 1}`);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    console.error('Curriculum data failed to load after maximum attempts');
+                    return false;
+                },
+
+                loadLessonFromUrl() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.domain = urlParams.get('domain') || 'AC';
+                    
+                    // Handle both 'pr' (from course navigation) and 'requirement' (direct access) parameters
+                    const prParam = urlParams.get('pr');
+                    const requirementParam = urlParams.get('requirement');
+                    
+                    if (prParam) {
+                        // If pr param contains the full lesson ID (e.g., "AC.3.1.1"), extract the requirement part
+                        if (prParam.includes('.')) {
+                            const parts = prParam.split('.');
+                            this.requirement = parts.slice(1).join('.'); // Take everything after domain
+                        } else {
+                            this.requirement = prParam;
+                        }
+                    } else {
+                        this.requirement = requirementParam || '3.1.1';
+                    }
+                    
+                    this.lessonId = `${this.domain}.L2-3.${this.requirement}`;
+                    
+                    console.log('🔍 URL Parameters:', {
+                        domain: this.domain,
+                        prParam: prParam,
+                        requirementParam: requirementParam,
+                        finalRequirement: this.requirement,
+                        lessonId: this.lessonId
+                    });
+                    
+                    // Update course name based on domain
+                    const courseNames = {
+                        'AC': 'Access Control',
+                        'AT': 'Awareness & Training',
+                        'AU': 'Audit & Accountability',
+                        'CM': 'Configuration Management',
+                        'IA': 'Identification & Authentication',
+                        'IR': 'Incident Response',
+                        'MA': 'Maintenance',
+                        'MP': 'Media Protection',
+                        'PS': 'Personnel Security',
+                        'PE': 'Physical Protection',
+                        'RA': 'Risk Assessment',
+                        'CA': 'Security Assessment',
+                        'SC': 'System & Communications Protection',
+                        'SI': 'System & Information Integrity'
+                    };
+                    this.courseName = courseNames[this.domain] || 'Course';
+                },loadLessonData() {
+                    console.log('Loading lesson data...');
+                    console.log('window.LESSONS_DATA available:', !!window.LESSONS_DATA);
+                    console.log('Domain:', this.domain, 'Requirement:', this.requirement);
+                    
+                    // Try to load from curriculum data
+                    if (window.LESSONS_DATA) {
+                        const allKeys = Object.keys(window.LESSONS_DATA);
+                        console.log('Total available keys:', allKeys.length);
+                        console.log('First few keys:', allKeys.slice(0, 5));
+                        
+                        // Try different key formats
+                        const possibleKeys = [
+                            `${this.domain}.${this.requirement}`,           // AC.3.1.1
+                            `${this.domain}.L2-3.${this.requirement}`,      // AC.L2-3.3.1.1
+                            `${this.domain}-${this.requirement}`,           // AC-3.1.1
+                            `${this.domain}_${this.requirement}`,           // AC_3.1.1
+                        ];
+                        
+                        let lessonKey = null;
+                        let lessonData = null;
+                        
+                        // First try exact matches
+                        for (const key of possibleKeys) {
+                            if (window.LESSONS_DATA[key]) {
+                                lessonKey = key;
+                                lessonData = window.LESSONS_DATA[key];
+                                console.log('Found exact match with key:', key);
+                                break;
+                            }
+                        }
+                        
+                        // If no exact match, try substring search
+                        if (!lessonKey) {
+                            lessonKey = allKeys.find(key => 
+                                key.includes(this.domain) && key.includes(this.requirement)
+                            );
+                            if (lessonKey) {
+                                lessonData = window.LESSONS_DATA[lessonKey];
+                                console.log('Found substring match with key:', lessonKey);
+                            }
+                        }
+                        
+                        console.log('Found lesson key:', lessonKey);
+                          if (lessonKey && lessonData) {
+                            console.log('Lesson data found:', lessonData);
+                            
+                            // Update lesson object properties
+                            this.lesson.title = lessonData.title || this.lesson.title;
+                            this.lesson.readTime = lessonData.readTime || this.lesson.readTime;
+                            this.lesson.officialRequirement = lessonData.officialRequirement || lessonData.why || this.lesson.officialRequirement;
+                            this.lesson.whyMatters = this.formatWhyMatters(lessonData);
+                            this.lesson.howMVLDoes = this.formatHowMVLDoes(lessonData);
+                            
+                            console.log('Updated lesson object:', this.lesson);
+                            
+                            // Force Alpine.js to detect changes
+                            this.$nextTick(() => {
+                                console.log('NextTick - lesson.whyMatters:', this.lesson.whyMatters);
+                                console.log('NextTick - lesson.howMVLDoes:', this.lesson.howMVLDoes);
+                            });
+                        } else {
+                            console.log('No lesson data found for any key variations');
+                            console.log('Searched for keys:', possibleKeys);
+                        }
+                    } else {
+                        console.log('window.LESSONS_DATA not available');
+                    }
+                },formatWhyMatters(lessonData) {
+                    console.log('formatWhyMatters called with:', lessonData);
+                    if (lessonData.whyMatters && Array.isArray(lessonData.whyMatters)) {
+                        console.log('Using whyMatters array:', lessonData.whyMatters);
+                        return lessonData.whyMatters.map(item => `
+                            <div class="flex items-start space-x-3">
+                                <span class="text-red-500 text-xl">•</span>
+                                <span>${item}</span>
+                            </div>
+                        `).join('');
+                    }
+                    console.log('Falling back to why field:', lessonData.why);
+                    return lessonData.why || '';
+                },                formatHowMVLDoes(lessonData) {
+                    if (lessonData.howMVLDoes && Array.isArray(lessonData.howMVLDoes)) {
+                        return lessonData.howMVLDoes.map((item, index) => `
+                            <div class="flex items-start space-x-3">
+                                <span class="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm font-bold">${index + 1}</span>
+                                <span>${item}</span>
+                            </div>
+                        `).join('');
+                    }
+                    if (lessonData.mvlTips && Array.isArray(lessonData.mvlTips)) {
+                        return lessonData.mvlTips.join('<br>');
+                    }
+                    return '';
+                },                findLessonKey() {
+                    console.log('🔍 findLessonKey called with domain:', this.domain, 'requirement:', this.requirement);
+                    
+                    if (!window.LESSONS_DATA) {
+                        console.log('❌ window.LESSONS_DATA not available');
+                        return null;
+                    }
+                    
+                    const allKeys = Object.keys(window.LESSONS_DATA);
+                    console.log('📋 Available keys:', allKeys.length, 'total');
+                    
+                    // Try different key formats
+                    const possibleKeys = [
+                        `${this.domain}.${this.requirement}`,           // AC.3.1.1
+                        `${this.domain}.L2-3.${this.requirement}`,      // AC.L2-3.3.1.1
+                        `${this.domain}-${this.requirement}`,           // AC-3.1.1
+                        `${this.domain}_${this.requirement}`,           // AC_3.1.1
+                    ];
+                    
+                    console.log('🔑 Trying possible keys:', possibleKeys);
+                    
+                    // First try exact matches
+                    for (const key of possibleKeys) {
+                        if (window.LESSONS_DATA[key]) {
+                            console.log('✅ Found exact match:', key);
+                            return key;
+                        }
+                    }
+                    
+                    // If no exact match, try substring search
+                    const foundKey = allKeys.find(key => 
+                        key.includes(this.domain) && key.includes(this.requirement)
+                    );
+                    
+                    if (foundKey) {
+                        console.log('✅ Found substring match:', foundKey);
+                    } else {
+                        console.log('❌ No matching key found');
+                    }
+                    
+                    return foundKey || null;
+                },getImplementationSteps() {
+                    const lessonKey = this.findLessonKey();
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                        const lessonData = window.LESSONS_DATA[lessonKey];
+                        
+                        if (lessonData.implementationSteps && Array.isArray(lessonData.implementationSteps)) {
+                            return lessonData.implementationSteps.map(step => `
+                                <div class="implementation-step">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">${step.step}️⃣</span>
+                                        <h4 class="font-semibold text-gray-900">${step.title}</h4>
+                                    </div>
+                                    <p class="text-gray-700 ml-11">${step.description}</p>
+                                </div>
+                            `).join('');
+                        }
+                        
+                        if (lessonData.steps && Array.isArray(lessonData.steps)) {
+                            return lessonData.steps.map(step => `
+                                <div class="implementation-step">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">${step.step}️⃣</span>
+                                        <h4 class="font-semibold text-gray-900">${step.title}</h4>
+                                    </div>
+                                    <p class="text-gray-700 ml-11">${step.description}</p>
+                                </div>
+                            `).join('');
+                        }
+                    }
+                    
+                    // Fallback content
+                    return `
+                        <div class="implementation-step">
+                            <div class="flex items-center space-x-3 mb-2">
+                                <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">1️⃣</span>
+                                <h4 class="font-semibold text-gray-900">Assessment</h4>
+                            </div>
+                            <p class="text-gray-700 ml-11">Review current implementation against CMMC requirements.</p>
+                        </div>
+                    `;
+                },
+
+                checkCompletion() {
+                    const key = `lesson_${this.domain}_${this.requirement}`;
+                    this.isComplete = localStorage.getItem(key) === 'completed';
+                },
+
+                markComplete() {
+                    const key = `lesson_${this.domain}_${this.requirement}`;
+                    localStorage.setItem(key, 'completed');
+                    localStorage.setItem(`${key}_date`, new Date().toISOString());
+                    this.isComplete = true;
+                    
+                    // Show success message
+                    this.showToast('Lesson completed successfully! 🎉');
+                },
+
+                nextLesson() {
+                    // Navigate back to course page
+                    window.location.href = `course.html?id=${this.domain}`;
+                },
+
+                showToast(message) {
+                    // Simple toast notification
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                    toast.textContent = message;
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 3000);
+                }
+            }
+        }        function quizData() {
+            return {
+                answers: {},
+                correctAnswers: {},
+
+                init() {
+                    this.loadQuizData();
+                },                loadQuizData() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const domain = urlParams.get('domain') || 'AC';
+                    
+                    // Handle both 'pr' (from course navigation) and 'requirement' (direct access) parameters
+                    const prParam = urlParams.get('pr');
+                    const requirementParam = urlParams.get('requirement');
+                    
+                    let requirement;
+                    if (prParam) {
+                        // If pr param contains the full lesson ID (e.g., "AC.3.1.1"), extract the requirement part
+                        if (prParam.includes('.')) {
+                            const parts = prParam.split('.');
+                            requirement = parts.slice(1).join('.'); // Take everything after domain
+                        } else {
+                            requirement = prParam;
+                        }
+                    } else {
+                        requirement = requirementParam || '3.1.1';
+                    }
+                    
+                    console.log('🎯 Quiz loading with domain:', domain, 'requirement:', requirement);
+                    
+                    if (window.LESSONS_DATA) {
+                        const lessonKey = Object.keys(window.LESSONS_DATA).find(key => 
+                            key.includes(domain) && key.includes(requirement)
+                        );
+                        
+                        console.log('🔑 Quiz lesson key found:', lessonKey);
+                        
+                        if (lessonKey && window.LESSONS_DATA[lessonKey] && window.LESSONS_DATA[lessonKey].quiz) {
+                            const quizData = window.LESSONS_DATA[lessonKey].quiz;
+                            console.log('📝 Quiz data loaded:', quizData.length, 'questions');
+                            quizData.forEach((q, index) => {
+                                this.correctAnswers[index + 1] = q.correct;
+                            });
+                        } else {
+                            console.log('⚠️ No quiz data found, using defaults');
+                            // Default answers for other lessons
+                            this.correctAnswers = {
+                                1: 'B',
+                                2: 'A', 
+                                3: 'B',
+                                4: 'B',
+                                5: 'C'
+                            };
+                        }
+                    }
+                },getQuizContent() {
+                    console.log('🎯 getQuizContent called');
+                    const lessonKey = this.findLessonKey();
+                    console.log('🔑 Quiz lesson key:', lessonKey);
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey] && window.LESSONS_DATA[lessonKey].quiz) {
+                        const quizData = window.LESSONS_DATA[lessonKey].quiz;
+                        console.log('📝 Quiz data found:', quizData.length, 'questions');
+                        
+                        // Set up correct answers
+                        this.correctAnswers = {};
+                        quizData.forEach((q, index) => {
+                            this.correctAnswers[index + 1] = q.correct;
+                        });
+                        
+                        const quizHTML = quizData.map((q, index) => {
+                            const questionNum = index + 1;
+                            const options = q.options.map((option, optIndex) => {
+                                const optionLetter = String.fromCharCode(65 + optIndex); // A, B, C, D
+                                return `
+                                    <div class="quiz-option" @click="selectAnswer(${questionNum}, '${optionLetter}')" :class="getAnswerClass(${questionNum}, '${optionLetter}')">
+                                        <strong>${optionLetter}.</strong> ${option}
+                                    </div>
+                                `;
+                            }).join('');
+                            
+                            return `
+                                <div class="quiz-question">
+                                    <h4 class="font-semibold text-gray-900 mb-3">${questionNum}. ${q.question}</h4>
+                                    <div class="space-y-2">
+                                        ${options}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                        
+                        console.log('✅ Quiz HTML generated successfully');
+                        return quizHTML;
+                    }
+                    
+                    console.log('⚠️ Using fallback quiz content');
+                    // Set up fallback correct answers
+                    this.correctAnswers = { 1: 'A', 2: 'A', 3: 'B', 4: 'B', 5: 'C' };
+                    
+                    // Fallback quiz content
+                    return `
+                        <div class="quiz-question">
+                            <h4 class="font-semibold text-gray-900 mb-3">1. This control is essential for CMMC Level 2 certification.</h4>
+                            <div class="space-y-2">
+                                <div class="quiz-option" @click="selectAnswer(1, 'A')" :class="getAnswerClass(1, 'A')">
+                                    <strong>A.</strong> True ✅
+                                </div>
+                                <div class="quiz-option" @click="selectAnswer(1, 'B')" :class="getAnswerClass(1, 'B')">
+                                    <strong>B.</strong> False
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                },
+
+                selectAnswer(questionNum, answer) {
+                    this.answers[questionNum] = answer;
+                },
+
+                getAnswerClass(questionNum, answer) {
+                    if (!this.answers[questionNum]) return '';
+                    
+                    if (this.answers[questionNum] === answer) {
+                        return this.correctAnswers[questionNum] === answer ? 'correct' : 'incorrect';
+                    }
+                    return '';
+                },
+
+                allAnswered() {
+                    return Object.keys(this.correctAnswers).every(q => this.answers[q]);
+                },
+
+                getScore() {
+                    let correct = 0;
+                    for (let q in this.correctAnswers) {
+                        if (this.answers[q] === this.correctAnswers[q]) {
+                            correct++;
+                        }
+                    }
+                    return correct;
+                },
+
+                getScoreText() {
+                    const score = this.getScore();
+                    const total = Object.keys(this.correctAnswers).length;
+                    return `Quiz Complete: ${score}/${total} correct`;
+                },                getQuizResultClass() {
+                    return this.getScore() >= 4 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                },                getAdditionalResources() {
+                    console.log('📚 getAdditionalResources called');
+                    const lessonKey = this.findLessonKey();
+                    console.log('🔑 Resources lesson key:', lessonKey);
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                        const lessonData = window.LESSONS_DATA[lessonKey];
+                        console.log('📚 Lesson data found for resources');
+                        
+                        if (lessonData.additionalResources && Array.isArray(lessonData.additionalResources)) {
+                            console.log('✅ Additional resources found:', lessonData.additionalResources.length);
+                            return lessonData.additionalResources.map(resource => `
+                                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                    <p class="text-gray-700">${resource}</p>
+                                </div>
+                            `).join('');
+                        }
+                        
+                        if (lessonData.resources && Array.isArray(lessonData.resources)) {
+                            console.log('✅ Resources found:', lessonData.resources.length);
+                            return lessonData.resources.map(resource => `
+                                <div class="border-l-4 border-blue-500 pl-4 py-2">
+                                    <p class="text-gray-700">${resource}</p>
+                                </div>
+                            `).join('');
+                        }
+                        
+                        console.log('⚠️ No resources found in lesson data');
+                    }
+                    
+                    console.log('⚠️ Using fallback resources');
+                    // Fallback content
+                    return `
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <h4 class="font-semibold text-gray-900">NIST SP 800-171 Reference</h4>
+                            <p class="text-gray-600 text-sm">Official NIST guidance for this control requirement</p>
+                            <a href="https://csrc.nist.gov/publications/detail/sp/800-171/rev-2/final" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">View NIST SP 800-171 →</a>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-4 py-2">
+                            <h4 class="font-semibold text-gray-900">CMMC Assessment Guide</h4>
+                            <p class="text-gray-600 text-sm">Official CMMC assessment procedures and evidence requirements</p>
+                            <a href="https://www.acq.osd.mil/cmmc/" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">View CMMC Resources →</a>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // URL parameter helper
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+    </script>
+</body>
+</html>

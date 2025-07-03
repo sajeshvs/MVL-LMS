@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS Navigation Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-center">MVL-LMS Navigation Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">Direct Links Test</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-center hover:bg-blue-600 transition-colors">
+                    Dashboard (index.html)
+                </a>
+                <a href="courses.html" class="bg-green-500 text-white px-4 py-2 rounded-lg text-center hover:bg-green-600 transition-colors">
+                    Courses (courses.html)
+                </a>
+                <a href="course.html?id=AC" class="bg-purple-500 text-white px-4 py-2 rounded-lg text-center hover:bg-purple-600 transition-colors">
+                    AC Course (course.html)
+                </a>
+                <a href="admin.html" class="bg-red-500 text-white px-4 py-2 rounded-lg text-center hover:bg-red-600 transition-colors">
+                    Admin (admin.html)
+                </a>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-semibold mb-4">System Status Check</h2>
+            <div id="status-check" class="space-y-2">
+                <div class="text-gray-600">Loading system status...</div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Troubleshooting Steps</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                <li>Clear browser cache (Ctrl+F5 for hard refresh)</li>
+                <li>Open browser developer tools (F12) and check for errors</li>
+                <li>Try clicking the "Courses (courses.html)" button above</li>
+                <li>If the button works but navigation doesn't, check if there are multiple "Courses" links</li>
+                <li>Try opening courses.html in a new tab/window</li>
+            </ol>
+        </div>
+    </div>
+    
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        // Check system status
+        setTimeout(() => {
+            const statusDiv = document.getElementById('status-check');
+            const checks = [];
+            
+            // Check if curriculum data loaded
+            if (window.COURSES_DATA) {
+                checks.push(`✅ COURSES_DATA loaded: ${window.COURSES_DATA.length} courses`);
+            } else {
+                checks.push(`❌ COURSES_DATA not loaded`);
+            }
+            
+            if (window.CURRICULUM_DATA) {
+                const domains = Object.keys(window.CURRICULUM_DATA.LESSONS || {});
+                checks.push(`✅ CURRICULUM_DATA loaded: ${domains.length} domains`);
+            } else {
+                checks.push(`❌ CURRICULUM_DATA not loaded`);
+            }
+            
+            if (window.LESSONS_DATA) {
+                checks.push(`✅ LESSONS_DATA loaded: ${Object.keys(window.LESSONS_DATA).length} lessons`);
+            } else {
+                checks.push(`❌ LESSONS_DATA not loaded`);
+            }
+            
+            // Check if courses.html is accessible
+            fetch('courses.html')
+                .then(response => {
+                    if (response.ok) {
+                        checks.push(`✅ courses.html is accessible`);
+                    } else {
+                        checks.push(`❌ courses.html returned ${response.status}`);
+                    }
+                })
+                .catch(error => {
+                    checks.push(`❌ courses.html fetch error: ${error.message}`);
+                })
+                .finally(() => {
+                    statusDiv.innerHTML = checks.map(check => 
+                        `<div class="py-1">${check}</div>`
+                    ).join('');
+                });
+        }, 500);
+    </script>
+</body>
+</html>

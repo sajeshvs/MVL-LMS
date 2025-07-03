@@ -1,0 +1,239 @@
+{
+  "id": "AU",
+  "title": "Audit & Accountability",
+  "lessons": {
+
+    "3.3.1": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Create & Retain Audit Logs",
+      "officialRequirement": "Create and retain system audit records to enable the monitoring, analysis, investigation, and reporting of unlawful or unauthorized system activity.",
+      "why": "Without logs the SOC is blind. If MVL can’t reconstruct events, we fail CMMC and DFARS 7012 incident-reporting within 72 h.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Forward Windows Event IDs 4624/4625/4688 and Linux auth.log to **Azure Sentinel** via the AMA agent.",
+          "Enable **Microsoft 365 Audit (Advanced)** for Exchange, SharePoint, Teams, and Defender alerts.",
+          "Configure **Azure Monitor Diagnostic Settings** on every resource group to push JSON logs to Sentinel’s Log Analytics workspace ‘mvl-prod’.",
+          "Set **Sentinel Data Retention**: 90 days hot, 2 years in Azure Archive (meets CMMC + IRS 1075).",
+          "Deploy **Acronis Cyber Protect** immutable S3 vault replication every night for off-site copy.",
+          "Automate log-schema validation with **Kusto function `validateLog()`**; failures fire a P1 ticket."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Your log-ins, file access, and admin actions are recorded for security—no impact on performance.",
+          "Viewing or downloading large CUI bundles triggers an alert; if it’s legit, no worries, just be ready to confirm.",
+          "Help Desk use these logs to troubleshoot, so detail = faster fixes."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "Median incident investigation time drops **70 %** with centralized logging (IBM 2024).",
+          "Provides documentary evidence for DoD, cyber-insurance, and potential litigation.",
+          "Supports root-cause analysis → continuous improvement; FY-24 root-cause insights removed 11 recurring mis-configs."
+        ]
+      },
+      "mvlTips": [
+        "Sentinel workbook **“Audit Heatmap”** shows log volume by source—red if daily flow ▼ 10 %.",
+        "Immutable Acronis copy stored in Gov-cloud ‘mvl-audit-vault’; retention policy = 7 years.",
+        "Quarterly log restoration drill proves we can read month-old data within 2 h SLA."
+      ],
+      "steps": [
+        "Install Azure Monitoring Agent on all servers.",
+        "Turn on M365 Advanced Audit per tenant-settings.",
+        "Create Diagnostic Settings templates in Azure Policy.",
+        "Set Sentinel retention & Archive rules.",
+        "Script Acronis S3 daily sync; test restore.",
+        "Document in Playbook AU-01; link in LMS."
+      ],
+      "quiz": {
+        "q": "Where does MVL store its off-site, immutable copy of audit logs?",
+        "answers": [
+          "On-prem NAS",
+          "Acronis Cyber Protect vault (Gov-Cloud)",
+          "Dropbox",
+          "No off-site copy"
+        ],
+        "correctIndex": 1,
+        "explanation": "Acronis provides write-once object lock so logs can’t be tampered with."
+      },
+      "resources": [
+        { "label": "NIST SP 800-171 3.3.1", "url": "https://csrc.nist.gov" },
+        { "label": "Azure Sentinel Architecture", "url": "https://learn.microsoft.com/azure/sentinel/overview" }
+      ]
+    },
+
+    "3.3.2": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Trace Actions to Individual Users",
+      "officialRequirement": "Ensure that the actions of individual users can be uniquely traced to those users.",
+      "why": "If we don’t know *who* changed or downloaded data, incident response stalls and blame lands on MVL.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Force **AAD Premium P1** sign-in—every token carries a unique user Object-ID logged in Sentinel.",
+          "Disable local admin account SID-500; require named admin with PIM elevation.",
+          "Endpoint **Sysmon** installs capture parent-child process chain with user SID.",
+          "Linux uses **sudo iolog** with session ID transmitted to Sentinel.",
+          "Sentinel analytic *‘Non-attributable account activity’* fires if Username == ‘UNKNOWN’."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Use your own account—no sharing; all activity is logged under your name.",
+          "Admin duties? Elevate via PIM so we have the audit trail.",
+          "Shared service accounts are forbidden unless rev-controlled and vaulted."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "Enables disciplinary or legal action when malicious activity occurs.",
+          "Meets **NIST IR 8259** recommendations on accountability.",
+          "Reduces MTTR by 50 % because SOC can ping the exact user immediately."
+        ]
+      },
+      "mvlTips": [
+        "Weekly Sentinel query checks any event where `PrincipalName == 'NT AUTHORITY\\SYSTEM'` *and* interactive.",
+        "Developers use **GitHub signed commits** so code changes trace to individual keys."
+      ],
+      "steps": [
+        "Remove local admin SID-500 via Intune script.",
+        "Deploy Sysmon baseline + AMA ingestion.",
+        "Enable sudo logging on Linux hosts.",
+        "Build Sentinel analytic rule.",
+        "Educate staff on account sharing policy."
+      ],
+      "quiz": {
+        "q": "What tool logs Windows process chains with user SID at MVL?",
+        "answers": ["Event Viewer default", "Sysmon", "Wireshark", "Intune"],
+        "correctIndex": 1
+      }
+    },
+
+    "3.3.3": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Review & Update Audited Events",
+      "officialRequirement": "Review and update audited events periodically.",
+      "why": "Threats change. If we still log floppy-disk events but not Azure Key Vault, we’re sunk.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Quarterly log-source review during Cyber Architecture Board (CAB) sprint: compare to MITRE ATT&CK updates.",
+          "Sentinel Content Hub rules updated monthly; new event types tagged ‘NEW’ for 14 days.",
+          "Any new critical SaaS (e.g., Jira) must have log ingestion onboarding checklist before go-live."
+        ]
+      },
+      "mvlTips": [
+        "CAB ticket **‘LOG-SRC-2025-Q1’** tracks additions; artifact goes in CMMC folder for assessors."
+      ],
+      "quiz": {
+        "q": "How often does MVL formally review its audit-event list?",
+        "answers": ["Annually", "Quarterly", "Monthly", "Never"],
+        "correctIndex": 1
+      }
+    },
+
+    "3.3.4": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Alert on Audit Processing Failures",
+      "officialRequirement": "Alert in the event of an audit logging process failure.",
+      "why": "If logs stop flowing, attackers step in. Fast alerts mean we plug the gap within SLA.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Sentinel **Health Monitoring** workbook alerts if any table’s EPS ▼ 80 % for 15 min.",
+          "Azure Monitor Alert: Log Analytics ‘IngestionLatency > 30 min’ sends PagerDuty P1.",
+          "Acronis job-status failure triggers SOC Teams post."
+        ]
+      },
+      "quiz": {
+        "q": "What signals a log-ingest drop in Sentinel?",
+        "answers": ["CPU graph", "EPS threshold alert", "Manual check", "None"],
+        "correctIndex": 1
+      }
+    },
+
+    "3.3.5": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Audit Reduction & Report Generation",
+      "officialRequirement": "Provide audit reduction and report generation to support analysis and investigation.",
+      "why": "Raw logs = noise. Reduction gives SOC actionable context fast.",
+      "itPerspective": {
+        "content": [
+          "Sentinel **Bookmarks** & **Hunting Queries** summarise multi-day events into 50-line evidence sets.",
+          "Custom **Power BI** report ‘Audit-Insight’ slices by user, time, and MITRE technique."
+        ]
+      }
+    },
+
+    "3.3.6": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Correlate Audit Repositories",
+      "officialRequirement": "Provide centralized management and correlation of information system audit records.",
+      "why": "Correlating cloud + on-prem is how we detect lateral movement.",
+      "itPerspective": {
+        "content": [
+          "All logs funnel to **single Sentinel workspace ‘mvl-prod’**; UEBA ties AAD, Defender, Zscaler, Acronis."
+        ]
+      }
+    },
+
+    "3.3.7": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Provide Audit Record Integrity",
+      "officialRequirement": "Provide audit reduction and report generation to support on-demand analysis and reporting.",
+      "why": "Tampered logs invalidate evidence; WORM storage + hashing keeps integrity.",
+      "itPerspective": {
+        "content": [
+          "Acronis vault enables object-lock; Sentinel raw data hashed with SHA-256 every 24 h."
+        ]
+      }
+    },
+
+    "3.3.8": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Time-Stamp Audit Records",
+      "officialRequirement": "Protect audit information and audit logging tools from unauthorized access, modification, and deletion.",
+      "why": "Correlating events needs synced time.",
+      "itPerspective": {
+        "content": [
+          "NTP → time.windows.com; Azure resources inherit.",
+          "Sentinel marks all logs in UTC; workbook converts to Gulf (+04:00) for users."
+        ]
+      }
+    },
+
+    "3.3.9": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Protect Audit Tools & Info",
+      "officialRequirement": "Protect audit information and audit logging tools from unauthorized access, modification, and deletion.",
+      "why": "If attackers delete logs we lose the crime scene. RBAC + immutability stops that.",
+      "itPerspective": {
+        "content": [
+          "Sentinel ‘Log Analytics Contributor’ role only; no ‘Contributor’ on workspace.",
+          "Acronis vault is write-once; delete via legal hold only.",
+          "Break-glass Global Admins can’t delete Sentinel tables—Azure RBAC denies."
+        ]
+      },
+      "quiz": {
+        "q": "Which storage type makes MVL’s long-term logs tamper-proof?",
+        "answers": ["Azure Blob Hot", "Acronis WORM vault", "Local HDD", "Dropbox"],
+        "correctIndex": 1
+      }
+    }
+
+  }
+}

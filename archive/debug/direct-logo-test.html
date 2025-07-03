@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Direct Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+</head>
+<body class="bg-gray-50 p-8">
+    <h1 class="text-2xl font-bold mb-6">Logo Visibility Tests</h1>
+    
+    <div class="space-y-6">
+        <!-- Test 1: Direct inline styles -->
+        <div class="border p-4 rounded">
+            <h2 class="font-semibold mb-2">Test 1: Inline styles (should always work)</h2>
+            <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: 2px solid white; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);">MVL</div>
+        </div>
+        
+        <!-- Test 2: Using logo-mvl class -->
+        <div class="border p-4 rounded">
+            <h2 class="font-semibold mb-2">Test 2: Using .logo-mvl class</h2>
+            <div class="logo-mvl">MVL</div>
+        </div>
+        
+        <!-- Test 3: Force with !important -->
+        <div class="border p-4 rounded">
+            <h2 class="font-semibold mb-2">Test 3: Force with !important</h2>
+            <div class="logo-mvl-force">MVL</div>
+        </div>
+        
+        <!-- Test 4: Current header component -->
+        <div class="border p-4 rounded">
+            <h2 class="font-semibold mb-2">Test 4: Current header component</h2>
+            <div id="header-test-container"></div>
+        </div>
+    </div>
+
+    <style>
+        .logo-mvl-force {
+            width: 56px !important;
+            height: 56px !important;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+            border: 2px solid white !important;
+            border-radius: 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: white !important;
+            font-weight: bold !important;
+            font-size: 14px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        }
+    </style>
+
+    <script>
+        // Load current header
+        fetch('components/header.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('header-test-container').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('header-test-container').innerHTML = '<div style="color: red;">Error loading header: ' + error.message + '</div>';
+            });
+    </script>
+</body>
+</html>

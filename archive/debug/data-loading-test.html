@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Data Loading Test</title>
+</head>
+<body>
+    <h1>Data Loading Test</h1>
+    <pre id="output"></pre>
+    
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        const output = document.getElementById('output');
+        
+        function test() {
+            let result = '';
+            
+            result += 'typeof LESSONS_DATA: ' + typeof LESSONS_DATA + '\n';
+            result += 'typeof window.LESSONS_DATA: ' + typeof window.LESSONS_DATA + '\n';
+            
+            if (typeof LESSONS_DATA !== 'undefined') {
+                result += 'LESSONS_DATA keys: ' + Object.keys(LESSONS_DATA).length + '\n';
+                result += 'First 5 keys: ' + Object.keys(LESSONS_DATA).slice(0, 5).join(', ') + '\n';
+            }
+            
+            if (typeof window.LESSONS_DATA !== 'undefined') {
+                result += 'window.LESSONS_DATA keys: ' + Object.keys(window.LESSONS_DATA).length + '\n';
+                result += 'First 5 window keys: ' + Object.keys(window.LESSONS_DATA).slice(0, 5).join(', ') + '\n';
+            }
+            
+            result += '\nAC.3.1.1 lookup:\n';
+            if (window.LESSONS_DATA && window.LESSONS_DATA['AC.3.1.1']) {
+                result += 'Found AC.3.1.1: ' + window.LESSONS_DATA['AC.3.1.1'].title + '\n';
+            } else {
+                result += 'AC.3.1.1 not found\n';
+            }
+            
+            output.textContent = result;
+        }
+        
+        // Test immediately and after a delay
+        test();
+        setTimeout(test, 500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,730 @@
+/* Custom CSS Overrides for MVL-LMS */
+
+/* Anti-flash dark mode - Hide elements until Alpine.js initializes */
+[x-cloak] {
+  display: none !important;
+}
+
+/* Prevent theme flashing during initialization */
+html {
+  visibility: hidden;
+}
+
+html.ready {
+  visibility: visible;
+}
+
+/* Header Layout Protection - Fixed frames to prevent overlap at all screen sizes */
+@media (min-width: 1024px) {
+  .header-container {
+    min-height: 80px;
+  }
+  
+  .header-logo-section {
+    /* Fixed minimum and maximum width to prevent overflow */
+    min-width: 280px;
+    max-width: 420px;
+    flex-shrink: 0;
+  }
+  
+  .header-nav-section {
+    /* Fixed width for navigation to prevent flex shrinking */
+    flex-shrink: 0;
+    min-width: 300px;
+    max-width: 500px;
+  }
+  
+  /* Ensure logo container has fixed sizing */
+  .mvl-logo-container {
+    max-width: 380px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .header-container {
+    min-height: 96px;
+  }
+  
+  .header-logo-section {
+    min-width: 320px;
+    max-width: 480px;
+  }
+  
+  .header-nav-section {
+    min-width: 350px;
+    max-width: 600px;
+  }
+  
+  .mvl-logo-container {
+    max-width: 440px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .header-logo-section {
+    min-width: 380px;
+    max-width: 560px;
+  }
+  
+  .header-nav-section {
+    min-width: 400px;
+    max-width: 700px;
+  }
+  
+  .mvl-logo-container {
+    max-width: 520px;
+  }
+}
+
+/* Ultra-wide screen optimizations (2560px+) */
+@media (min-width: 2560px) {
+  .header-container {
+    min-height: 112px;
+  }
+  
+  .header-logo-section {
+    min-width: 450px;
+    max-width: 700px;
+  }
+  
+  .header-nav-section {
+    min-width: 500px;
+    max-width: 900px;
+  }
+  
+  .mvl-logo-container {
+    max-width: 660px;
+  }
+}
+
+/* Prevent text wrapping and overflow in navigation */
+.nav-link {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Ensure logo and text scale proportionally with fixed containers */
+.mvl-logo-container {
+  display: flex;
+  align-items: center;
+  overflow: hidden; /* Prevent content overflow */
+}
+
+.mvl-text-container {
+  overflow: hidden;
+  flex: 1;
+  min-width: 0;
+}
+
+.mvl-text-container h1,
+.mvl-text-container p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive logo sizing with fixed frames */
+@media (max-width: 640px) {
+  .mvl-logo-container {
+    max-width: 280px;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1024px) {
+  .mvl-logo-container {
+    max-width: 320px;
+  }
+}
+
+/* Header gap prevention */
+.header-container > div {
+  gap: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .header-container > div {
+    gap: 2rem;
+  }
+}
+
+/* MVL Logo - Guaranteed Visibility System */
+.mvl-logo-guaranteed {
+  position: relative;
+  flex-shrink: 0 !important;
+}
+
+/* CSS-only logo - always visible fallback */
+.mvl-css-logo {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  border: 2px solid white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Responsive sizing for guaranteed logo */
+@media (max-width: 640px) {
+  .mvl-logo-guaranteed,
+  .mvl-css-logo {
+    width: 56px !important;
+    height: 56px !important;
+  }
+  .mvl-css-logo div {
+    font-size: 12px !important;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1024px) {
+  .mvl-logo-guaranteed,
+  .mvl-css-logo {
+    width: 64px !important;
+    height: 64px !important;
+  }
+  .mvl-css-logo div {
+    font-size: 14px !important;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1280px) {
+  .mvl-logo-guaranteed,
+  .mvl-css-logo {
+    width: 80px !important;
+    height: 80px !important;
+  }
+  .mvl-css-logo div {
+    font-size: 16px !important;
+  }
+}
+
+@media (min-width: 1280px) {
+  .mvl-logo-guaranteed,
+  .mvl-css-logo {
+    width: 96px !important;
+    height: 96px !important;
+  }
+  .mvl-css-logo div {
+    font-size: 18px !important;
+  }
+}
+
+/* Enhanced visibility for all logo elements */
+.mvl-logo-container {
+  flex-shrink: 0 !important;
+}
+
+/* Critical logo visibility fixes */
+.mvl-logo-guaranteed {
+  position: relative !important;
+  display: flex !important;
+  z-index: 100 !important;
+}
+
+.mvl-css-logo {
+  z-index: 1 !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.mvl-logo-guaranteed img {
+  z-index: 2 !important;
+  position: relative !important;
+}
+
+/* Force logo container visibility */
+.header-logo-section,
+.mvl-logo-container,
+.mvl-logo-guaranteed {
+  min-height: 56px !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Override any conflicting styles that might hide the logo */
+.mvl-logo-guaranteed * {
+  visibility: visible !important;
+}
+
+/* Ensure logo text is never hidden */
+.mvl-css-logo div {
+  color: white !important;
+  font-weight: bold !important;
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Hover effects */
+.mvl-logo-guaranteed:hover .mvl-css-logo {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+.mvl-logo-guaranteed:hover img {
+  transform: scale(1.05);
+  transition: transform 0.2s ease;
+}
+
+/* Header styling to prevent flashing */
+header {
+  transition: none !important;
+}
+
+/* Animation Classes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+/* Editable Content Styling */
+.editable[contenteditable="true"] {
+  border: 2px dashed #93c5fd;
+  background-color: #eff6ff;
+  transition: all 0.2s ease;
+}
+
+.dark .editable[contenteditable="true"] {
+  background-color: rgba(30, 58, 138, 0.2);
+  border-color: #2563eb;
+}
+
+.editable[contenteditable="true"]:hover {
+  border-color: #60a5fa;
+  background-color: #dbeafe;
+}
+
+.dark .editable[contenteditable="true"]:hover {
+  background-color: rgba(30, 58, 138, 0.3);
+}
+
+.editable[contenteditable="true"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: #dbeafe;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.dark .editable[contenteditable="true"]:focus {
+  background-color: rgba(30, 58, 138, 0.4);
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background-color: #f3f4f6;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background-color: #1f2937;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #9ca3af;
+  border-radius: 9999px;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #4b5563;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #6b7280;
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .card {
+    box-shadow: none;
+    border: 1px solid #d1d5db;
+    break-inside: avoid;
+  }
+}
+
+/* Dark Mode Transitions */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Logo hover effect */
+.mvl-logo {
+  transition: opacity 0.2s ease;
+}
+
+.mvl-logo:hover {
+  opacity: 0.8;
+}
+
+/* Flexbox fallback for older browsers */
+.header-flex-container {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@supports not (display: flex) {
+  .header-flex-container {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  
+  .header-logo-section,
+  .header-nav-section {
+    display: table-cell;
+    vertical-align: middle;
+  }
+}
+
+/* Header compact mode for overflow protection */
+.header-compact .header-logo-section h1 {
+  font-size: 1.25rem !important;
+}
+
+.header-compact .header-logo-section p {
+  display: none !important;
+}
+
+.header-compact .header-nav-section .nav-link span {
+  display: none !important;
+}
+
+.header-compact .header-nav-section .nav-link {
+  padding: 0.5rem !important;
+}
+
+.header-compact .hidden.xl\\:flex {
+  display: none !important;
+}
+
+/* Ensure critical elements never disappear */
+.header-compact .mvl-logo-container img,
+.header-compact .mvl-logo-container svg {
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
+/* Animation for smooth transitions */
+.header-container,
+.header-logo-section h1,
+.header-logo-section p,
+.header-nav-section .nav-link {
+  transition: all 0.3s ease;
+}
+
+/* Additional protection against logo hiding */
+.mvl-logo-guaranteed,
+.mvl-css-logo,
+.mvl-logo-guaranteed img {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Prevent any parent container from hiding logo */
+.header-container,
+.header-logo-section,
+.mvl-logo-container {
+  overflow: visible !important;
+}
+
+/* Ensure minimum size enforcement across all breakpoints */
+@media (max-width: 480px) {
+  .mvl-logo-guaranteed,
+  .mvl-css-logo {
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+}
+
+/* Force visibility on load */
+.mvl-logo-guaranteed {
+  animation: logoFadeIn 0.3s ease-in;
+}
+
+@keyframes logoFadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .mvl-css-logo {
+    border-width: 3px !important;
+    box-shadow: 0 0 0 2px #000, 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
+/* Print styles - ensure logo is visible when printing */
+@media print {
+  .mvl-logo-guaranteed,
+  .mvl-css-logo {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* Simplified, guaranteed-visible logo system */
+.logo-mvl {
+    width: 56px !important;
+    height: 56px !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    border: 2px solid white !important;
+    border-radius: 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: white !important;
+    font-weight: bold !important;
+    font-size: 14px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    flex-shrink: 0 !important;
+    min-width: 56px !important;
+    min-height: 56px !important;
+}
+
+.logo-mvl:hover {
+    transform: scale(1.05) !important;
+    transition: transform 0.2s ease !important;
+}
+
+/* Responsive logo sizing - simplified and working */
+@media (min-width: 640px) {
+    .logo-mvl {
+        width: 64px !important;
+        height: 64px !important;
+        font-size: 16px !important;
+        min-width: 64px !important;
+        min-height: 64px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .logo-mvl {
+        width: 72px !important;
+        height: 72px !important;
+        font-size: 18px !important;
+        min-width: 72px !important;
+        min-height: 72px !important;
+    }
+}
+
+@media (min-width: 1280px) {
+    .logo-mvl {
+        width: 80px !important;
+        height: 80px !important;
+        font-size: 20px !important;
+        min-width: 80px !important;
+        min-height: 80px !important;
+    }
+}
+
+/* Ensure logo container never collapses */
+.logo-mvl-container {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+
+/* CRITICAL: Force MVL Logo Visibility - Ultimate Protection */
+div[title="MVL Logo"],
+.mvl-logo-force,
+.mvl-logo-guaranteed {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 9999 !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    border: 3px solid white !important;
+    border-radius: 16px !important;
+    color: white !important;
+    font-weight: bold !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25) !important;
+    flex-shrink: 0 !important;
+    width: 64px !important;
+    height: 64px !important;
+    min-width: 64px !important;
+    min-height: 64px !important;
+    max-width: 64px !important;
+    max-height: 64px !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 18px !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Force logo container visibility */
+.flex.items-center:has(div[title="MVL Logo"]) {
+    display: flex !important;
+    align-items: center !important;
+    gap: 24px !important;
+}
+
+/* Prevent any hiding of logo area */
+.header-logo-section,
+.mvl-logo-container,
+.logo-section {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    min-height: 80px !important;
+}
+
+/* Ensure proper text positioning to the right of logo */
+.border-l-2.border-blue-600 {
+    margin-left: 24px !important;
+    padding-left: 24px !important;
+}
+
+/* Mobile responsiveness for forced logo */
+@media (max-width: 640px) {
+    div[title="MVL Logo"],
+    .mvl-logo-force,
+    .mvl-logo-guaranteed {
+        width: 56px !important;
+        height: 56px !important;
+        min-width: 56px !important;
+        min-height: 56px !important;
+        max-width: 56px !important;
+        max-height: 56px !important;
+        font-size: 14px !important;
+    }
+}
+
+@media (min-width: 1280px) {
+    div[title="MVL Logo"],
+    .mvl-logo-force,
+    .mvl-logo-guaranteed {
+        width: 80px !important;
+        height: 80px !important;
+        min-width: 80px !important;
+        min-height: 80px !important;
+        max-width: 80px !important;
+        max-height: 80px !important;
+        font-size: 22px !important;
+    }
+}
+
+/* Logo Natural Aspect Ratio Enforcement */
+.mvl-logo-natural {
+  height: auto !important;
+  width: auto !important;
+  max-width: none !important;
+  aspect-ratio: auto !important;
+}
+
+.mvl-logo-container-natural {
+  width: auto !important;
+  height: auto !important;
+  min-height: 50px !important;
+  max-height: 70px !important;
+  aspect-ratio: auto !important;
+}
+
+/* Force natural logo dimensions */
+img[src*="mvl-logo"] {
+  height: 50px !important;
+  width: auto !important;
+  max-width: none !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  aspect-ratio: auto !important;
+}
+
+/* Container for natural aspect ratio logo */
+div[title="MVL Logo"] {
+  width: auto !important;
+  height: auto !important;
+  min-height: 50px !important;
+  max-height: 70px !important;
+  aspect-ratio: auto !important;
+}
+
+/* Logo Masking - Remove white background plate */
+.mvl-logo-mask {
+  mask-image: url("assets/img/mvl-logo.png");
+  -webkit-mask-image: url("assets/img/mvl-logo.png");
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-position: center;
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  background: transparent !important;
+  background-color: #1e40af !important; /* MVL blue color fill */
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Logo wrapper - no backgrounds or hard-coded sizes */
+.mvl-logo-wrapper {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Custom CSS Overrides for MVL-LMS */
+
+/* MVL Logo Display - Show the colorful logo directly */
+.logo-mask { 
+  width: auto; 
+  height: 40px;                    /* h-10 = 40px */
+  object-fit: contain;
+  /* Remove masking - show the actual colorful logo */
+}
+
+/* Responsive logo sizing */
+@media (max-width: 640px) {
+  .logo-mask {
+    height: 32px;                  /* h-8 = 32px for mobile */
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1024px) {
+  .logo-mask {
+    height: 36px;                  /* h-9 = 36px for tablet */
+  }
+}
+
+@media (min-width: 1024px) {
+  .logo-mask {
+    height: 40px;                  /* h-10 = 40px for desktop */
+  }
+}

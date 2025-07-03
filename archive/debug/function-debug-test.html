@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Function Debug Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 p-8">
+    <div x-data="functionTest()">
+        <h1 class="text-2xl font-bold mb-6">Function Debug Test</h1>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-lg font-semibold mb-4">Test Results</h2>
+            <div class="space-y-2">
+                <p><strong>Domain:</strong> <span x-text="domain"></span></p>
+                <p><strong>Requirement:</strong> <span x-text="requirement"></span></p>
+                <p><strong>Data Available:</strong> <span x-text="dataAvailable"></span></p>
+                <p><strong>Found Key:</strong> <span x-text="foundKey || 'None'"></span></p>
+            </div>
+            <button @click="testFunctions()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Test Functions</button>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-lg font-semibold mb-4">Quiz Function Result</h2>
+            <div class="border p-4 rounded">
+                <div x-html="quizResult">Click "Test Functions" to see result</div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-4">Resources Function Result</h2>
+            <div class="border p-4 rounded">
+                <div x-html="resourcesResult">Click "Test Functions" to see result</div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        function functionTest() {
+            return {
+                domain: 'AC',
+                requirement: '3.1.1',
+                dataAvailable: false,
+                foundKey: null,
+                quizResult: 'Not tested yet',
+                resourcesResult: 'Not tested yet',
+                
+                init() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.domain = urlParams.get('domain') || 'AC';
+                    this.requirement = urlParams.get('requirement') || '3.1.1';
+                    
+                    this.checkData();
+                },
+                
+                checkData() {
+                    this.dataAvailable = !!(window.LESSONS_DATA && Object.keys(window.LESSONS_DATA).length > 0);
+                    if (this.dataAvailable) {
+                        this.foundKey = this.findLessonKey();
+                    }
+                },
+                
+                findLessonKey() {
+                    if (!window.LESSONS_DATA) return null;
+                    
+                    const allKeys = Object.keys(window.LESSONS_DATA);
+                    const possibleKeys = [
+                        `${this.domain}.${this.requirement}`,
+                        `${this.domain}.L2-3.${this.requirement}`,
+                        `${this.domain}-${this.requirement}`,
+                        `${this.domain}_${this.requirement}`,
+                    ];
+                    
+                    for (const key of possibleKeys) {
+                        if (window.LESSONS_DATA[key]) {
+                            return key;
+                        }
+                    }
+                    
+                    return allKeys.find(key => 
+                        key.includes(this.domain) && key.includes(this.requirement)
+                    );
+                },
+                
+                testFunctions() {
+                    console.log('Testing functions...');
+                    
+                    // Test quiz function
+                    try {
+                        const quizContent = this.getQuizContent();
+                        this.quizResult = quizContent || 'Function returned null/undefined';
+                        console.log('Quiz result:', this.quizResult);
+                    } catch (e) {
+                        this.quizResult = `Error: ${e.message}`;
+                        console.error('Quiz error:', e);
+                    }
+                    
+                    // Test resources function
+                    try {
+                        const resourcesContent = this.getAdditionalResources();
+                        this.resourcesResult = resourcesContent || 'Function returned null/undefined';
+                        console.log('Resources result:', this.resourcesResult);
+                    } catch (e) {
+                        this.resourcesResult = `Error: ${e.message}`;
+                        console.error('Resources error:', e);
+                    }
+                },
+                
+                getQuizContent() {
+                    const lessonKey = this.findLessonKey();
+                    console.log('Quiz - Found key:', lessonKey);
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey] && window.LESSONS_DATA[lessonKey].quiz) {
+                        const quizData = window.LESSONS_DATA[lessonKey].quiz;
+                        console.log('Quiz data:', quizData);
+                        return `Found ${quizData.length} quiz questions`;
+                    }
+                    
+                    return 'No quiz data found';
+                },
+                
+                getAdditionalResources() {
+                    const lessonKey = this.findLessonKey();
+                    console.log('Resources - Found key:', lessonKey);
+                    
+                    if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                        const lessonData = window.LESSONS_DATA[lessonKey];
+                        console.log('Lesson data for resources:', lessonData);
+                        
+                        if (lessonData.additionalResources && Array.isArray(lessonData.additionalResources)) {
+                            console.log('Additional resources:', lessonData.additionalResources);
+                            return `Found ${lessonData.additionalResources.length} additional resources`;
+                        }
+                    }
+                    
+                    return 'No additional resources found';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,198 @@
+{
+  "id": "AT",
+  "title": "Awareness & Training",
+  "lessons": {
+
+    /* ──────────────────────────  3.2.1  ────────────────────────── */
+    "3.2.1": {
+      "status": "Incomplete",
+      "readTime": "5 min read",
+      "title": "Security-Awareness Training for All Personnel",
+      "officialRequirement": "Ensure that managers, systems administrators, and users of organizational systems are made aware of the security risks associated with their activities.",
+      "why": "IBM’s 2024 report shows **95 %** of breaches trace back to human error. If MVL’s people don’t recognise phishing, social-engineering, or sloppy data-handling mistakes, no tech stack can save our CUI or our SPRS score (current 83, target 90).",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Deploy **KnowBe4** (or M365 Attack Simulation) for monthly micro-modules & phishing tests.",
+          "SSO the platform with Entra ID; completions sync to LMS (`/learn`) via SCIM.",
+          "Create Power BI dashboard fed by the KnowBe4 API → shows fail-rate, click-rate, and improvement trend to SOC & execs.",
+          "Teams bot *“SecBot”* posts just-in-time tips when a user reports a phish with the Outlook ‘Report’ button.",
+          "Set conditional access policy: users who miss 2+ consecutive modules get ‘high-risk user’ flag (extra MFA prompts).",
+          "Integrate Sentinel with KnowBe4 so repeat clickers trigger automated ticket for follow-up coaching."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Expect a **15-minute video or game-style quiz every month**—complete by month-end.",
+          "Random phishing simulations drop in quarterly; failing one auto-assigns a 5-minute remedial clip.",
+          "Top performers hit the leaderboard on #🎉-wins each quarter (gift-card incentive).",
+          "See a sketchy email? Click **‘Report Phish’**; it helps train our filters *and* scores you 🔒 points.",
+          "Security tips pop up in Teams—think of them as seat-belts for your keyboard."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "KnowBe4 data: sustained programmes cut phishing click-rates from 29 % → **< 3 %** in a year.",
+          "Cyber-insurance renewal asks for proof of continuous training—this module checks that box.",
+          "CMMC assessors look for evidence (roster + content + frequency); dashboard export fulfils the artifact.",
+          "FY24 KPI: drive aggregate click-rate below **5 %**; currently 4.8 % after two quarters."
+        ]
+      },
+      "mvlTips": [
+        "Monthly **“MVL Cyber Snapshot”** newsletter summarises real incidents (names redacted) to keep it tangible.",
+        "Fail-safe: if a module isn’t done by the 25-th, LMS nudges via email, SMS, and a Teams pop-up.",
+        "CISO joins the all-hands once a year for a live ‘Stupid Hack Tricks’ demo—big engagement boost."
+      ],
+      "steps": [
+        "Integrate KnowBe4 SSO with Entra ID.",
+        "Import HR org structure to auto-enrol all new hires on day 1.",
+        "Schedule baseline phishing test; record click-rate.",
+        "Roll out monthly micro-learning path (12 topics per year).",
+        "Wire API feed into Power BI dashboard; set targets & alerts.",
+        "Publish programme charter on MVL Policy site and link in LMS."
+      ],
+      "quiz": {
+        "q": "Roughly what percentage of breaches involve human error?",
+        "answers": ["15 %", "35 %", "95 %", "None – tech failures dominate"],
+        "correctIndex": 2,
+        "explanation": "IBM’s ‘Cost of a Data Breach 2024’ pegs human error at ~95 % of successful attacks—why training matters."
+      },
+      "resources": [
+        { "label": "NIST SP 800-53 AT-2", "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf#page=58" },
+        { "label": "KnowBe4 Platform Overview", "url": "https://www.knowbe4.com/platform/overview" },
+        { "label": "CMMC AT.L2-3.2.1 Assessment Guide", "url": "https://dodcio.defense.gov/CMMC" }
+      ]
+    },
+
+    /* ──────────────────────────  3.2.2  ────────────────────────── */
+    "3.2.2": {
+      "status": "Incomplete",
+      "readTime": "5 min read",
+      "title": "Role-Based Security Training",
+      "officialRequirement": "Ensure that organizational personnel are trained to carry out their assigned information security-related duties and responsibilities.",
+      "why": "Developers need secure coding; finance needs BEC defences; execs need insider-threat spotting. One-size-fits-all wastes time and leaves gaps.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Map Azure AD groups → LMS ‘tracks’ (Dev, Admin, Finance, Exec, Field).",
+          "Developers: **Secure Code Warrior** hands-on labs + GitHub Advanced Security scan triage as homework.",
+          "Admins: **PIM** & **Defender** labs inside an Azure Sandbox (subscription auto-nukes nightly).",
+          "Finance/HR: quarterly BEC & privacy tabletop run via Teams Breakout + Forms quiz.",
+          "Automatic HR feed: job-role change triggers LMS track switch within 24 h (SCIM).",
+          "Completion metrics exported to PURVIEW Compliance Manager to close CA-3 evidence gap."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Your training playlist adapts when you change roles—new modules unlock, old ones retire.",
+          "Technical staff get **hands-on ‘break‐&-fix’ labs** instead of PowerPoints.",
+          "Managers see risk-focused briefs (BEC, legal hold, data-spill response).",
+          "Missed role modules show as red in your dashboard and in your performance objectives."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "**65 % fewer role-specific incidents** reported after year-one rollout (Ponemon study mirrors our pilot).",
+          "Helps satisfy auditors that ‘knowledge, skills, and abilities’ exist for each control owner.",
+          "Reduces mean-time-to-remediate code vulns by **47 %** (Dev track)."
+        ]
+      },
+      "mvlTips": [
+        "Quarterly insider-threat case study for execs uses anonymised MVL log data—keeps it real.",
+        "Sandbox labs spin up in MVL’s Azure sponsorship—zero prod risk.",
+        "Role tracks are reviewed every sprint with the CAB to keep content fresh."
+      ],
+      "steps": [
+        "Define role matrix → map to AAD groups.",
+        "Create LMS tracks and load content (Secure Code Warrior, Policy videos, labs).",
+        "Build HR-to-AAD SCIM sync to auto-switch tracks.",
+        "Publish KPI: role-track completion ≥ 95 % each quarter.",
+        "Report metrics to steering committee monthly."
+      ],
+      "quiz": {
+        "q": "Which MVL platform delivers hands-on secure-coding challenges?",
+        "answers": [
+          "KnowBe4",
+          "Secure Code Warrior",
+          "Power BI",
+          "Teams Live Events"
+        ],
+        "correctIndex": 1,
+        "explanation": "Secure Code Warrior provides interactive labs matched to MVL’s Dev role track."
+      },
+      "resources": [
+        { "label": "NIST SP 800-53 AT-3", "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-53r5.pdf#page=59" },
+        { "label": "Secure Code Warrior Overview", "url": "https://www.securecodewarrior.com/platform" },
+        { "label": "CMMC AT.L2-3.2.2 Guide", "url": "https://dodcio.defense.gov/CMMC" }
+      ]
+    },
+
+    /* ──────────────────────────  3.2.3  ────────────────────────── */
+    "3.2.3": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Insider-Threat Awareness & Reporting",
+      "officialRequirement": "Provide security training on recognizing and reporting potential indicators of insider threat in accordance with the organization's insider-threat program.",
+      "why": "Half of MVL’s cyber-insurance questionnaire focuses on insider threat. One disgruntled admin dumping CUI to a USB stick could cost contracts and reputation overnight.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Integrate **Microsoft Insider Risk Management** (IRM) alerts with the LMS: each medium+ IRM alert auto-assigns the user a refresher micro-module.",
+          "Quarterly tabletop: SOC + HR + Legal walk through an insider-leak scenario; output updates our Playbook *IR-07*.",
+          "Sentinel connector pulls IRM audit data for UEBA—keeps false positives manageable.",
+          "Teams app ‘See Something – Say Something’ button opens a pre-filled confidential report to HR & SOC."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Annual 20-min insider-threat module uses MVL case studies (data anonymised).",
+          "You’ll learn red-flags: sudden overtime + large OneDrive uploads, unusual encryption usage, off-hours cloud access.",
+          "Reporting is anonymous via the Teams button; whistle-blower policy protects you.",
+          "If IRM flags odd activity on your account, expect a polite check-in from the SOC—not a witch hunt."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "ACFE 2024 shows median insider-fraud loss $125 k; early detection can halve that.",
+          "Demonstrates to DoD that MVL meets National Insider Threat Task Force guidance.",
+          "Supports ISO 27001 A.7.3 evidence if MVL pursues certification."
+        ]
+      },
+      "mvlTips": [
+        "‘Coffee & Culture’ monthly talk highlights a real insider case from industry to keep awareness high.",
+        "IRM policy tuned to MVL baselines—< 1 % false positive rate last quarter.",
+        "Lessons-learned from any insider event feed straight back into this module within 30 days."
+      ],
+      "steps": [
+        "Enable Microsoft IRM; define high-risk indicators (mass download + USB).",
+        "Build Power Automate flow → IRM alert ➜ assign LMS refresher.",
+        "Publish anonymous-reporting SOP; pin Teams button in company-wide channel.",
+        "Run quarterly tabletop; update Playbook IR-07 accordingly.",
+        "Track insider-alert metrics; goal: triage P1 insiders within 2 h."
+      ],
+      "quiz": {
+        "q": "Which MVL service auto-assigns refresher training when insider-risk alerts fire?",
+        "answers": [
+          "Azure Sentinel",
+          "Microsoft Insider Risk Management + Power Automate",
+          "KnowBe4",
+          "Defender AV"
+        ],
+        "correctIndex": 1,
+        "explanation": "The IRM + Power Automate flow links real-world risk events directly to immediate micro-training."
+      },
+      "resources": [
+        { "label": "NIST SP 800-171 3.2.3", "url": "https://csrc.nist.gov" },
+        { "label": "MS Insider Risk Management", "url": "https://learn.microsoft.com/microsoft-365/compliance/insider-risk-management" },
+        { "label": "National Insider Threat Task Force Guide", "url": "https://www.dni.gov" }
+      ]
+    }
+
+  }
+}

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS Domain Enhancement Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 py-8" x-data="testData()">
+        <h1 class="text-3xl font-bold text-gray-900 mb-8">MVL-LMS Domain Enhancement Test</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Test Results Summary</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-green-100 p-4 rounded-lg">
+                    <h3 class="font-semibold text-green-800">Enhanced Lessons</h3>
+                    <p class="text-2xl font-bold text-green-600" x-text="enhancedCount"></p>
+                </div>
+                <div class="bg-yellow-100 p-4 rounded-lg">
+                    <h3 class="font-semibold text-yellow-800">Legacy Format</h3>
+                    <p class="text-2xl font-bold text-yellow-600" x-text="legacyCount"></p>
+                </div>
+                <div class="bg-blue-100 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-800">Total Lessons</h3>
+                    <p class="text-2xl font-bold text-blue-600" x-text="totalCount"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold mb-4">Domain Enhancement Status</h2>
+            <div class="space-y-4">
+                <template x-for="domain in domainStatus" :key="domain.name">
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-semibold" x-text="domain.name"></h3>
+                            <span class="px-2 py-1 rounded text-sm font-medium" 
+                                  :class="domain.enhanced ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'"
+                                  x-text="domain.enhanced ? 'Enhanced' : 'Legacy'"></span>
+                        </div>
+                        <p class="text-gray-600 text-sm" x-text="domain.lessons + ' lessons'"></p>
+                        <div class="mt-2">
+                            <button class="text-blue-600 hover:text-blue-800 text-sm" 
+                                    @click="testDomain(domain.code)">
+                                Test First Lesson →
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold mb-4">Enhanced Lesson Samples</h2>
+            <div class="space-y-4">
+                <template x-for="sample in enhancedSamples" :key="sample.key">
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="font-semibold" x-text="sample.title"></h3>
+                            <span class="text-sm text-gray-500" x-text="sample.key"></span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-2" x-text="sample.domain"></p>
+                        <div class="flex space-x-2">
+                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs" 
+                                  x-show="sample.hasWhyMatters">Why Matters ✓</span>
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs" 
+                                  x-show="sample.hasHowMVLDoes">How MVL Does ✓</span>
+                            <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs" 
+                                  x-show="sample.hasQuizArray">Multi-Question Quiz ✓</span>
+                            <span class="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs" 
+                                  x-show="sample.hasResources">Resources ✓</span>
+                        </div>
+                        <div class="mt-2">
+                            <a :href="'lesson.html?domain=' + sample.domain.split(' ')[0] + '&requirement=' + sample.key.split('.')[1]" 
+                               class="text-blue-600 hover:text-blue-800 text-sm" target="_blank">
+                                View Lesson →
+                            </a>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        function testData() {
+            return {
+                enhancedCount: 0,
+                legacyCount: 0,
+                totalCount: 0,
+                domainStatus: [],
+                enhancedSamples: [],
+
+                init() {
+                    this.analyzeLessons();
+                },
+
+                analyzeLessons() {
+                    if (!window.LESSONS_DATA) {
+                        console.error('LESSONS_DATA not available');
+                        return;
+                    }
+
+                    const lessons = window.LESSONS_DATA;
+                    this.totalCount = Object.keys(lessons).length;
+
+                    // Domain tracking
+                    const domains = {};
+                    
+                    // Analyze each lesson
+                    for (const [key, lesson] of Object.entries(lessons)) {
+                        const [domain] = key.split('.');
+                        
+                        if (!domains[domain]) {
+                            domains[domain] = {
+                                code: domain,
+                                name: this.getDomainName(domain),
+                                lessons: 0,
+                                enhanced: 0
+                            };
+                        }
+                        
+                        domains[domain].lessons++;
+                        
+                        // Check if enhanced format
+                        const isEnhanced = Array.isArray(lesson.whyMatters) && 
+                                         Array.isArray(lesson.howMVLDoes) && 
+                                         Array.isArray(lesson.quiz);
+                        
+                        if (isEnhanced) {
+                            this.enhancedCount++;
+                            domains[domain].enhanced++;
+                            
+                            // Add to enhanced samples
+                            this.enhancedSamples.push({
+                                key: key,
+                                title: lesson.title,
+                                domain: domains[domain].name,
+                                hasWhyMatters: Array.isArray(lesson.whyMatters),
+                                hasHowMVLDoes: Array.isArray(lesson.howMVLDoes),
+                                hasQuizArray: Array.isArray(lesson.quiz),
+                                hasResources: Array.isArray(lesson.additionalResources)
+                            });
+                        } else {
+                            this.legacyCount++;
+                        }
+                    }
+
+                    // Convert domains to array and mark as enhanced if all lessons are enhanced
+                    this.domainStatus = Object.values(domains).map(domain => ({
+                        ...domain,
+                        enhanced: domain.enhanced === domain.lessons
+                    }));
+
+                    console.log('Analysis complete:', {
+                        total: this.totalCount,
+                        enhanced: this.enhancedCount,
+                        legacy: this.legacyCount,
+                        domains: this.domainStatus.length
+                    });
+                },
+
+                getDomainName(domain) {
+                    const names = {
+                        'AC': 'Access Control',
+                        'AT': 'Awareness & Training',
+                        'AU': 'Audit & Accountability',
+                        'CM': 'Configuration Management',
+                        'CP': 'Contingency Planning',
+                        'IA': 'Identification & Authentication',
+                        'IR': 'Incident Response',
+                        'MA': 'Maintenance',
+                        'MP': 'Media Protection',
+                        'PE': 'Physical Protection',
+                        'PS': 'Personnel Security',
+                        'RA': 'Risk Assessment',
+                        'SC': 'System & Communications Protection',
+                        'SI': 'System & Information Integrity'
+                    };
+                    return names[domain] || domain;
+                },
+
+                testDomain(domainCode) {
+                    // Find first lesson in domain
+                    const lessons = window.LESSONS_DATA;
+                    const firstLesson = Object.keys(lessons).find(key => key.startsWith(domainCode + '.'));
+                    
+                    if (firstLesson) {
+                        const [domain, requirement] = firstLesson.split('.');
+                        const url = `lesson.html?domain=${domain}&requirement=${requirement}`;
+                        window.open(url, '_blank');
+                    } else {
+                        alert('No lessons found for domain ' + domainCode);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

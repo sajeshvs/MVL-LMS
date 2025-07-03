@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Loading Test</title>
+</head>
+<body>
+    <h1>MVL-LMS Data Loading Test</h1>
+    <div id="results"></div>
+
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const results = document.getElementById('results');
+            
+            // Test 1: Check if LESSONS_DATA exists
+            results.innerHTML += '<h2>Test Results:</h2>';
+            
+            if (window.LESSONS_DATA) {
+                const lessonCount = Object.keys(window.LESSONS_DATA).length;
+                results.innerHTML += `<p>✅ LESSONS_DATA loaded: ${lessonCount} lessons</p>`;
+                
+                // Test specific lessons
+                const testLessons = ['AC.3.1.1', 'AT.3.2.1', 'AU.3.3.1', 'CM.3.4.1'];
+                
+                testLessons.forEach(lessonKey => {
+                    if (window.LESSONS_DATA[lessonKey]) {
+                        const lesson = window.LESSONS_DATA[lessonKey];
+                        results.innerHTML += `<p>✅ ${lessonKey}: ${lesson.title}</p>`;
+                        
+                        // Check if enhanced format
+                        const isEnhanced = Array.isArray(lesson.whyMatters) && Array.isArray(lesson.howMVLDoes);
+                        results.innerHTML += `<p>&nbsp;&nbsp;&nbsp;Format: ${isEnhanced ? 'Enhanced' : 'Legacy'}</p>`;
+                        
+                        if (isEnhanced) {
+                            results.innerHTML += `<p>&nbsp;&nbsp;&nbsp;Why Matters: ${lesson.whyMatters.length} items</p>`;
+                            results.innerHTML += `<p>&nbsp;&nbsp;&nbsp;How MVL Does: ${lesson.howMVLDoes.length} items</p>`;
+                            results.innerHTML += `<p>&nbsp;&nbsp;&nbsp;Quiz: ${lesson.quiz.length} questions</p>`;
+                        }
+                    } else {
+                        results.innerHTML += `<p>❌ ${lessonKey}: NOT FOUND</p>`;
+                    }
+                });
+                
+                // Show first few lesson keys
+                const firstKeys = Object.keys(window.LESSONS_DATA).slice(0, 10);
+                results.innerHTML += '<h3>First 10 Lesson Keys:</h3>';
+                firstKeys.forEach(key => {
+                    results.innerHTML += `<p>${key}</p>`;
+                });
+                
+            } else {
+                results.innerHTML += '<p>❌ LESSONS_DATA not loaded</p>';
+            }
+            
+            // Test 2: Check if COURSES_DATA exists
+            if (window.COURSES_DATA) {
+                results.innerHTML += '<p>✅ COURSES_DATA loaded</p>';
+            } else {
+                results.innerHTML += '<p>❌ COURSES_DATA not loaded</p>';
+            }
+            
+            // Test 3: Check if CURRICULUM_DATA exists
+            if (window.CURRICULUM_DATA) {
+                results.innerHTML += '<p>✅ CURRICULUM_DATA loaded</p>';
+            } else {
+                results.innerHTML += '<p>❌ CURRICULUM_DATA not loaded</p>';
+            }
+        });
+    </script>
+</body>
+</html>

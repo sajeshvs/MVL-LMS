@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Navigation Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="assets/js/curriculum-data.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto" x-data="navigationTest()">
+        <h1 class="text-3xl font-bold mb-6">Lesson Navigation Test</h1>
+        
+        <div class="bg-white rounded-lg p-6 shadow-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">URL Parameters Analysis</h2>
+            <div class="space-y-2 text-sm">
+                <p><strong>Current URL:</strong> <span x-text="currentUrl"></span></p>
+                <p><strong>Domain:</strong> <span x-text="domain"></span></p>
+                <p><strong>PR Parameter:</strong> <span x-text="prParam"></span></p>
+                <p><strong>Requirement Parameter:</strong> <span x-text="requirementParam"></span></p>
+                <p><strong>Final Requirement:</strong> <span x-text="finalRequirement"></span></p>
+                <p><strong>Lesson ID:</strong> <span x-text="lessonId"></span></p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg p-6 shadow-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">Data Loading Test</h2>
+            <div class="space-y-2 text-sm">
+                <p><strong>LESSONS_DATA Available:</strong> <span x-text="lessonsDataAvailable"></span></p>
+                <p><strong>Total Lessons in Data:</strong> <span x-text="totalLessons"></span></p>
+                <p><strong>Matching Lesson Found:</strong> <span x-text="lessonFound"></span></p>
+                <p><strong>Lesson Key:</strong> <span x-text="lessonKey"></span></p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg p-6 shadow-lg" x-show="lessonData">
+            <h2 class="text-xl font-semibold mb-4">Lesson Data Preview</h2>
+            <div class="space-y-3">
+                <div><strong>Title:</strong> <span x-text="lessonData?.title || 'Not found'"></span></div>
+                <div><strong>Official Requirement:</strong> <span x-text="lessonData?.officialRequirement || 'Not found'"></span></div>
+                <div><strong>Why Matters Array Length:</strong> <span x-text="lessonData?.whyMatters?.length || 'Not found'"></span></div>
+                <div><strong>How MVL Does Array Length:</strong> <span x-text="lessonData?.howMVLDoes?.length || 'Not found'"></span></div>
+                <div><strong>Quiz Questions:</strong> <span x-text="lessonData?.quiz?.length || 'Not found'"></span></div>
+            </div>
+        </div>
+        
+        <div class="mt-6 space-x-4">
+            <a href="course.html?id=AC" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Back to AC Course
+            </a>
+            <a href="lesson.html?domain=AC&pr=AC.3.1.1" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+                Test AC.3.1.1 Navigation
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function navigationTest() {
+            return {
+                currentUrl: window.location.href,
+                domain: '',
+                prParam: '',
+                requirementParam: '',
+                finalRequirement: '',
+                lessonId: '',
+                lessonsDataAvailable: false,
+                totalLessons: 0,
+                lessonFound: false,
+                lessonKey: '',
+                lessonData: null,
+                
+                init() {
+                    this.parseUrlParams();
+                    this.checkDataAvailability();
+                    this.findLessonData();
+                },
+                
+                parseUrlParams() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.domain = urlParams.get('domain') || 'AC';
+                    this.prParam = urlParams.get('pr') || 'None';
+                    this.requirementParam = urlParams.get('requirement') || 'None';
+                    
+                    // Handle both 'pr' and 'requirement' parameters
+                    if (this.prParam && this.prParam !== 'None') {
+                        if (this.prParam.includes('.')) {
+                            const parts = this.prParam.split('.');
+                            this.finalRequirement = parts.slice(1).join('.');
+                        } else {
+                            this.finalRequirement = this.prParam;
+                        }
+                    } else if (this.requirementParam && this.requirementParam !== 'None') {
+                        this.finalRequirement = this.requirementParam;
+                    } else {
+                        this.finalRequirement = '3.1.1';
+                    }
+                    
+                    this.lessonId = `${this.domain}.L2-3.${this.finalRequirement}`;
+                },
+                
+                checkDataAvailability() {
+                    this.lessonsDataAvailable = !!(window.LESSONS_DATA);
+                    if (window.LESSONS_DATA) {
+                        this.totalLessons = Object.keys(window.LESSONS_DATA).length;
+                    }
+                },
+                
+                findLessonData() {
+                    if (!window.LESSONS_DATA) return;
+                    
+                    const allKeys = Object.keys(window.LESSONS_DATA);
+                    console.log('All available keys:', allKeys);
+                    
+                    // Try different key formats
+                    const possibleKeys = [
+                        `${this.domain}.${this.finalRequirement}`,           // AC.3.1.1
+                        `${this.domain}.L2-3.${this.finalRequirement}`,      // AC.L2-3.3.1.1
+                        `${this.domain}-${this.finalRequirement}`,           // AC-3.1.1
+                        `${this.domain}_${this.finalRequirement}`,           // AC_3.1.1
+                    ];
+                    
+                    console.log('Trying possible keys:', possibleKeys);
+                    
+                    // First try exact matches
+                    for (const key of possibleKeys) {
+                        if (window.LESSONS_DATA[key]) {
+                            this.lessonKey = key;
+                            this.lessonData = window.LESSONS_DATA[key];
+                            this.lessonFound = true;
+                            console.log('Found exact match:', key);
+                            return;
+                        }
+                    }
+                    
+                    // If no exact match, try substring search
+                    const foundKey = allKeys.find(key => 
+                        key.includes(this.domain) && key.includes(this.finalRequirement)
+                    );
+                    
+                    if (foundKey) {
+                        this.lessonKey = foundKey;
+                        this.lessonData = window.LESSONS_DATA[foundKey];
+                        this.lessonFound = true;
+                        console.log('Found substring match:', foundKey);
+                    } else {
+                        console.log('No matching lesson found');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

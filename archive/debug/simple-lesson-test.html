@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Lesson Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto p-8" x-data="simpleLesson()">
+        <h1 class="text-3xl font-bold mb-6">Simple Lesson Test</h1>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Lesson Data Status</h2>
+            <p><strong>Data Available:</strong> <span x-text="dataAvailable ? 'Yes' : 'No'"></span></p>
+            <p><strong>Domain:</strong> <span x-text="domain"></span></p>
+            <p><strong>Requirement:</strong> <span x-text="requirement"></span></p>
+            <p><strong>Lesson Key Found:</strong> <span x-text="lessonKey || 'None'"></span></p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Lesson Title</h2>
+            <p x-text="lessonTitle">Loading...</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Why This Matters</h2>
+            <div x-html="whyMatters">Loading...</div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">How MVL Does It</h2>
+            <div x-html="howMVLDoes">Loading...</div>
+        </div>
+    </div>
+    
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        function simpleLesson() {
+            return {
+                dataAvailable: false,
+                domain: 'AC',
+                requirement: '3.1.1',
+                lessonKey: null,
+                lessonTitle: 'Loading...',
+                whyMatters: 'Loading...',
+                howMVLDoes: 'Loading...',
+                
+                init() {
+                    // Get URL parameters
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.domain = urlParams.get('domain') || 'AC';
+                    this.requirement = urlParams.get('requirement') || '3.1.1';
+                    
+                    // Wait for data and then load
+                    this.waitForData().then(() => {
+                        this.loadLessonData();
+                    });
+                },
+                
+                async waitForData() {
+                    for (let i = 0; i < 50; i++) {
+                        if (window.LESSONS_DATA && Object.keys(window.LESSONS_DATA).length > 0) {
+                            this.dataAvailable = true;
+                            console.log('Data loaded successfully');
+                            return;
+                        }
+                        console.log(`Waiting for data... attempt ${i + 1}`);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    console.error('Data failed to load');
+                },
+                
+                loadLessonData() {
+                    if (!window.LESSONS_DATA) {
+                        console.error('No lesson data available');
+                        return;
+                    }
+                    
+                    // Try different key formats
+                    const possibleKeys = [
+                        `${this.domain}.${this.requirement}`,           // AC.3.1.1
+                        `${this.domain}.L2-3.${this.requirement}`,      // AC.L2-3.3.1.1
+                        `${this.domain}-${this.requirement}`,           // AC-3.1.1
+                        `${this.domain}_${this.requirement}`,           // AC_3.1.1
+                    ];
+                    
+                    console.log('Trying keys:', possibleKeys);
+                    console.log('Available keys:', Object.keys(window.LESSONS_DATA).slice(0, 10));
+                    
+                    // Find the lesson
+                    let lessonData = null;
+                    for (const key of possibleKeys) {
+                        if (window.LESSONS_DATA[key]) {
+                            this.lessonKey = key;
+                            lessonData = window.LESSONS_DATA[key];
+                            console.log('Found exact match:', key);
+                            break;
+                        }
+                    }
+                    
+                    // If no exact match, try substring search
+                    if (!lessonData) {
+                        const foundKey = Object.keys(window.LESSONS_DATA).find(key => 
+                            key.includes(this.domain) && key.includes(this.requirement)
+                        );
+                        if (foundKey) {
+                            this.lessonKey = foundKey;
+                            lessonData = window.LESSONS_DATA[foundKey];
+                            console.log('Found substring match:', foundKey);
+                        }
+                    }
+                    
+                    if (lessonData) {
+                        console.log('Lesson data:', lessonData);
+                        
+                        this.lessonTitle = lessonData.title || 'No title found';
+                        
+                        // Format why matters
+                        if (lessonData.whyMatters && Array.isArray(lessonData.whyMatters)) {
+                            this.whyMatters = lessonData.whyMatters.map(item => `<p>• ${item}</p>`).join('');
+                        } else if (lessonData.why) {
+                            this.whyMatters = `<p>${lessonData.why}</p>`;
+                        } else {
+                            this.whyMatters = 'No "why matters" content found';
+                        }
+                        
+                        // Format how MVL does it
+                        if (lessonData.howMVLDoes && Array.isArray(lessonData.howMVLDoes)) {
+                            this.howMVLDoes = lessonData.howMVLDoes.map((item, index) => `<p>${index + 1}. ${item}</p>`).join('');
+                        } else {
+                            this.howMVLDoes = 'No "how MVL does it" content found';
+                        }
+                    } else {
+                        console.error('No lesson data found');
+                        this.lessonTitle = 'Lesson not found';
+                        this.whyMatters = 'Could not find lesson data';
+                        this.howMVLDoes = 'Could not find lesson data';
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

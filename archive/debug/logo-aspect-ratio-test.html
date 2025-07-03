@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL Logo - Natural Aspect Ratio Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .logo-container {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 8px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8">
+    <h1 class="text-3xl font-bold mb-8">MVL Logo - Natural Aspect Ratio Tests</h1>
+    
+    <div class="space-y-8">
+        <!-- Test 1: Natural Size -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Test 1: Logo at Natural Size</h2>
+            <div class="logo-container">
+                <img src="assets/img/mvl-logo.png" alt="MVL Logo" style="width: auto; height: auto; max-width: 300px; display: block;">
+            </div>
+        </div>
+
+        <!-- Test 2: 48px Height (Header Size) -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Test 2: Logo at 48px Height (Header Size)</h2>
+            <div class="logo-container">
+                <img src="assets/img/mvl-logo.png" alt="MVL Logo" style="width: auto; height: 48px; object-fit: contain; display: block;">
+            </div>
+        </div>
+
+        <!-- Test 3: 64px Height (Larger Header) -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Test 3: Logo at 64px Height (Larger Header)</h2>
+            <div class="logo-container">
+                <img src="assets/img/mvl-logo.png" alt="MVL Logo" style="width: auto; height: 64px; object-fit: contain; display: block;">
+            </div>
+        </div>
+
+        <!-- Test 4: Header Simulation -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Test 4: Simulated Header Layout</h2>
+            <div class="bg-gradient-to-r from-slate-50 to-blue-50 shadow-lg border-b-4 border-blue-600 p-4">
+                <div class="flex items-center space-x-6">
+                    <!-- Logo with natural aspect ratio -->
+                    <div style="
+                        width: auto; 
+                        height: 64px; 
+                        min-width: 120px; 
+                        max-width: 200px;
+                        background: white; 
+                        border: 2px solid #e5e7eb; 
+                        border-radius: 8px; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        padding: 8px 12px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+                        flex-shrink: 0;
+                    ">
+                        <img src="assets/img/mvl-logo.png" 
+                             alt="MVL Logo" 
+                             style="
+                                 width: auto; 
+                                 height: 48px; 
+                                 max-width: 180px;
+                                 object-fit: contain;
+                                 display: block;
+                             ">
+                    </div>
+                    
+                    <!-- Text positioned to the right -->
+                    <div class="border-l-2 border-blue-600 pl-6">
+                        <h1 class="text-2xl font-bold text-blue-600">MVL-LMS</h1>
+                        <p class="text-gray-600">CMMC 2.0 Learning Management System</p>
+                    </div>
+                    
+                    <!-- Navigation on the right -->
+                    <div class="ml-auto flex space-x-4">
+                        <button class="bg-blue-600 text-white px-4 py-2 rounded-lg">Dashboard</button>
+                        <button class="text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Courses</button>
+                        <button class="text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100">Admin</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Debug Information -->
+        <div class="bg-yellow-50 p-6 rounded-lg border border-yellow-200">
+            <h2 class="text-xl font-semibold mb-4 text-yellow-800">Debug Information</h2>
+            <div id="debug-info" class="text-sm text-yellow-700"></div>
+        </div>
+    </div>
+
+    <script>
+        // Log image loading status
+        const images = document.querySelectorAll('img[src*="mvl-logo.png"]');
+        const debugInfo = document.getElementById('debug-info');
+        let debugText = `<p><strong>Testing ${images.length} logo instances:</strong></p><ul>`;
+        
+        images.forEach((img, index) => {
+            img.onload = function() {
+                debugText += `<li>Logo ${index + 1}: ✅ Loaded successfully (${this.naturalWidth}x${this.naturalHeight}px)</li>`;
+                updateDebug();
+            };
+            
+            img.onerror = function() {
+                debugText += `<li>Logo ${index + 1}: ❌ Failed to load</li>`;
+                updateDebug();
+            };
+        });
+        
+        function updateDebug() {
+            debugInfo.innerHTML = debugText + '</ul>';
+        }
+        
+        // Initial debug
+        setTimeout(() => {
+            debugText += '</ul>';
+            updateDebug();
+        }, 2000);
+    </script>
+</body>
+</html>

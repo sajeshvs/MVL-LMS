@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Debug Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-6xl mx-auto p-8" x-data="debugLesson()">
+        <h1 class="text-3xl font-bold mb-6">Lesson Debug Console</h1>
+        
+        <!-- URL Parameters -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">URL Parameters</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-medium">Domain:</label>
+                    <input type="text" x-model="domain" class="border rounded p-2 w-full" />
+                </div>
+                <div>
+                    <label class="block font-medium">Requirement:</label>
+                    <input type="text" x-model="requirement" class="border rounded p-2 w-full" />
+                </div>
+            </div>
+            <button @click="loadLessonData()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Reload Data</button>
+        </div>
+        
+        <!-- Data Status -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Data Status</h2>
+            <div class="space-y-2">
+                <p><strong>LESSONS_DATA available:</strong> <span x-text="dataStatus.lessonsAvailable" class="font-mono"></span></p>
+                <p><strong>Total lessons:</strong> <span x-text="dataStatus.totalLessons" class="font-mono"></span></p>
+                <p><strong>Lesson key found:</strong> <span x-text="dataStatus.lessonKey || 'None'" class="font-mono"></span></p>
+                <p><strong>Search attempts:</strong> <span x-text="dataStatus.searchAttempts" class="font-mono"></span></p>
+            </div>
+        </div>
+        
+        <!-- Search Details -->
+        <div class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Key Search Details</h2>
+            <div x-show="searchDetails.triedKeys.length > 0">
+                <h3 class="font-semibold mb-2">Tried Keys:</h3>
+                <ul class="list-disc list-inside space-y-1">
+                    <template x-for="key in searchDetails.triedKeys">
+                        <li class="font-mono text-sm" x-text="key"></li>
+                    </template>
+                </ul>
+            </div>
+            <div x-show="searchDetails.availableKeys.length > 0" class="mt-4">
+                <h3 class="font-semibold mb-2">Available Keys (first 20):</h3>
+                <ul class="list-disc list-inside space-y-1 max-h-40 overflow-y-auto">
+                    <template x-for="key in searchDetails.availableKeys.slice(0, 20)">
+                        <li class="font-mono text-sm" x-text="key"></li>
+                    </template>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Found Data -->
+        <div x-show="foundData" class="bg-white p-6 rounded-lg shadow mb-6">
+            <h2 class="text-xl font-semibold mb-4">Found Lesson Data</h2>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="font-semibold">Title:</h3>
+                    <p x-text="foundData.title || 'N/A'"></p>
+                </div>
+                <div>
+                    <h3 class="font-semibold">Why Matters (raw):</h3>
+                    <pre class="bg-gray-100 p-2 rounded text-sm overflow-x-auto" x-text="JSON.stringify(foundData.whyMatters, null, 2)"></pre>
+                </div>
+                <div>
+                    <h3 class="font-semibold">How MVL Does (raw):</h3>
+                    <pre class="bg-gray-100 p-2 rounded text-sm overflow-x-auto" x-text="JSON.stringify(foundData.howMVLDoes, null, 2)"></pre>
+                </div>
+                <div>
+                    <h3 class="font-semibold">Implementation Steps:</h3>
+                    <pre class="bg-gray-100 p-2 rounded text-sm overflow-x-auto" x-text="JSON.stringify(foundData.implementationSteps, null, 2)"></pre>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Console Logs -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4">Console Log</h2>
+            <div class="bg-black text-green-400 p-4 rounded font-mono text-sm max-h-60 overflow-y-auto">
+                <template x-for="log in logs">
+                    <div x-text="log"></div>
+                </template>
+            </div>
+            <button @click="logs = []" class="mt-2 bg-red-600 text-white px-3 py-1 rounded text-sm">Clear Log</button>
+        </div>
+    </div>
+    
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        function debugLesson() {
+            return {
+                domain: 'AC',
+                requirement: '3.1.1',
+                dataStatus: {
+                    lessonsAvailable: false,
+                    totalLessons: 0,
+                    lessonKey: null,
+                    searchAttempts: 0
+                },
+                searchDetails: {
+                    triedKeys: [],
+                    availableKeys: []
+                },
+                foundData: null,
+                logs: [],
+                
+                init() {
+                    this.log('🚀 Initializing debug lesson...');
+                    
+                    // Get URL parameters
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.domain = urlParams.get('domain') || 'AC';
+                    this.requirement = urlParams.get('requirement') || '3.1.1';
+                    
+                    this.log(`📍 URL params - Domain: ${this.domain}, Requirement: ${this.requirement}`);
+                    
+                    // Wait for data and load
+                    this.waitForData().then(() => {
+                        this.loadLessonData();
+                    });
+                },
+                
+                log(message) {
+                    const timestamp = new Date().toLocaleTimeString();
+                    this.logs.push(`[${timestamp}] ${message}`);
+                    console.log(message);
+                },
+                
+                async waitForData() {
+                    this.log('⏳ Waiting for curriculum data...');
+                    
+                    for (let i = 0; i < 50; i++) {
+                        if (window.LESSONS_DATA && typeof window.LESSONS_DATA === 'object') {
+                            const keys = Object.keys(window.LESSONS_DATA);
+                            if (keys.length > 0) {
+                                this.dataStatus.lessonsAvailable = true;
+                                this.dataStatus.totalLessons = keys.length;
+                                this.searchDetails.availableKeys = keys;
+                                this.log(`✅ Curriculum data loaded! ${keys.length} lessons available`);
+                                return;
+                            }
+                        }
+                        this.log(`⏳ Attempt ${i + 1}/50...`);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    
+                    this.log('❌ Failed to load curriculum data after 50 attempts');
+                },
+                
+                loadLessonData() {
+                    this.log('🔍 Starting lesson data search...');
+                    this.dataStatus.searchAttempts++;
+                    
+                    if (!window.LESSONS_DATA) {
+                        this.log('❌ window.LESSONS_DATA not available');
+                        return;
+                    }
+                    
+                    // Clear previous search details
+                    this.searchDetails.triedKeys = [];
+                    this.foundData = null;
+                    
+                    // Try different key formats
+                    const possibleKeys = [
+                        `${this.domain}.${this.requirement}`,           // AC.3.1.1
+                        `${this.domain}.L2-3.${this.requirement}`,      // AC.L2-3.3.1.1
+                        `${this.domain}-${this.requirement}`,           // AC-3.1.1
+                        `${this.domain}_${this.requirement}`,           // AC_3.1.1
+                    ];
+                    
+                    this.log(`🔑 Trying ${possibleKeys.length} possible key formats...`);
+                    this.searchDetails.triedKeys = [...possibleKeys];
+                    
+                    // Try exact matches first
+                    for (const key of possibleKeys) {
+                        this.log(`🔍 Checking exact key: "${key}"`);
+                        if (window.LESSONS_DATA[key]) {
+                            this.dataStatus.lessonKey = key;
+                            this.foundData = window.LESSONS_DATA[key];
+                            this.log(`✅ Found exact match: "${key}"`);
+                            return;
+                        }
+                    }
+                    
+                    // Try substring search
+                    this.log('🔍 Trying substring search...');
+                    const allKeys = Object.keys(window.LESSONS_DATA);
+                    const foundKey = allKeys.find(key => {
+                        const matches = key.includes(this.domain) && key.includes(this.requirement);
+                        if (matches) {
+                            this.log(`🔍 Substring match candidate: "${key}"`);
+                        }
+                        return matches;
+                    });
+                    
+                    if (foundKey) {
+                        this.dataStatus.lessonKey = foundKey;
+                        this.foundData = window.LESSONS_DATA[foundKey];
+                        this.log(`✅ Found substring match: "${foundKey}"`);
+                    } else {
+                        this.log('❌ No matching lesson found');
+                        this.log(`💡 Searched in ${allKeys.length} available keys`);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

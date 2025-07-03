@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en" :class="{ 'dark': $store.app.theme === 'dark' }" x-data>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - CMMC Courses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>    <script src="https://unpkg.com/heroicons@2.0.16/24/outline/index.js" type="module"></script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">    <!-- Header -->
+    <header id="header-container"></header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="coursesData()">
+        <!-- Page Header -->
+        <section class="mb-8">
+            <div class="editable" 
+                 id="courses-header"
+                 :contenteditable="$store.app.edit"
+                 @blur="$store.app.saveContent('courses-header', $event.target.innerHTML)">
+                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    CMMC 2.0 Training Courses
+                </h1>
+                <p class="text-xl text-gray-600 dark:text-gray-300">
+                    Master cybersecurity requirements with comprehensive training modules
+                </p>
+            </div>
+        </section>
+
+        <!-- Search and Filter -->
+        <section class="mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                    <!-- Search -->
+                    <div class="relative flex-1 lg:max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               x-model="searchQuery"
+                               placeholder="Search courses..."
+                               class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- Filter Tags -->
+                    <div class="flex flex-wrap gap-2">
+                        <button @click="selectedFilter = 'all'"
+                                :class="selectedFilter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+                                class="px-3 py-1 text-sm rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                            All Courses
+                        </button>
+                        <button @click="selectedFilter = 'completed'"
+                                :class="selectedFilter === 'completed' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+                                class="px-3 py-1 text-sm rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                            Completed
+                        </button>
+                        <button @click="selectedFilter = 'in-progress'"
+                                :class="selectedFilter === 'in-progress' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+                                class="px-3 py-1 text-sm rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                            In Progress
+                        </button>
+                        <button @click="selectedFilter = 'not-started'"
+                                :class="selectedFilter === 'not-started' ? 'bg-blue-500 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
+                                class="px-3 py-1 text-sm rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-300 dark:hover:bg-gray-600">
+                            Not Started
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Course Grid -->
+        <section class="mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <template x-for="course in filteredCourses" :key="course.id">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl hover:scale-105 transition-all duration-200 cursor-pointer"
+                         @click="window.location.href = `course.html?id=${course.id}`">
+                        <!-- Course Header -->
+                        <div class="p-6 pb-4">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="flex items-center space-x-3">
+                                    <div class="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                                        <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400" x-text="course.id"></span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span x-show="$store.app.isCourseComplete(course.id)"
+                                          class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Complete
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2" x-text="course.title"></h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm mb-4" x-text="getCourseDescription(course.id)"></p>
+                        </div>
+                        
+                        <!-- Progress Bar -->
+                        <div class="px-6 pb-4">
+                            <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 mb-2">
+                                <span>Progress</span>
+                                <span x-text="`${getCourseProgress(course.id)}%`">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                <div class="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-500"
+                                     :style="`width: ${getCourseProgress(course.id)}%`"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Course Stats -->
+                        <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex items-center space-x-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                        </svg>
+                                        <span x-text="`${getLessonCount(course.id)} lessons`">0 lessons</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>~30 min</span>
+                                    </div>
+                                </div>
+                                <div class="text-blue-600 dark:text-blue-400 font-medium">
+                                    Start Course →
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </section>
+    </main>    <!-- Footer -->
+    <footer id="footer-container"></footer>    <script>
+        function coursesData() {
+            return {
+                searchQuery: '',
+                selectedFilter: 'all',
+                courses: [],                init() {
+                    // Load courses from global data
+                    this.loadCourses();
+                    console.log('Courses initialized:', this.courses.length);
+                    console.log('Available global data:', {
+                        COURSES_DATA: window.COURSES_DATA ? window.COURSES_DATA.length : 'undefined',
+                        CURRICULUM_DATA: window.CURRICULUM_DATA ? Object.keys(window.CURRICULUM_DATA.LESSONS || {}).length : 'undefined',
+                        LESSONS_DATA: window.LESSONS_DATA ? Object.keys(window.LESSONS_DATA).length : 'undefined'
+                    });
+                },
+                
+                loadCourses() {
+                    // Use global curriculum data
+                    if (window.COURSES_DATA && window.COURSES_DATA.length > 0) {
+                        this.courses = window.COURSES_DATA;
+                        console.log('Loaded courses from global data:', this.courses.length);
+                    } else {
+                        // Fallback courses data
+                        this.courses = [
+                            { id: "AC", title: "Access Control", icon: "lock-closed" },
+                            { id: "AT", title: "Awareness & Training", icon: "presentation-chart-bar" },
+                            { id: "AU", title: "Audit & Accountability", icon: "clipboard-document" },
+                            { id: "CM", title: "Configuration Management", icon: "cog-8-tooth" },
+                            { id: "IA", title: "Identification & Authentication", icon: "finger-print" },
+                            { id: "IR", title: "Incident Response", icon: "exclamation-triangle" },
+                            { id: "MA", title: "Maintenance", icon: "wrench-screwdriver" },
+                            { id: "MP", title: "Media Protection", icon: "document" },
+                            { id: "PS", title: "Personnel Security", icon: "users" },
+                            { id: "PE", title: "Physical Protection", icon: "building-office" },
+                            { id: "RA", title: "Risk Assessment", icon: "shield-check" },
+                            { id: "CA", title: "Security Assessment", icon: "magnifying-glass" },
+                            { id: "SC", title: "System & Comms Protection", icon: "wifi" },
+                            { id: "SI", title: "System & Info Integrity", icon: "bug-ant" }
+                        ];
+                        console.log('Using fallback courses:', this.courses.length);
+                    }
+                },
+                
+                get filteredCourses() {
+                    let filtered = this.courses;
+                    
+                    // Apply search filter
+                    if (this.searchQuery) {
+                        filtered = filtered.filter(course => 
+                            course.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+                            course.id.toLowerCase().includes(this.searchQuery.toLowerCase())
+                        );
+                    }
+                    
+                    // Apply completion filter
+                    if (this.selectedFilter === 'completed') {
+                        filtered = filtered.filter(course => Alpine.store('app').isCourseComplete(course.id));
+                    } else if (this.selectedFilter === 'in-progress') {
+                        filtered = filtered.filter(course => {
+                            const progress = this.getCourseProgress(course.id);
+                            return progress > 0 && progress < 100;
+                        });
+                    } else if (this.selectedFilter === 'not-started') {
+                        filtered = filtered.filter(course => this.getCourseProgress(course.id) === 0);
+                    }
+                    
+                    return filtered;
+                },
+                
+                getCourseDescription(courseId) {
+                    const descriptions = {
+                        'AC': 'Control access to systems and data through proper user management and authorization.',
+                        'AT': 'Build security awareness and train personnel on cybersecurity best practices.',
+                        'AU': 'Implement comprehensive auditing and accountability measures for all system activities.',
+                        'CM': 'Establish and maintain secure configurations for all organizational systems.',
+                        'IA': 'Implement strong identification and authentication mechanisms for users and devices.',
+                        'IR': 'Develop and maintain incident response capabilities to handle security events.',
+                        'MA': 'Ensure secure maintenance practices for all organizational systems.',
+                        'MP': 'Protect sensitive media containing controlled unclassified information.',
+                        'PS': 'Implement personnel security measures and background screening processes.',
+                        'PE': 'Establish physical security controls to protect facilities and equipment.',
+                        'RA': 'Conduct regular risk assessments and vulnerability management activities.',
+                        'CA': 'Perform security assessments and implement continuous monitoring.',
+                        'SC': 'Protect system communications and implement boundary protection.',
+                        'SI': 'Maintain system integrity and protect against malicious code.'
+                    };
+                    return descriptions[courseId] || 'Comprehensive cybersecurity training module.';
+                },
+                  getCourseProgress(courseId) {
+                    // Calculate progress based on completed lessons using real curriculum data
+                    const totalLessons = this.getLessonCount(courseId);
+                    if (totalLessons === 0) return 0;
+                    
+                    let completedLessons = 0;
+                    // Check localStorage for completed lessons in this course
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith(`lesson_${courseId}_`) && !key.endsWith('_date') && localStorage.getItem(key) === 'completed') {
+                            completedLessons++;
+                        }
+                    }
+                    
+                    return Math.round((completedLessons / totalLessons) * 100);
+                },                getLessonCount(courseId) {
+                    // Use real curriculum data if available
+                    if (window.CURRICULUM_DATA && window.CURRICULUM_DATA.LESSONS && window.CURRICULUM_DATA.LESSONS[courseId]) {
+                        return Object.keys(window.CURRICULUM_DATA.LESSONS[courseId]).length;
+                    }
+                    
+                    // Fallback to hardcoded counts if curriculum data isn't loaded
+                    const lessonCounts = {
+                        'AC': 22, 'AT': 3, 'AU': 9, 'CM': 9, 'IA': 11, 'IR': 3,
+                        'MA': 6, 'MP': 9, 'PS': 2, 'PE': 6, 'RA': 3, 'CA': 2, 'SC': 16, 'SI': 7
+                    };
+                    return lessonCounts[courseId] || 0;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
+            }
+        }
+    </script>
+</body>
+</html>

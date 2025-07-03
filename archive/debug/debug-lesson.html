@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Lesson Data</title>
+</head>
+<body>
+    <h1>Debug Lesson Data Loading</h1>
+    <div id="debug-output"></div>
+    
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        function debugLessonData() {
+            const debugOutput = document.getElementById('debug-output');
+            
+            // Check if LESSONS_DATA is available
+            if (typeof LESSONS_DATA !== 'undefined') {
+                debugOutput.innerHTML += '<p><strong>✅ LESSONS_DATA is defined</strong></p>';
+                
+                // Check the global window object
+                if (window.LESSONS_DATA) {
+                    debugOutput.innerHTML += '<p><strong>✅ window.LESSONS_DATA is available</strong></p>';
+                } else {
+                    debugOutput.innerHTML += '<p><strong>❌ window.LESSONS_DATA is NOT available</strong></p>';
+                    // Try to assign it
+                    window.LESSONS_DATA = LESSONS_DATA;
+                    debugOutput.innerHTML += '<p><strong>🔧 Assigned LESSONS_DATA to window.LESSONS_DATA</strong></p>';
+                }
+                
+                // Show available keys
+                const keys = Object.keys(LESSONS_DATA);
+                debugOutput.innerHTML += `<p><strong>Total lessons:</strong> ${keys.length}</p>`;
+                debugOutput.innerHTML += '<p><strong>First 10 keys:</strong></p>';
+                debugOutput.innerHTML += '<ul>';
+                keys.slice(0, 10).forEach(key => {
+                    debugOutput.innerHTML += `<li>${key}</li>`;
+                });
+                debugOutput.innerHTML += '</ul>';
+                
+                // Test the lookup for AC.3.1.1
+                const domain = 'AC';
+                const requirement = '3.1.1';
+                const foundKey = keys.find(key => 
+                    key.includes(domain) && key.includes(requirement)
+                );
+                
+                debugOutput.innerHTML += `<p><strong>Looking for domain:</strong> ${domain}, requirement: ${requirement}</p>`;
+                debugOutput.innerHTML += `<p><strong>Found key:</strong> ${foundKey || 'NOT FOUND'}</p>`;
+                
+                if (foundKey) {
+                    const lessonData = LESSONS_DATA[foundKey];
+                    debugOutput.innerHTML += '<p><strong>Lesson data structure:</strong></p>';
+                    debugOutput.innerHTML += `<pre>${JSON.stringify(lessonData, null, 2).substring(0, 500)}...</pre>`;
+                }
+                
+            } else {
+                debugOutput.innerHTML += '<p><strong>❌ LESSONS_DATA is NOT defined</strong></p>';
+            }
+        }
+        
+        // Run the debug after a short delay
+        setTimeout(debugLessonData, 100);
+    </script>
+</body>
+</html>

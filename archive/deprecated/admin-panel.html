@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: $persist(false) }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS Admin Panel - Lesson Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/css/overrides.css" rel="stylesheet">
+    <style>
+        .admin-header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        .lesson-card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            transition: box-shadow 0.2s;
+        }
+        .lesson-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .status-incomplete { border-left: 4px solid #ffc107; }
+        .status-draft { border-left: 4px solid #17a2b8; }
+        .status-complete { border-left: 4px solid #28a745; }
+        .json-editor {
+            font-family: 'Courier New', monospace;
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.375rem;
+        }
+        .generation-status {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        .mvl-logo {
+            height: 40px;
+            margin-right: 1rem;
+        }
+        .lesson-preview {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 0.375rem;
+            padding: 1rem;
+        }
+        .automation-controls {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body x-cloak>
+    <!-- Header Component -->
+    <div id="header-component"></div>
+
+    <div class="admin-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="d-flex align-items-center">
+                        <img src="assets/img/mvl-logo.png" alt="MVL Group" class="mvl-logo">
+                        <div>
+                            <h1 class="mb-0">MVL-LMS Admin Panel</h1>
+                            <p class="mb-0">CMMC Level 2 Curriculum Management & Automation</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <span class="badge bg-success">GCC High Ready</span>
+                    <span class="badge bg-info">CMMC Level 2</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Automation Controls -->
+        <div class="automation-controls">
+            <h3><i class="fas fa-robot"></i> Automated Lesson Generation</h3>
+            <p class="text-muted">Generate comprehensive lessons using OpenAI GPT-4 and MVL's specialized prompt template.</p>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="generationMode" class="form-label">Generation Mode</label>
+                        <select class="form-select" id="generationMode">
+                            <option value="mock">Mock Mode (Free, Testing)</option>
+                            <option value="openai">OpenAI API (Live Generation)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="domainSelect" class="form-label">Target Domain</label>
+                        <select class="form-select" id="domainSelect">
+                            <option value="">All Domains (110+ lessons)</option>
+                            <option value="AC">Access Control (22 lessons)</option>
+                            <option value="AT">Awareness & Training (3 lessons)</option>
+                            <option value="AU">Audit & Accountability (9 lessons)</option>
+                            <option value="CA">Security Assessment (7 lessons)</option>
+                            <option value="CM">Configuration Management (11 lessons)</option>
+                            <option value="CP">Contingency Planning (4 lessons)</option>
+                            <option value="IA">Identification & Authentication (11 lessons)</option>
+                            <option value="IR">Incident Response (3 lessons)</option>
+                            <option value="MA">Maintenance (2 lessons)</option>
+                            <option value="MP">Media Protection (8 lessons)</option>
+                            <option value="PE">Physical Protection (6 lessons)</option>
+                            <option value="PS">Personnel Security (2 lessons)</option>
+                            <option value="RA">Risk Assessment (3 lessons)</option>
+                            <option value="SA">System Acquisition (22 lessons)</option>
+                            <option value="SC">System Protection (43 lessons)</option>
+                            <option value="SI">System Integrity (16 lessons)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="practiceId" class="form-label">Specific Practice ID (Optional)</label>
+                        <input type="text" class="form-control" id="practiceId" placeholder="e.g., 3.1.7">
+                        <div class="form-text">Leave empty to generate all practices in the selected domain</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="createBackup" checked>
+                            <label class="form-check-label" for="createBackup">
+                                Create backup before generation
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="validateOutput" checked>
+                            <label class="form-check-label" for="validateOutput">
+                                Validate JSON structure after generation
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="d-flex gap-2">
+                <button class="btn btn-primary" onclick="startGeneration()">
+                    <i class="fas fa-magic"></i> Start Generation
+                </button>
+                <button class="btn btn-outline-secondary" onclick="testConnection()">
+                    <i class="fas fa-plug"></i> Test OpenAI Connection
+                </button>
+                <button class="btn btn-outline-info" onclick="previewPrompt()">
+                    <i class="fas fa-eye"></i> Preview Prompt
+                </button>
+            </div>
+        </div>
+
+        <!-- Generation Status -->
+        <div id="generationStatus" class="generation-status" style="display: none;">
+            <h4><i class="fas fa-cog fa-spin"></i> Generation in Progress</h4>
+            <div class="progress mb-2">
+                <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+            </div>
+            <div id="statusText">Initializing...</div>
+            <div id="currentLesson" class="text-muted"></div>
+        </div>
+
+        <!-- Curriculum Overview -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2>Curriculum Overview</h2>
+                    <div>
+                        <button class="btn btn-outline-primary" onclick="loadCurriculum()">
+                            <i class="fas fa-refresh"></i> Refresh
+                        </button>
+                        <button class="btn btn-success" onclick="exportCurriculum()">
+                            <i class="fas fa-download"></i> Export
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="curriculumStats" class="row mb-4">
+                    <!-- Stats will be populated here -->
+                </div>
+                
+                <div id="domainList">
+                    <!-- Domain cards will be populated here -->
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-edit"></i> Lesson Editor</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="editorContent">
+                            <p class="text-muted">Select a lesson to edit its content.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Recent Changes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentChanges">
+                            <p class="text-muted">No recent changes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Edit Modal -->
+    <div class="modal fade" id="lessonEditModal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Lesson</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>JSON Editor</h6>
+                            <textarea id="lessonJsonEditor" class="form-control json-editor" rows="20"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Preview</h6>
+                            <div id="lessonPreview" class="lesson-preview"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLesson()">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        let currentEditingLesson = null;
+        
+        // Initialize admin panel
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCurriculum();
+            updateRecentChanges();
+        });
+        
+        function loadCurriculum() {
+            if (typeof curriculumData === 'undefined') {
+                document.getElementById('curriculumStats').innerHTML = 
+                    '<div class="col-12"><div class="alert alert-warning">Curriculum data not loaded. Please refresh the page.</div></div>';
+                return;
+            }
+            
+            updateCurriculumStats();
+            renderDomainList();
+        }
+        
+        function updateCurriculumStats() {
+            const domains = Object.keys(curriculumData.domains || {});
+            let totalLessons = 0;
+            let completeLessons = 0;
+            
+            domains.forEach(domainId => {
+                const practices = curriculumData.domains[domainId].practices || {};
+                const lessons = Object.values(practices);
+                totalLessons += lessons.length;
+                completeLessons += lessons.filter(l => l.status === 'Complete').length;
+            });
+            
+            const completionRate = totalLessons > 0 ? ((completeLessons / totalLessons) * 100).toFixed(1) : 0;
+            
+            document.getElementById('curriculumStats').innerHTML = `
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-primary">${domains.length}</h3>
+                            <p class="mb-0">Domains</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-info">${totalLessons}</h3>
+                            <p class="mb-0">Total Lessons</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-success">${completeLessons}</h3>
+                            <p class="mb-0">Complete</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-warning">${completionRate}%</h3>
+                            <p class="mb-0">Progress</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderDomainList() {
+            const domains = curriculumData.domains || {};
+            let html = '';
+            
+            Object.entries(domains).forEach(([domainId, domain]) => {
+                const practices = domain.practices || {};
+                const lessons = Object.values(practices);
+                const completeCount = lessons.filter(l => l.status === 'Complete').length;
+                
+                html += `
+                    <div class="card lesson-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">${domainId}: ${domain.name}</h5>
+                            <div>
+                                <span class="badge bg-primary">${lessons.length} lessons</span>
+                                <span class="badge bg-success">${completeCount} complete</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                `;
+                
+                Object.entries(practices).forEach(([practiceId, lesson]) => {
+                    const statusClass = lesson.status === 'Complete' ? 'status-complete' : 
+                                       lesson.status === 'Draft' ? 'status-draft' : 'status-incomplete';
+                    
+                    html += `
+                        <div class="col-md-6 mb-2">
+                            <div class="card lesson-card ${statusClass}">
+                                <div class="card-body p-2">
+                                    <h6 class="card-title mb-1">${practiceId}</h6>
+                                    <p class="card-text small text-muted mb-1">${lesson.title}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">${lesson.readTime || 'N/A'}</small>
+                                        <button class="btn btn-sm btn-outline-primary" onclick="editLesson('${domainId}', '${practiceId}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('domainList').innerHTML = html;
+        }
+        
+        function editLesson(domainId, practiceId) {
+            const lesson = curriculumData.domains[domainId].practices[practiceId];
+            currentEditingLesson = { domainId, practiceId };
+            
+            document.getElementById('lessonJsonEditor').value = JSON.stringify(lesson, null, 2);
+            updateLessonPreview();
+            
+            const modal = new bootstrap.Modal(document.getElementById('lessonEditModal'));
+            modal.show();
+        }
+        
+        function updateLessonPreview() {
+            try {
+                const jsonText = document.getElementById('lessonJsonEditor').value;
+                const lesson = JSON.parse(jsonText);
+                
+                document.getElementById('lessonPreview').innerHTML = `
+                    <h6>${lesson.title}</h6>
+                    <p><strong>Status:</strong> ${lesson.status}</p>
+                    <p><strong>Read Time:</strong> ${lesson.readTime}</p>
+                    <p><strong>Why:</strong> ${lesson.why}</p>
+                    <h6>Quiz:</h6>
+                    <p><strong>Q:</strong> ${lesson.quiz?.q || 'No quiz'}</p>
+                    <h6>Resources:</h6>
+                    <ul>
+                        ${lesson.resources?.map(r => `<li><a href="${r.url}" target="_blank">${r.title}</a></li>`).join('') || '<li>No resources</li>'}
+                    </ul>
+                `;
+            } catch (error) {
+                document.getElementById('lessonPreview').innerHTML = `<div class="alert alert-danger">Invalid JSON: ${error.message}</div>`;
+            }
+        }
+        
+        function saveLesson() {
+            if (!currentEditingLesson) return;
+            
+            try {
+                const jsonText = document.getElementById('lessonJsonEditor').value;
+                const lesson = JSON.parse(jsonText);
+                
+                // Update the curriculum data
+                curriculumData.domains[currentEditingLesson.domainId].practices[currentEditingLesson.practiceId] = lesson;
+                
+                // Save to localStorage as temporary storage
+                localStorage.setItem('mvl-curriculum-temp', JSON.stringify(curriculumData));
+                
+                // Update display
+                loadCurriculum();
+                updateRecentChanges();
+                
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('lessonEditModal')).hide();
+                
+                alert('Lesson saved successfully! Note: This is temporary storage. Use Export to save permanently.');
+                
+            } catch (error) {
+                alert('Error saving lesson: ' + error.message);
+            }
+        }
+        
+        function exportCurriculum() {
+            const dataStr = JSON.stringify(curriculumData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `mvl-curriculum-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+        
+        function startGeneration() {
+            const mode = document.getElementById('generationMode').value;
+            const domain = document.getElementById('domainSelect').value;
+            const practiceId = document.getElementById('practiceId').value.trim();
+            
+            document.getElementById('generationStatus').style.display = 'block';
+            document.getElementById('statusText').textContent = 'Starting generation...';
+            
+            // Simulate generation process (replace with actual API calls)
+            simulateGeneration(mode, domain, practiceId);
+        }
+        
+        function simulateGeneration(mode, domain, practiceId) {
+            let progress = 0;
+            const total = practiceId ? 1 : (domain ? getDomainLessonCount(domain) : 110);
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress > 100) progress = 100;
+                
+                document.getElementById('progressBar').style.width = progress + '%';
+                document.getElementById('statusText').textContent = `Generating lessons... ${Math.round(progress)}%`;
+                document.getElementById('currentLesson').textContent = `Processing ${domain || 'AC'}.${practiceId || '3.1.' + Math.ceil(Math.random() * 22)}`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('statusText').textContent = 'Generation complete!';
+                    document.getElementById('currentLesson').textContent = `Generated ${total} lessons successfully.`;
+                    
+                    setTimeout(() => {
+                        document.getElementById('generationStatus').style.display = 'none';
+                        loadCurriculum();
+                    }, 2000);
+                }
+            }, 500);
+        }
+        
+        function getDomainLessonCount(domain) {
+            const counts = {
+                'AC': 22, 'AT': 3, 'AU': 9, 'CA': 7, 'CM': 11, 'CP': 4,
+                'IA': 11, 'IR': 3, 'MA': 2, 'MP': 8, 'PE': 6, 'PS': 2,
+                'RA': 3, 'SA': 22, 'SC': 43, 'SI': 16
+            };
+            return counts[domain] || 1;
+        }
+        
+        function testConnection() {
+            alert('OpenAI connection test would be implemented here. For now, use Mock Mode for testing.');
+        }
+        
+        function previewPrompt() {
+            alert('Prompt preview would show the filled template here. Check prompts/mvl-lesson.tpl.md for the current template.');
+        }
+        
+        function updateRecentChanges() {
+            document.getElementById('recentChanges').innerHTML = `
+                <small class="text-muted d-block">System initialized</small>
+                <small class="text-muted d-block">Curriculum loaded</small>
+                <small class="text-muted d-block">Admin panel ready</small>
+            `;
+        }
+        
+        // JSON editor auto-preview
+        document.addEventListener('DOMContentLoaded', function() {
+            const editor = document.getElementById('lessonJsonEditor');            if (editor) {
+                editor.addEventListener('input', updateLessonPreview);
+            }
+        });
+    </script>
+
+    <!-- Component Loading Scripts -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

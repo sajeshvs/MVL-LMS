@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" :class="{ 'dark': $store.app.theme === 'dark' }" x-data>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - CMMC Courses (DEBUG)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
+    <!-- Debug Information -->
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-4">
+        <div class="flex">
+            <div class="flex-shrink-0">
+                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm">
+                    <strong>DEBUG MODE:</strong> This is a diagnostic version of courses.html to help identify loading issues.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header id="header-container">
+        <div class="bg-blue-500 text-white p-4 text-center">
+            Loading header component...
+        </div>
+    </header>
+
+    <!-- Debug Panel -->
+    <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">System Diagnostic</h2>
+            <div id="debug-info" class="space-y-2 text-sm">
+                <div>🔄 Initializing diagnostic checks...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="coursesData()">
+        <!-- Course Grid -->
+        <section class="mb-12">
+            <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-8">CMMC 2.0 Training Courses</h1>
+            
+            <!-- Course Count Display -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
+                <div class="text-lg font-semibold">
+                    Courses Found: <span x-text="courses.length" class="text-blue-600">0</span>
+                </div>
+                <div class="text-sm text-gray-600" x-show="courses.length === 0">
+                    ⚠️ No courses are loading. Check debug information above.
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <template x-for="course in courses" :key="course.id">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 p-6">
+                        <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2" x-text="course.title"></h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm mb-4" x-text="course.id"></p>
+                        <div class="text-sm text-gray-500">
+                            Lessons: <span x-text="getLessonCount(course.id)"></span>
+                        </div>
+                    </div>
+                </template>
+            </div>
+            
+            <!-- Fallback message if no courses -->
+            <div x-show="courses.length === 0" class="text-center py-12">
+                <div class="text-6xl text-gray-300 mb-4">📚</div>
+                <h3 class="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">No Courses Found</h3>
+                <p class="text-gray-500">Check the debug information above for details.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer id="footer-container">
+        <div class="bg-gray-200 text-gray-600 p-4 text-center">
+            Loading footer component...
+        </div>
+    </footer>
+
+    <script>
+        // Enhanced diagnostic logging
+        console.log('=== COURSES DEBUG PAGE LOADED ===');
+        console.log('Time:', new Date().toISOString());
+        console.log('URL:', window.location.href);
+        console.log('User Agent:', navigator.userAgent);
+
+        function coursesData() {
+            return {
+                searchQuery: '',
+                selectedFilter: 'all',
+                courses: [],
+                
+                init() {
+                    console.log('=== COURSES DATA INIT ===');
+                    this.loadCourses();
+                    this.updateDebugInfo();
+                    
+                    // Wait a moment and update again to catch async loading
+                    setTimeout(() => {
+                        this.updateDebugInfo();
+                    }, 1000);
+                },
+                
+                loadCourses() {
+                    console.log('Loading courses...');
+                    console.log('Available data:', {
+                        COURSES_DATA: window.COURSES_DATA ? window.COURSES_DATA.length : 'undefined',
+                        CURRICULUM_DATA: window.CURRICULUM_DATA ? Object.keys(window.CURRICULUM_DATA.LESSONS || {}).length : 'undefined',
+                        LESSONS_DATA: window.LESSONS_DATA ? Object.keys(window.LESSONS_DATA).length : 'undefined'
+                    });
+                    
+                    if (window.COURSES_DATA && window.COURSES_DATA.length > 0) {
+                        this.courses = window.COURSES_DATA;
+                        console.log('✅ Loaded courses from global data:', this.courses.length);
+                    } else {
+                        console.log('⚠️ Using fallback courses data');
+                        this.courses = [
+                            { id: "AC", title: "Access Control", icon: "lock-closed" },
+                            { id: "AT", title: "Awareness & Training", icon: "presentation-chart-bar" },
+                            { id: "AU", title: "Audit & Accountability", icon: "clipboard-document" },
+                            { id: "CM", title: "Configuration Management", icon: "cog-8-tooth" },
+                            { id: "IA", title: "Identification & Authentication", icon: "finger-print" },
+                            { id: "IR", title: "Incident Response", icon: "exclamation-triangle" },
+                            { id: "MA", title: "Maintenance", icon: "wrench-screwdriver" },
+                            { id: "MP", title: "Media Protection", icon: "document" },
+                            { id: "PS", title: "Personnel Security", icon: "users" },
+                            { id: "PE", title: "Physical Protection", icon: "building-office" },
+                            { id: "RA", title: "Risk Assessment", icon: "shield-check" },
+                            { id: "CA", title: "Security Assessment", icon: "magnifying-glass" },
+                            { id: "SC", title: "System & Comms Protection", icon: "wifi" },
+                            { id: "SI", title: "System & Info Integrity", icon: "bug-ant" }
+                        ];
+                    }
+                    console.log('Final courses count:', this.courses.length);
+                },
+                
+                getLessonCount(courseId) {
+                    if (window.CURRICULUM_DATA && window.CURRICULUM_DATA.LESSONS && window.CURRICULUM_DATA.LESSONS[courseId]) {
+                        return Object.keys(window.CURRICULUM_DATA.LESSONS[courseId]).length;
+                    }
+                    const lessonCounts = {
+                        'AC': 22, 'AT': 3, 'AU': 9, 'CM': 9, 'IA': 11, 'IR': 3,
+                        'MA': 6, 'MP': 9, 'PS': 2, 'PE': 6, 'RA': 3, 'CA': 2, 'SC': 16, 'SI': 7
+                    };
+                    return lessonCounts[courseId] || 0;
+                },
+                
+                updateDebugInfo() {
+                    const debugDiv = document.getElementById('debug-info');
+                    const checks = [
+                        `🕐 Time: ${new Date().toLocaleTimeString()}`,
+                        `📍 URL: ${window.location.href}`,
+                        `📊 Courses loaded: ${this.courses.length}`,
+                        `🗂️ COURSES_DATA: ${window.COURSES_DATA ? '✅ Available (' + window.COURSES_DATA.length + ')' : '❌ Missing'}`,
+                        `🗂️ CURRICULUM_DATA: ${window.CURRICULUM_DATA ? '✅ Available (' + Object.keys(window.CURRICULUM_DATA.LESSONS || {}).length + ' domains)' : '❌ Missing'}`,
+                        `📚 LESSONS_DATA: ${window.LESSONS_DATA ? '✅ Available (' + Object.keys(window.LESSONS_DATA).length + ' lessons)' : '❌ Missing'}`,
+                        `🎯 Alpine.js: ${window.Alpine ? '✅ Available' : '❌ Missing'}`,
+                        `🎨 Tailwind: ${document.querySelector('script[src*="tailwindcss"]') ? '✅ Available' : '❌ Missing'}`,
+                        `🔧 Components: ${window.loadMVLComponents ? '✅ Available' : '❌ Missing'}`
+                    ];
+                    
+                    if (debugDiv) {
+                        debugDiv.innerHTML = checks.map(check => 
+                            `<div class="py-1">${check}</div>`
+                        ).join('');
+                    }
+                }
+            }
+        }
+        
+        // Log any JavaScript errors
+        window.addEventListener('error', (event) => {
+            console.error('JavaScript Error:', event.error);
+            const debugDiv = document.getElementById('debug-info');
+            if (debugDiv) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-red-600 font-bold';
+                errorDiv.textContent = `🚨 Error: ${event.error.message}`;
+                debugDiv.appendChild(errorDiv);
+            }
+        });
+    </script>
+</body>
+</html>

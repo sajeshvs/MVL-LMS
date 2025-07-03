@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Debug - Simple</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="assets/js/curriculum-data.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto" x-data="simpleLessonTest()" x-init="init()">
+        <h1 class="text-3xl font-bold mb-6">Simple Lesson Debug</h1>
+        
+        <!-- URL Info -->
+        <div class="bg-white rounded-lg p-6 shadow-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">URL Parameters</h2>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div><strong>Domain:</strong> <span x-text="domain"></span></div>
+                <div><strong>PR Param:</strong> <span x-text="prParam"></span></div>
+                <div><strong>Requirement:</strong> <span x-text="requirement"></span></div>
+                <div><strong>Final Lesson ID:</strong> <span x-text="lessonId"></span></div>
+            </div>
+        </div>
+        
+        <!-- Data Status -->
+        <div class="bg-white rounded-lg p-6 shadow-lg mb-6">
+            <h2 class="text-xl font-semibold mb-4">Data Loading Status</h2>
+            <div class="space-y-2 text-sm">
+                <div><strong>LESSONS_DATA Available:</strong> <span x-text="dataAvailable"></span></div>
+                <div><strong>Total Keys:</strong> <span x-text="totalKeys"></span></div>
+                <div><strong>Lesson Found:</strong> <span x-text="lessonFound"></span></div>
+                <div><strong>Lesson Key Used:</strong> <span x-text="usedKey"></span></div>
+            </div>
+        </div>
+        
+        <!-- Lesson Content -->
+        <div class="bg-white rounded-lg p-6 shadow-lg" x-show="lessonFound">
+            <h2 class="text-xl font-semibold mb-4">Lesson Content</h2>
+            <div class="space-y-4">
+                <div><strong>Title:</strong> <span x-text="lesson.title"></span></div>
+                <div><strong>Official Requirement:</strong> <span x-text="lesson.officialRequirement"></span></div>
+                
+                <div x-show="lesson.whyMatters">
+                    <strong>Why It Matters:</strong>
+                    <ul class="list-disc list-inside mt-2">
+                        <template x-for="item in lesson.whyMatters" :key="item">
+                            <li x-text="item"></li>
+                        </template>
+                    </ul>
+                </div>
+                
+                <div x-show="lesson.howMVLDoes">
+                    <strong>How MVL Does It:</strong>
+                    <ul class="list-decimal list-inside mt-2">
+                        <template x-for="item in lesson.howMVLDoes" :key="item">
+                            <li x-text="item"></li>
+                        </template>
+                    </ul>
+                </div>
+                
+                <div x-show="lesson.quiz">
+                    <strong>Quiz Questions Available:</strong> <span x-text="lesson.quiz.length"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Not Found -->
+        <div class="bg-red-50 border border-red-200 rounded-lg p-6" x-show="!lessonFound && dataAvailable">
+            <h2 class="text-xl font-semibold text-red-800 mb-4">Lesson Not Found</h2>
+            <p class="text-red-700">Could not find lesson data for the current URL parameters.</p>
+            <div class="mt-4 text-sm text-red-600">
+                <p>Searched for keys containing:</p>
+                <ul class="list-disc list-inside">
+                    <li>Domain: <span x-text="domain"></span></li>
+                    <li>Requirement: <span x-text="requirement"></span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function simpleLessonTest() {
+            return {
+                domain: '',
+                prParam: '',
+                requirement: '',
+                lessonId: '',
+                dataAvailable: false,
+                totalKeys: 0,
+                lessonFound: false,
+                usedKey: '',
+                lesson: {},
+                
+                init() {
+                    console.log('Simple lesson test initializing...');
+                    this.parseUrlParams();
+                    this.waitForData().then(() => {
+                        this.loadLessonData();
+                    });
+                },
+                
+                async waitForData(maxAttempts = 50) {
+                    for (let i = 0; i < maxAttempts; i++) {
+                        if (window.LESSONS_DATA && Object.keys(window.LESSONS_DATA).length > 0) {
+                            console.log('Data is ready');
+                            return true;
+                        }
+                        console.log(`Waiting for data... attempt ${i + 1}`);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    }
+                    console.error('Data failed to load');
+                    return false;
+                },
+                
+                parseUrlParams() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.domain = urlParams.get('domain') || 'AC';
+                    this.prParam = urlParams.get('pr') || '';
+                    
+                    // Handle both 'pr' and 'requirement' parameters
+                    if (this.prParam) {
+                        if (this.prParam.includes('.')) {
+                            const parts = this.prParam.split('.');
+                            this.requirement = parts.slice(1).join('.');
+                        } else {
+                            this.requirement = this.prParam;
+                        }
+                    } else {
+                        this.requirement = urlParams.get('requirement') || '3.1.1';
+                    }
+                    
+                    this.lessonId = `${this.domain}.${this.requirement}`;
+                    
+                    console.log('Parsed URL params:', {
+                        domain: this.domain,
+                        prParam: this.prParam,
+                        requirement: this.requirement,
+                        lessonId: this.lessonId
+                    });
+                },
+                
+                loadLessonData() {
+                    this.dataAvailable = !!(window.LESSONS_DATA);
+                    if (!window.LESSONS_DATA) {
+                        console.error('LESSONS_DATA not available');
+                        return;
+                    }
+                    
+                    const allKeys = Object.keys(window.LESSONS_DATA);
+                    this.totalKeys = allKeys.length;
+                    
+                    console.log('Available lesson keys:', allKeys);
+                    console.log('Looking for lesson with domain:', this.domain, 'requirement:', this.requirement);
+                    
+                    // Try different key formats
+                    const possibleKeys = [
+                        `${this.domain}.${this.requirement}`,
+                        `${this.domain}.L2-3.${this.requirement}`,
+                        `${this.domain}-${this.requirement}`,
+                        `${this.domain}_${this.requirement}`,
+                    ];
+                    
+                    // First try exact matches
+                    for (const key of possibleKeys) {
+                        if (window.LESSONS_DATA[key]) {
+                            this.usedKey = key;
+                            this.lesson = window.LESSONS_DATA[key];
+                            this.lessonFound = true;
+                            console.log('Found exact match with key:', key);
+                            return;
+                        }
+                    }
+                    
+                    // Try substring search
+                    const foundKey = allKeys.find(key => 
+                        key.includes(this.domain) && key.includes(this.requirement)
+                    );
+                    
+                    if (foundKey) {
+                        this.usedKey = foundKey;
+                        this.lesson = window.LESSONS_DATA[foundKey];
+                        this.lessonFound = true;
+                        console.log('Found substring match with key:', foundKey);
+                    } else {
+                        console.log('No lesson found for', this.domain, this.requirement);
+                        console.log('Tried keys:', possibleKeys);
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

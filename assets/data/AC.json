@@ -1,0 +1,207 @@
+{
+  "id": "AC",
+  "title": "Access Control",
+  "lessons": {
+    "3.1.1": {
+      "status": "Incomplete",
+      "readTime": "6 min read",
+      "title": "Account Management",
+      "officialRequirement": "a. Define the types of system accounts allowed and prohibited. b. Create, enable, modify, disable, and remove system accounts in accordance with policy, procedures, prerequisites, and criteria. c. Specify: 1. Authorized users of the system, 2. Group and role membership, and 3. Access authorizations (i.e., privileges) for each account. d. Authorize access to the system based on: 1. A valid access authorization and 2. Intended system usage. e. Monitor the use of system accounts. f. Disable system accounts when: 1. The accounts have expired, 2. The accounts have been inactive for [Assignment: organization-defined time period], 3. The accounts are no longer associated with a user or individual, 4. The accounts are in violation of organizational policy, or 5. Significant risks associated with individuals are discovered. g. Notify account managers and designated personnel or roles within: 1. [Assignment: organization-defined time period] when accounts are no longer required. 2. [Assignment: organization-defined time period] when users are terminated or transferred. 3. [Assignment: organization-defined time period] when system usage or the need-to-know changes for an individual. h. Require that users log out of the system after [Assignment: organization-defined time period] of expected inactivity or when [Assignment: organization-defined circumstances].",
+      "why": "Proper account management is the foundation of access control. Without it, unauthorized users can access CUI and create security breaches that violate CMMC and DFARS requirements.",
+      "nistDiscussion": "This requirement focuses on account management for systems and applications. The definition and enforcement of access authorizations other than those determined by account type (e.g., privileged access, non-privileged access) are addressed in 03.01.02. System account types include individual, group, temporary, system, guest, anonymous, emergency, developer, and service. Users who require administrative privileges on system accounts receive additional scrutiny by personnel responsible for approving such accounts and privileged access. Types of accounts that organizations may prohibit due to increased risk include group, emergency, guest, anonymous, and temporary. Organizations may choose to define access privileges or other attributes by account, type of account, or a combination of both. Other attributes required for authorizing access include restrictions on the time of day, day of the week, and point of origin. When defining other system account attributes, organizations consider system requirements (e.g., system upgrades, scheduled maintenance) and mission and business requirements (e.g., time zone differences, remote access to facilitate travel requirements). Users who pose a significant security risk include individuals for whom reliable evidence indicates either the intention to use authorized access to the system to cause harm or that adversaries will cause harm through them. Close coordination among mission and business owners, system administrators, human resource managers, and legal staff is essential when disabling system accounts for high-risk individuals. Time periods for the notification of organizational personnel or roles may vary. Inactivity logout is behavior- or policy-based and requires users to take physical action to log out when they are expecting inactivity longer than the defined period. Automatic enforcement of inactivity logout is addressed by 03.01.10.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Implement **Azure AD Conditional Access** policies to enforce account standards and monitor usage patterns.",
+          "Configure **Microsoft Entra ID Governance** for automated account lifecycle management with approval workflows.",
+          "Deploy **Azure AD Identity Protection** to detect and respond to risky sign-in attempts and compromised accounts.",
+          "Use **Privileged Identity Management (PIM)** to provide just-in-time access for administrative accounts.",
+          "Set up **automated account deprovisioning** within 24 hours of HR termination notices via API integration.",
+          "Enable **Sign-in risk policies** to require MFA for unusual access patterns or locations."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Your account access is monitored for security compliance—this protects both you and the company.",
+          "Report any suspicious account activity immediately to the IT security team.",
+          "Your account will be automatically disabled if inactive for more than 90 days.",
+          "Use only your assigned account—never share credentials or use service accounts for personal work."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "Proper account management reduces the risk of data breaches by up to 80% according to Verizon's DBIR.",
+          "Automated account lifecycle management reduces administrative overhead and improves compliance posture.",
+          "Real-time account monitoring enables rapid response to potential security incidents.",
+          "Supports compliance with CMMC Level 2 requirements for controlled access to CUI."
+        ]
+      },
+      "mvlTips": [
+        "Use the Azure AD admin center to review account status and access rights monthly.",
+        "Implement least-privilege principle—only grant minimum access needed for job functions.",
+        "Regular access reviews help identify and remove unnecessary privileges.",
+        "Document all privileged account justifications for audit purposes."
+      ],
+      "steps": [
+        "Configure Azure AD Conditional Access policies for account standards.",
+        "Set up automated account provisioning and deprovisioning workflows.",
+        "Enable Azure AD Identity Protection with risk-based policies.",
+        "Implement Privileged Identity Management for admin accounts.",
+        "Create monitoring alerts for unusual account activity.",
+        "Establish regular access review cycles."
+      ],
+      "quiz": {
+        "q": "What is the maximum inactive period before MVL disables user accounts?",
+        "answers": [
+          "30 days",
+          "60 days", 
+          "90 days",
+          "120 days"
+        ],
+        "correctIndex": 2,
+        "explanation": "MVL disables accounts after 90 days of inactivity to maintain security while allowing for extended business travel or leave."
+      },
+      "resources": [
+        { "label": "NIST SP 800-171r3 03.01.01", "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/800-171r3/NIST.SP.800-171r3.html#d30e734-Head3" },
+        { "label": "Azure AD Identity Governance", "url": "https://docs.microsoft.com/en-us/azure/active-directory/governance/" },
+        { "label": "CMMC Account Management", "url": "https://dodcio.defense.gov/CMMC/Model/" }
+      ]
+    },
+    "3.1.2": {
+      "status": "Incomplete", 
+      "readTime": "5 min read",
+      "title": "Access Enforcement",
+      "officialRequirement": "Enforce approved authorizations for logical access to CUI and system resources in accordance with applicable access control policies.",
+      "why": "Access enforcement ensures that only authorized users can access CUI, preventing data breaches and maintaining compliance with DFARS and CMMC requirements.",
+      "nistDiscussion": "Access control policies control access between active entities or subjects (i.e., users or system processes acting on behalf of users) and passive entities or objects (i.e., devices, files, records, domains) in organizational systems. Types of system access include remote access and access to systems that communicate through external networks, such as the internet. Access enforcement mechanisms can also be employed at the application and service levels to provide increased protection for CUI. This recognizes that the system can host many applications and services in support of mission and business functions. Access control policies are defined in 03.15.01.",
+      "itPerspective": {
+        "title": "IT Professional Implementation", 
+        "content": [
+          "Deploy **Azure AD Conditional Access** with location, device, and risk-based policies.",
+          "Implement **Microsoft Defender for Cloud Apps** to control access to cloud applications.",
+          "Use **Azure Information Protection** to classify and protect CUI at the data level.",
+          "Configure **Windows Hello for Business** for passwordless authentication on managed devices.",
+          "Set up **Application Proxy** for secure remote access to on-premises applications.",
+          "Enable **session controls** in Conditional Access to monitor and limit user actions."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "You may be prompted for additional verification when accessing sensitive data from new locations.",
+          "Some applications may have restricted functionality when accessed from unmanaged devices.",
+          "CUI documents will be automatically classified and protected with usage restrictions.",
+          "Report any access issues immediately—don't try to work around security controls."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "Granular access controls reduce the attack surface and limit potential data exposure.",
+          "Real-time policy enforcement adapts to changing risk conditions automatically.",
+          "Detailed access logs support forensic investigations and compliance reporting.",
+          "Zero-trust architecture improves overall security posture and customer confidence."
+        ]
+      },
+      "mvlTips": [
+        "Use Conditional Access templates for consistent policy deployment across the organization.",
+        "Test new access policies in report-only mode before enforcement.",
+        "Monitor access patterns to identify potential security anomalies.",
+        "Regularly review and update access control policies based on business needs."
+      ],
+      "steps": [
+        "Define access control policies for different user roles and CUI categories.",
+        "Configure Conditional Access policies in Azure AD.",
+        "Deploy Microsoft Defender for Cloud Apps with session controls.",
+        "Implement Azure Information Protection for data classification.",
+        "Set up monitoring and alerting for access policy violations.",
+        "Conduct regular access control policy reviews."
+      ],
+      "quiz": {
+        "q": "What happens when a user tries to access CUI from an unmanaged device?",
+        "answers": [
+          "Access is automatically granted",
+          "Access is blocked or restricted based on policy",
+          "Only read access is allowed",
+          "User receives a warning but can proceed"
+        ],
+        "correctIndex": 1,
+        "explanation": "Conditional Access policies can block or restrict access from unmanaged devices to protect CUI according to organizational security requirements."
+      },
+      "resources": [
+        { "label": "NIST SP 800-171r3 03.01.02", "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/800-171r3/NIST.SP.800-171r3.html#d30e807-Head3" },
+        { "label": "Azure Conditional Access", "url": "https://docs.microsoft.com/en-us/azure/active-directory/conditional-access/" },
+        { "label": "Microsoft Defender for Cloud Apps", "url": "https://docs.microsoft.com/en-us/cloud-app-security/" }
+      ]
+    },
+    "3.1.3": {
+      "status": "Incomplete",
+      "readTime": "6 min read", 
+      "title": "Information Flow Enforcement",
+      "officialRequirement": "Enforce approved authorizations for controlling the flow of CUI within the system and between connected systems.",
+      "why": "Information flow control prevents unauthorized movement of CUI between systems, networks, or security domains, ensuring data protection throughout its lifecycle.",
+      "nistDiscussion": "Information flow control regulates where CUI can transit within a system and between systems (in contrast to who is allowed to access the information) and without regard to subsequent accesses to that information. Flow control restrictions include keeping CUI from being transmitted in the clear to the internet, blocking external communications traffic that claims to be sourced from within the organization, restricting requests to the internet that are not from the internal web proxy server, and limiting CUI transfers between organizations based on data structures and content. Transferring CUI between organizations may require an agreement that specifies how the information flow is enforced (see 03.12.05). Transferring CUI between systems that represent different security domains with different security policies introduces the risk that such transfers violate one or more domain security policies. In such situations, information owners or stewards provide guidance at designated policy enforcement points between interconnected systems. Organizations consider mandating specific architectural solutions when required to enforce specific security policies. Enforcement includes prohibiting CUI transfers between interconnected systems (i.e., allowing information access only), employing hardware mechanisms to enforce one-way information flows, and implementing trustworthy regrading mechanisms to reassign security attributes and security labels. Organizations commonly use information flow control policies and enforcement mechanisms to control the flow of CUI between designated sources and destinations (e.g., networks, individuals, and devices) within systems and between interconnected systems. Flow control is based on characteristics of the information or the information path. Enforcement occurs in boundary protection devices (e.g., encrypted tunnels, routers, gateways, and firewalls) that use rule sets or establish configuration settings that restrict system services, provide a packet-filtering capability based on header information, or provide a message-filtering capability based on message content (e.g., implementing key word searches or using document characteristics). Organizations also consider the trustworthiness of filtering and inspection mechanisms (i.e., hardware, firmware, and software components) that are critical to information flow enforcement.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Deploy **Microsoft Purview Data Loss Prevention (DLP)** to control CUI flow across email, SharePoint, and Teams.",
+          "Configure **Azure Firewall Premium** with TLS inspection and application-aware filtering rules.",
+          "Implement **Microsoft Defender for Cloud Apps** to monitor and control data movement to cloud services.",
+          "Use **Azure Information Protection** labels to track and control CUI as it moves between systems.",
+          "Set up **network segmentation** with Azure Virtual Network security groups and NSGs.",
+          "Deploy **Microsoft Sentinel** analytics rules to detect unauthorized CUI transfers."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "You may receive warnings when trying to share CUI through unauthorized channels.",
+          "Some file sharing or email attachments may be blocked or require additional approval.",
+          "CUI documents are automatically tagged and their movement is monitored.",
+          "Use approved collaboration tools and methods for sharing sensitive information."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "Automated flow controls reduce the risk of accidental CUI disclosure by 85%.",
+          "Real-time monitoring provides visibility into data movement patterns and potential threats.",
+          "Policy-based enforcement ensures consistent protection regardless of user behavior.",
+          "Detailed audit trails support compliance reporting and incident investigation."
+        ]
+      },
+      "mvlTips": [
+        "Configure DLP policies with business-friendly notifications rather than hard blocks where possible.",
+        "Use Azure Information Protection templates to simplify classification for end users.",
+        "Regularly review and tune flow control policies based on business workflow changes.",
+        "Train users on approved methods for CUI sharing to reduce policy violations."
+      ],
+      "steps": [
+        "Classify and label all CUI according to organizational sensitivity levels.",
+        "Configure Microsoft Purview DLP policies for different CUI categories.",
+        "Set up Azure Firewall rules to control network-level information flows.",
+        "Deploy Defender for Cloud Apps with data sharing policies.",
+        "Implement network segmentation for different security domains.",
+        "Create monitoring rules to detect unauthorized information flows."
+      ],
+      "quiz": {
+        "q": "What happens when DLP detects CUI being sent to an external email address?",
+        "answers": [
+          "The email is automatically deleted",
+          "The email is quarantined for review",
+          "The user receives a warning and can choose to proceed",
+          "The email is encrypted automatically"
+        ],
+        "correctIndex": 1,
+        "explanation": "DLP typically quarantines emails containing CUI sent externally for manual review to prevent accidental disclosure while allowing legitimate business needs."
+      },
+      "resources": [
+        { "label": "NIST SP 800-171r3 03.01.03", "url": "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/800-171r3/NIST.SP.800-171r3.html#d30e842-Head3" },
+        { "label": "Microsoft Purview DLP", "url": "https://docs.microsoft.com/en-us/microsoft-365/compliance/dlp-learn-about-dlp" },
+        { "label": "Azure Information Protection", "url": "https://docs.microsoft.com/en-us/azure/information-protection/" }
+      ]
+    }
+  }
+}

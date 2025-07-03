@@ -1,0 +1,293 @@
+{
+  "id": "IA",
+  "title": "Identification & Authentication",
+  "lessons": {
+
+    /* ───────────────────────── 3.5.1 ───────────────────────── */
+    "3.5.1": {
+      "status": "Incomplete",
+      "readTime": "5 min read",
+      "title": "Identify & Authenticate Users and Devices",
+      "officialRequirement": "Identify system users, processes acting on behalf of users, and devices; authenticate (or verify) their identities as a prerequisite to system access.",
+      "why": "If we can’t prove *who* or *what* is connecting, zero-trust falls apart—CUI and GCC-High tenant get exposed.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "**Entra ID** is authoritative: every human and service principal must exist here first.",
+          "All endpoints enrol in **Intune**; compliance state is checked at token issuance (device identity).",
+          "**Managed identities** replace shared service credentials in Azure Functions and Logic Apps.",
+          "**Sentinel UEBA** alerts on unknown Object-IDs or devices missing serial #."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Log on only with your MVL account—personal Microsoft accounts are blocked.",
+          "Every company laptop is named `MVL-<serial>`; spoofing names fails the compliance check.",
+          "Forgotten password? Use **Self-Service Password Reset (SSPR)**, backed by MFA."
+        ]
+      },
+      "managementPerspective": {
+        "title": "Business Impact & Risk Management",
+        "content": [
+          "Zero ‘unknown device’ connections since mandatory Intune (March 2024).",
+          "Provides clean audit trail that satisfies both CMMC and DFARS 252.204-7012(b).",
+          "Enables accurate license counting, saving ≈ USD 18 k/yr."
+        ]
+      },
+      "mvlTips": [
+        "Weekly Sentinel query *“UnknownDeviceSignIns”* must return **0**; CAB reviews if not.",
+        "Service principals rotate secrets every 90 days via GitHub Action."
+      ],
+      "steps": [
+        "Onboard all user and service IDs to Entra ID.",
+        "Block legacy authentication (POP/IMAP, basic SMTP).",
+        "Force Intune compliance at CA level.",
+        "Roll PowerShell script to replace creds with managed identities."
+      ],
+      "quiz": {
+        "q": "Which MVL tool enforces device identity at sign-in?",
+        "answers": ["Zscaler ZPA", "Intune compliance in Conditional Access", "Acronis", "Edge"],
+        "correctIndex": 1
+      },
+      "resources": [
+        { "label": "NIST SP 800-171 3.5.1", "url": "https://csrc.nist.gov" },
+        { "label": "Azure AD Conditional Access", "url": "https://learn.microsoft.com/azure/active-directory/conditional-access" }
+      ]
+    },
+
+    /* ───────────────────────── 3.5.2 ───────────────────────── */
+    "3.5.2": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Uniquely Identify Users",
+      "officialRequirement": "Ensure that the system uniquely identifies and authenticates organizational users.",
+      "why": "Shared credentials erase accountability and violate auditing rules.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Disable local ‘Administrator’; use PIM-controlled named accounts (e.g. `sajesh-priv`).",
+          "Guests provisioned with **B2B External** IDs—always `firstname.lastname.ext@mvl‐guest.com`.",
+          "All Linux sudo activity logs the exact user via sudo-iolog ➜ Sentinel."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Never share your password—even with IT. Support uses screen-share + elevation, not your creds."
+        ]
+      },
+      "quiz": {
+        "q": "How are privileged Windows accounts named at MVL?",
+        "answers": ["admin", "root", "<name>-priv", "service-desk"],
+        "correctIndex": 2
+      }
+    },
+
+    /* ───────────────────────── 3.5.3 ───────────────────────── */
+    "3.5.3": {
+      "status": "Incomplete",
+      "readTime": "5 min read",
+      "title": "Use Multifactor Authentication",
+      "officialRequirement": "Use multifactor authentication for local and network access to privileged accounts and for network access to non-privileged accounts.",
+      "why": "Microsoft data: MFA blocks 99.9 % of credential-stuffing attacks.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "**FIDO2 security keys** required for Global Admins and Developers.",
+          "All other users: Entra push + number match; SMS banned.",
+          "CA policy ‘MFA-Everywhere’ scoped tenant-wide; excludes break-glass.",
+          "**Defender for Cloud Apps** forces MFA re-auth if session risk rises to ‘Medium+’.",
+          "Sentinel analytic *MFA-Bypass* triggers SOC P1 on legacy protocol usage."
+        ]
+      },
+      "employeePerspective": {
+        "title": "What This Means for Employees",
+        "content": [
+          "Expect number-match prompt on phone or tap your YubiKey.",
+          "Travelling? Push notifications may be slower—plan extra 30 s.",
+          "Lost phone/key? Call Service Desk, they’ll issue temp OTP good for 8 h."
+        ]
+      },
+      "managementPerspective": {
+        "content": [
+          "MFA rollout dropped compromised-account tickets from 12/month → 0 (since Aug 2024).",
+          "MFA evidence satisfies IRS 1075, CMMC IA, and cyber-insurer questionnaire."
+        ]
+      },
+      "mvlTips": [
+        "YubiKeys stored in badge lanyards; replacement stock kept in IT Store Rm 2.",
+        "Break-glass account has long random password in physical safe #3; access logged."
+      ],
+      "steps": [
+        "Ship FIDO2 keys to privileged users.",
+        "Enforce CA ‘Require Compliant + MFA’ on all cloud apps.",
+        "Retire Basic Auth connectors.",
+        "Create Sentinel analytic for legacy auth attempts."
+      ],
+      "quiz": {
+        "q": "What factor **is not** allowed at MVL for MFA?",
+        "answers": ["FIDO2 key", "Number-match push", "SMS one-time code", "Authenticator app"],
+        "correctIndex": 2
+      },
+      "resources": [
+        { "label": "NIST SP 800-63B MFA Guidance", "url": "https://pages.nist.gov/800-63-3/sp800-63b.html" }
+      ]
+    },
+
+    /* ───────────────────────── 3.5.4 ───────────────────────── */
+    "3.5.4": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Replay-Resistant Authentication",
+      "officialRequirement": "Employ replay-resistant authentication mechanisms for network access to privileged and non-privileged accounts.",
+      "why": "Tokens that can be replayed allow pass-the-hash attacks.",
+      "itPerspective": {
+        "title": "IT Professional Implementation",
+        "content": [
+          "Disable NTLM in domain; force **Kerberos** or token-based OIDC.",
+          "TLS 1.3 for all external endpoints—PFS thwarts capture-replay.",
+          "SSH servers require **PubKey + FIDO2**; passwords disabled."
+        ]
+      },
+      "quiz": {
+        "q": "Which protocol is blocked to enforce replay-resistant auth on Windows servers?",
+        "answers": ["Kerberos", "NTLM", "TLS 1.3", "SAML"],
+        "correctIndex": 1
+      }
+    },
+
+    /* ───────────────────────── 3.5.5 ───────────────────────── */
+    "3.5.5": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Prevent Identifier Re-Use",
+      "officialRequirement": "Prevent reuse of identifiers for a defined period.",
+      "why": "Recycling UPNs could link new hires to old audit history, confusing investigations.",
+      "itPerspective": {
+        "content": [
+          "AAD recycle bin retains deleted UPNs for 180 days; script blocks creation during that period.",
+          "Email aliases marked ‘retired’ for one year before re-assignment."
+        ]
+      }
+    },
+
+    /* ───────────────────────── 3.5.6 ───────────────────────── */
+    "3.5.6": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Disable Identifiers After Inactivity",
+      "officialRequirement": "Disable user identifiers after a defined period of inactivity.",
+      "why": "Dormant accounts are top attack targets.",
+      "itPerspective": {
+        "content": [
+          "AAD **Access Reviews** auto-disable accounts idle 35 days (contractors).",
+          "Intune device objects stale > 30 days auto-deleted; CA blocks them."
+        ]
+      }
+    },
+
+    /* ───────────────────────── 3.5.7 ───────────────────────── */
+    "3.5.7": {
+      "status": "Incomplete",
+      "readTime": "4 min read",
+      "title": "Enforce Password Complexity / Length",
+      "officialRequirement": "Enforce minimum password complexity and change of characters when new passwords are created.",
+      "why": "Weak passwords + credential dumps = breach.",
+      "itPerspective": {
+        "content": [
+          "**Azure AD Password Protection**: min 14 chars, banned-password list (500 k entries).",
+          "SSPR forces random pass if reset; users can go password-less but not weaker.",
+          "Local administrator passwords rotated by **LAPS** every 24 h."
+        ]
+      },
+      "quiz": {
+        "q": "Minimum password length in AAD Password Protection?",
+        "answers": ["8", "12", "14", "16"],
+        "correctIndex": 2
+      }
+    },
+
+    /* ───────────────────────── 3.5.8 ───────────────────────── */
+    "3.5.8": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Prohibit Password Re-Use",
+      "officialRequirement": "Prohibit password reuse for a specified number of generations.",
+      "why": "Stops ‘pass1234’ ➜ ‘pass1235’ cycles.",
+      "itPerspective": {
+        "content": [
+          "AAD remembers last **24** passwords; cannot be reused.",
+          "Service accounts converted to managed identities—no rotation headaches."
+        ]
+      }
+    },
+
+    /* ───────────────────────── 3.5.9 ───────────────────────── */
+    "3.5.9": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Limit Temporary Password Use",
+      "officialRequirement": "Allow use of temporary passwords only for system-defined time period.",
+      "why": "Temp creds in onboarding emails are tasty phishing bait.",
+      "itPerspective": {
+        "content": [
+          "Temp passwords in AAD expire in **24 h**; enforced via Company Portal.",
+          "Service Desk uses **Passwordless QR** for in-person resets—no temp pass at all."
+        ]
+      }
+    },
+
+    /* ───────────────────────── 3.5.10 ───────────────────────── */
+    "3.5.10": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Protect Passwords in Storage & Transit",
+      "officialRequirement": "Store and transmit only cryptographically protected passwords.",
+      "why": "Plain-text creds = instant fail.",
+      "itPerspective": {
+        "content": [
+          "AAD stores salted + hashed pass (PBKDF2).",
+          "LDAP Simple Bind disabled; only LDAPS.",
+          "**Application Gateway** offloads TLS 1.3 with AES-256."
+        ]
+      }
+    },
+
+    /* ───────────────────────── 3.5.11 ───────────────────────── */
+    "3.5.11": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Obscure Authentication Feedback",
+      "officialRequirement": "Obscure feedback of authentication information.",
+      "why": "Login errors should not confirm a username to brute-forcers.",
+      "itPerspective": {
+        "content": [
+          "AAD custom error: generic ‘Incorrect user or password’.",
+          "Lock-screen hides last logged-in user on Windows (`DontDisplayLastUserName`)."
+        ]
+      }
+    },
+
+    /* ───────────────────────── 3.5.12 ───────────────────────── */
+    "3.5.12": {
+      "status": "Incomplete",
+      "readTime": "3 min read",
+      "title": "Authenticate Network Devices",
+      "officialRequirement": "Authenticate (or verify) the identities of devices before establishing a network connection.",
+      "why": "Rogue Pi on the VLAN? No thanks.",
+      "itPerspective": {
+        "content": [
+          "**802.1X** EAP-TLS with certs from MVL-CA; MAC bypass disabled.",
+          "Zscaler Client Connector enforces device posture before split-tunnel traffic."
+        ]
+      },
+      "quiz": {
+        "q": "What protocol verifies wired & Wi-Fi devices at MVL HQ?",
+        "answers": ["WPA2-PSK", "802.1X EAP-TLS", "Telnet", "SNMPv1"],
+        "correctIndex": 1
+      }
+    }
+
+  }
+}

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Wrapper Tightening - Responsive Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .test-container {
+            border: 2px solid #ddd;
+            padding: 20px;
+            margin: 10px;
+            background: #f8f9fa;
+        }
+        .viewport-indicator {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <div class="viewport-indicator" id="viewport-info">Viewport: <span id="viewport-size"></span></div>
+    
+    <h1 class="text-3xl font-bold text-center mb-8">MVL Logo Wrapper Tightening - All Breakpoints</h1>
+    
+    <div class="space-y-6 max-w-7xl mx-auto">
+        
+        <!-- BEFORE: Fixed/centered wrapper -->
+        <div class="test-container">
+            <h3 class="text-lg font-semibold mb-4 text-red-600">❌ BEFORE: Fixed/Centered Wrapper</h3>
+            <div class="bg-gradient-to-r from-slate-50 to-blue-50 p-4 border-b-4 border-blue-600">
+                <div class="flex items-center space-x-6">
+                    <div style="
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        margin-right: 20px;
+                        padding: 4px;
+                        background: rgba(255,0,0,0.1);
+                        min-width: 80px;
+                    " title="Old Style">
+                        <img src="assets/img/mvl-logo.png" 
+                             alt="MVL Logo" 
+                             style="height: 56px; width: auto;">
+                    </div>
+                    <div class="border-l-2 border-blue-600 pl-6">
+                        <h1 class="text-2xl font-bold text-blue-600">MVL-LMS</h1>
+                        <p class="text-sm text-gray-600">CMMC 2.0 Learning Management System</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-red-600">
+                ❌ Fixed container size<br>
+                ❌ Justify-content: center<br>
+                ❌ Extra padding around logo<br>
+                ❌ No breathing room from blue bar
+            </div>
+        </div>
+        
+        <!-- AFTER: Fit-content wrapper -->
+        <div class="test-container">
+            <h3 class="text-lg font-semibold mb-4 text-green-600">✅ AFTER: Fit-Content Wrapper</h3>
+            <div class="bg-gradient-to-r from-slate-50 to-blue-50 p-4 border-b-4 border-blue-600">
+                <div class="flex items-center space-x-6">
+                    <!-- New Tight Wrapper -->
+                    <div style="
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: flex-start; 
+                        width: fit-content;
+                        height: fit-content;
+                        margin-right: 16px;
+                        padding: 0;
+                        background: transparent;
+                    " title="New Style">
+                        <img src="assets/img/mvl-logo.png" 
+                             alt="MVL Logo" 
+                             style="height: 56px; width: auto; display: block; object-fit: contain;">
+                    </div>
+                    <div class="border-l-2 border-blue-600 pl-6 ml-4">
+                        <h1 class="text-2xl font-bold text-blue-600">MVL-LMS</h1>
+                        <p class="text-sm text-gray-600">CMMC 2.0 Learning Management System</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-green-600">
+                ✅ width: fit-content (hugs logo exactly)<br>
+                ✅ height: fit-content (no fixed dimensions)<br>
+                ✅ justify-content: flex-start<br>
+                ✅ padding: 0 (no extra space)<br>
+                ✅ background: transparent<br>
+                ✅ ml-4 spacing before blue bar
+            </div>
+        </div>
+        
+        <!-- Live Header Implementation -->
+        <div class="test-container">
+            <h3 class="text-lg font-semibold mb-4 text-blue-600">🔴 LIVE: Current Header Implementation</h3>
+            <div class="bg-gradient-to-r from-slate-50 to-blue-50 shadow-lg border-b-4 border-blue-600">
+                <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center py-4 lg:py-0 lg:h-20">
+                        <!-- Logo Section -->
+                        <div class="flex items-center justify-between w-full lg:w-auto mb-4 lg:mb-0">
+                            <div class="flex items-center space-x-6">
+                                <!-- MVL Logo - Tight Wrapper -->
+                                <div style="
+                                    display: flex !important; 
+                                    align-items: center !important; 
+                                    justify-content: flex-start !important; 
+                                    width: fit-content !important;
+                                    height: fit-content !important;
+                                    margin-right: 16px !important;
+                                    padding: 0 !important;
+                                    background: transparent !important;
+                                " title="MVL Logo">
+                                    <img src="assets/img/mvl-logo.png" 
+                                         alt="MVL Logo" 
+                                         style="
+                                             height: 56px !important; 
+                                             width: auto !important;
+                                             display: block !important;
+                                             object-fit: contain !important;
+                                             object-position: center !important;
+                                         ">
+                                </div>
+                                
+                                <!-- Text Section -->
+                                <div class="border-l-2 border-blue-600 pl-6 ml-4">
+                                    <h1 class="text-xl lg:text-2xl xl:text-3xl font-bold text-blue-600 leading-tight">MVL-LMS</h1>
+                                    <p class="text-sm lg:text-base text-gray-600 hidden sm:block">CMMC 2.0 Learning Management System</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Navigation -->
+                        <div class="hidden lg:flex items-center space-x-4">
+                            <nav class="flex items-center space-x-2">
+                                <a href="#" class="px-3 py-2 rounded-lg font-medium bg-blue-100 text-blue-600">Dashboard</a>
+                                <a href="#" class="px-3 py-2 rounded-lg font-medium text-gray-700 hover:bg-gray-100">Courses</a>
+                                <a href="#" class="px-3 py-2 rounded-lg font-medium text-gray-700 hover:bg-gray-100">Admin</a>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-blue-600">
+                🔴 Live implementation with all improvements applied<br>
+                ✅ Responsive design maintained<br>
+                ✅ Perfect logo spacing at all breakpoints
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-8">
+        <h2 class="text-xl font-semibold mb-4">Responsive Breakpoint Tests</h2>
+        <div class="bg-white p-6 rounded-lg shadow-lg max-w-4xl mx-auto">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <button onclick="setViewport(320)" class="bg-red-500 text-white px-3 py-2 rounded">Mobile (320px)</button>
+                <button onclick="setViewport(768)" class="bg-orange-500 text-white px-3 py-2 rounded">Tablet (768px)</button>
+                <button onclick="setViewport(1024)" class="bg-blue-500 text-white px-3 py-2 rounded">Desktop (1024px)</button>
+                <button onclick="setViewport(1440)" class="bg-green-500 text-white px-3 py-2 rounded">Large (1440px)</button>
+            </div>
+            <p class="mt-4 text-xs text-gray-600">
+                Note: Resize your browser window manually to test responsiveness.<br>
+                Watch how the logo wrapper stays tight and the blue bar maintains proper spacing.
+            </p>
+        </div>
+    </div>
+    
+    <div class="text-center mt-6">
+        <div class="space-x-4">
+            <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Test Main Index</a>
+            <a href="courses.html" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Test Courses</a>
+            <a href="admin.html" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Test Admin</a>
+        </div>
+    </div>
+    
+    <script>
+        function updateViewportInfo() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            document.getElementById('viewport-size').textContent = `${width}x${height}`;
+        }
+        
+        function setViewport(width) {
+            // Note: This is just for demo - actual viewport control would require dev tools
+            alert(`Suggested viewport: ${width}px width. Please resize your browser window to test.`);
+        }
+        
+        // Update viewport info on load and resize
+        updateViewportInfo();
+        window.addEventListener('resize', updateViewportInfo);
+        
+        console.log('Logo wrapper tightening test page loaded');
+        console.log('Key improvements:');
+        console.log('1. width: fit-content - hugs logo exactly');
+        console.log('2. height: fit-content - no fixed dimensions');
+        console.log('3. padding: 0 - no extra space around logo');
+        console.log('4. background: transparent - no white frame');
+        console.log('5. justify-content: flex-start - proper alignment');
+        console.log('6. ml-4 margin - breathing room before blue bar');
+    </script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Alignment Fix Comparison</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .comparison-container {
+            border: 2px solid #ddd;
+            padding: 20px;
+            margin: 10px;
+            background: #f8f9fa;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold text-center mb-8">MVL Logo Alignment Fix - Before vs After</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+        
+        <!-- BEFORE: Prominent frame -->
+        <div class="comparison-container">
+            <h3 class="text-lg font-semibold mb-4 text-red-600">❌ BEFORE: Prominent Frame</h3>
+            <div class="bg-gradient-to-r from-slate-50 to-blue-50 p-4 border-b-4 border-blue-600">
+                <div class="flex items-center space-x-6">
+                    <!-- Old Style with prominent frame -->
+                    <div style="
+                        width: auto; 
+                        height: auto; 
+                        min-height: 50px;
+                        max-height: 70px;
+                        background: white; 
+                        border: 2px solid #e5e7eb; 
+                        border-radius: 8px; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        padding: 8px 16px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
+                        margin-right: 16px;
+                    " title="MVL Logo (Old Style)">
+                        <img src="assets/img/mvl-logo.png" 
+                             alt="MVL Logo" 
+                             style="height: 50px; width: auto; object-fit: contain;">
+                    </div>
+                    <div class="border-l-2 border-blue-600 pl-6 ml-2">
+                        <h1 class="text-2xl font-bold text-blue-600">MVL-LMS</h1>
+                        <p class="text-sm text-gray-600">CMMC 2.0 Learning Management System</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-red-600">
+                ❌ Heavy white background and border<br>
+                ❌ Logo looks "boxed" and separate<br>
+                ❌ Shadow creates visual separation<br>
+                ❌ Alignment issues with text
+            </div>
+        </div>
+        
+        <!-- AFTER: Clean integration -->
+        <div class="comparison-container">
+            <h3 class="text-lg font-semibold mb-4 text-green-600">✅ AFTER: Clean Integration</h3>
+            <div class="bg-gradient-to-r from-slate-50 to-blue-50 p-4 border-b-4 border-blue-600">
+                <div class="flex items-center space-x-6">
+                    <!-- New Style with clean integration -->
+                    <div style="
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        margin-right: 20px;
+                        padding: 4px;
+                    " title="MVL Logo (New Style)">
+                        <img src="assets/img/mvl-logo.png" 
+                             alt="MVL Logo" 
+                             style="height: 56px; width: auto; object-fit: contain;">
+                    </div>
+                    <div class="border-l-2 border-blue-600 pl-6">
+                        <h1 class="text-2xl font-bold text-blue-600">MVL-LMS</h1>
+                        <p class="text-sm text-gray-600">CMMC 2.0 Learning Management System</p>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-2 text-sm text-green-600">
+                ✅ No prominent background or border<br>
+                ✅ Logo integrates naturally into header<br>
+                ✅ Clean, professional appearance<br>
+                ✅ Perfect alignment with text
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-8 max-w-4xl mx-auto">
+        <h2 class="text-xl font-semibold mb-4">Key Improvements Made</h2>
+        <div class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="font-semibold text-red-600 mb-2">Removed:</h3>
+                    <ul class="text-left space-y-1 text-sm">
+                        <li>❌ Heavy white background</li>
+                        <li>❌ Prominent border (2px solid)</li>
+                        <li>❌ Drop shadow effect</li>
+                        <li>❌ Excessive padding (8px 16px)</li>
+                        <li>❌ Min/max height constraints</li>
+                        <li>❌ Z-index and positioning issues</li>
+                        <li>❌ Hover transform effects</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-green-600 mb-2">Added:</h3>
+                    <ul class="text-left space-y-1 text-sm">
+                        <li>✅ Clean, minimal container</li>
+                        <li>✅ Natural logo integration</li>
+                        <li>✅ Proper vertical alignment</li>
+                        <li>✅ Optimized spacing (20px margin)</li>
+                        <li>✅ Slightly larger logo (56px height)</li>
+                        <li>✅ Removed extra margin on text</li>
+                        <li>✅ Professional appearance</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="text-center mt-6">
+        <h3 class="font-semibold mb-2">Test Navigation</h3>
+        <div class="space-x-4">
+            <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Main Dashboard</a>
+            <a href="courses.html" class="bg-purple-500 text-white px-4 py-2 rounded hover:bg-purple-600">Courses</a>
+            <a href="admin.html" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Admin</a>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Logo alignment comparison page loaded');
+    </script>
+</body>
+</html>

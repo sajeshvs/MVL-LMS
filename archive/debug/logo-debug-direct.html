@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Debug - Direct Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .debug-info {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #007acc;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold mb-6">MVL Logo Debug Test</h1>
+    
+    <div class="debug-info">
+        <strong>Purpose:</strong> Test logo loading directly without component system
+    </div>
+    
+    <!-- Direct logo test -->
+    <div class="bg-white p-6 rounded-lg shadow-lg mb-6">
+        <h2 class="text-xl font-semibold mb-4">Direct Logo Test</h2>
+        
+        <!-- Test 1: Simple img tag -->
+        <div class="mb-4">
+            <h3 class="font-medium mb-2">Test 1: Simple img tag</h3>
+            <img src="assets/img/mvl-logo.png" alt="MVL Logo" style="height: 50px; width: auto;" 
+                 onload="document.getElementById('test1-result').innerHTML = '✅ Loaded successfully'" 
+                 onerror="document.getElementById('test1-result').innerHTML = '❌ Failed to load'">
+            <div id="test1-result" class="debug-info mt-2">Loading...</div>
+        </div>
+        
+        <!-- Test 2: Full header style -->
+        <div class="mb-4">
+            <h3 class="font-medium mb-2">Test 2: Full header implementation</h3>
+            <div class="bg-gradient-to-r from-slate-50 to-blue-50 shadow-lg border-b-4 border-blue-600 p-4">
+                <div class="flex items-center space-x-6">
+                    <!-- MVL Logo -->
+                    <div style="
+                        width: auto !important; 
+                        height: auto !important; 
+                        min-height: 50px !important;
+                        max-height: 70px !important;
+                        background: white !important; 
+                        border: 2px solid #e5e7eb !important; 
+                        border-radius: 8px !important; 
+                        display: flex !important; 
+                        align-items: center !important; 
+                        justify-content: center !important; 
+                        padding: 8px 16px !important;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; 
+                        flex-shrink: 0 !important; 
+                        position: relative !important;
+                        z-index: 1000 !important;
+                        margin-right: 16px !important;
+                    " 
+                    onmouseover="this.style.transform='scale(1.02)'" 
+                    onmouseout="this.style.transform='scale(1)'"
+                    title="MVL Logo">
+                        <img src="assets/img/mvl-logo.png" 
+                             alt="MVL Logo" 
+                             style="
+                                 height: 50px !important; 
+                                 width: auto !important;
+                                 max-width: none !important;
+                                 object-fit: contain !important;
+                                 object-position: center !important;
+                                 display: block !important;
+                             "                             onload="document.getElementById('test2-result').innerHTML = '✅ Header logo loaded successfully'" 
+                             onerror="this.style.display='none'; this.parentElement.innerHTML='MVL'; document.getElementById('test2-result').innerHTML = '❌ Header logo failed, fallback applied';">
+                    </div>
+                    <div class="border-l-2 border-blue-600 pl-6">
+                        <h1 class="text-2xl font-bold text-blue-600">MVL-LMS</h1>
+                        <p class="text-sm text-gray-600">CMMC 2.0 Learning Management System</p>
+                    </div>
+                </div>
+            </div>
+            <div id="test2-result" class="debug-info mt-2">Loading...</div>
+        </div>
+        
+        <!-- Test 3: File path validation -->
+        <div class="mb-4">
+            <h3 class="font-medium mb-2">Test 3: File path validation</h3>
+            <div id="file-test" class="debug-info">
+                <script>
+                    // Test if file exists
+                    const testImg = new Image();
+                    testImg.onload = function() {
+                        document.getElementById('file-test').innerHTML = `
+                            ✅ File exists and loads<br>
+                            Natural dimensions: ${this.naturalWidth} x ${this.naturalHeight}px<br>
+                            Aspect ratio: ${(this.naturalWidth / this.naturalHeight).toFixed(2)}:1
+                        `;
+                    };
+                    testImg.onerror = function() {
+                        document.getElementById('file-test').innerHTML = '❌ File not found or cannot load';
+                    };
+                    testImg.src = 'assets/img/mvl-logo.png';
+                </script>
+            </div>
+        </div>
+        
+        <!-- Test 4: Component fallback simulation -->
+        <div class="mb-4">
+            <h3 class="font-medium mb-2">Test 4: Component fallback (JavaScript injection)</h3>
+            <div id="fallback-container"></div>
+            <script>
+                // Simulate the fallback header injection
+                const fallbackHtml = `
+                    <div class="bg-gradient-to-r from-slate-50 to-blue-50 shadow-lg border-b-4 border-blue-600 p-4">
+                        <div class="flex items-center space-x-6">
+                            <div style="
+                                width: auto !important; 
+                                height: auto !important; 
+                                min-height: 50px !important;
+                                max-height: 70px !important;
+                                background: white !important; 
+                                border: 2px solid #e5e7eb !important; 
+                                border-radius: 8px !important; 
+                                display: flex !important; 
+                                align-items: center !important; 
+                                justify-content: center !important; 
+                                padding: 8px 16px !important;
+                                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; 
+                                flex-shrink: 0 !important; 
+                                position: relative !important;
+                                z-index: 1000 !important;
+                                margin-right: 16px !important;
+                            " title="MVL Logo">
+                                <img src="assets/img/mvl-logo.png" 
+                                     alt="MVL Logo" 
+                                     style="
+                                         height: 50px !important; 
+                                         width: auto !important;
+                                         max-width: none !important;
+                                         object-fit: contain !important;
+                                         object-position: center !important;
+                                         display: block !important;
+                                     "
+                                     onerror="this.style.display='none'; this.parentElement.innerHTML='<div style=\\'color: #2563eb; font-weight: bold; font-size: 18px; padding: 0 12px;\\'>MVL</div>';">
+                            </div>
+                            <div class="border-l-2 border-blue-600 pl-6">
+                                <h1 class="text-2xl font-bold text-blue-600">MVL-LMS</h1>
+                                <p class="text-sm text-gray-600">CMMC 2.0 Learning Management System</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('fallback-container').innerHTML = fallbackHtml;
+            </script>
+            <div class="debug-info mt-2">✅ Fallback header injected via JavaScript</div>
+        </div>
+    </div>
+    
+    <div class="bg-blue-50 p-4 rounded-lg">
+        <h3 class="font-semibold mb-2">Navigation Test</h3>
+        <div class="space-x-4">
+            <a href="index.html" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Test Main Index</a>
+            <a href="index-standalone.html" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Test Standalone</a>
+        </div>
+    </div>
+    
+    <script>
+        console.log('Logo debug page loaded');
+        console.log('Current URL:', window.location.href);
+        console.log('Testing logo path: assets/img/mvl-logo.png');
+    </script>
+</body>
+</html>

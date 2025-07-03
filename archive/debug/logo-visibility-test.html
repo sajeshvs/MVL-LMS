@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL Logo Visibility Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+</head>
+<body class="bg-gray-100 p-8">
+    <h1 class="text-3xl font-bold mb-8">MVL Logo Visibility Test</h1>
+    
+    <!-- Test 1: Normal header load -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-4">Test 1: Normal Header Component</h2>
+        <div id="header-test-1"></div>
+    </div>
+    
+    <!-- Test 2: Logo with broken image -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-4">Test 2: Broken Image Path (Fallback Test)</h2>
+        <div class="bg-white p-4 rounded shadow">
+            <div class="mvl-logo-guaranteed flex items-center justify-center flex-shrink-0 w-20 h-20">
+                <div class="mvl-css-logo absolute w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl shadow-lg border-2 border-white flex items-center justify-center">
+                    <div class="text-white font-bold text-base">MVL</div>
+                </div>
+                <img src="assets/img/nonexistent-logo.png" alt="MVL Logo" 
+                     class="relative z-10 w-20 h-20 object-contain rounded-xl shadow-lg" 
+                     style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); border: 2px solid white;"
+                     onerror="this.style.display='none'; console.log('Test: PNG logo failed, CSS fallback visible');">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Test 3: Different screen sizes simulation -->
+    <div class="mb-8">
+        <h2 class="text-xl font-semibold mb-4">Test 3: Different Screen Sizes</h2>
+        <div class="space-y-4">
+            <div class="bg-white p-4 rounded shadow">
+                <p class="font-medium mb-2">Mobile Size (56px):</p>
+                <div class="mvl-logo-guaranteed flex items-center justify-center flex-shrink-0" style="width: 56px; height: 56px;">
+                    <div class="mvl-css-logo absolute bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl shadow-lg border-2 border-white flex items-center justify-center" style="width: 56px; height: 56px;">
+                        <div class="text-white font-bold text-xs">MVL</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow">
+                <p class="font-medium mb-2">Tablet Size (64px):</p>
+                <div class="mvl-logo-guaranteed flex items-center justify-center flex-shrink-0" style="width: 64px; height: 64px;">
+                    <div class="mvl-css-logo absolute bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl shadow-lg border-2 border-white flex items-center justify-center" style="width: 64px; height: 64px;">
+                        <div class="text-white font-bold text-sm">MVL</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow">
+                <p class="font-medium mb-2">Desktop Size (80px):</p>
+                <div class="mvl-logo-guaranteed flex items-center justify-center flex-shrink-0" style="width: 80px; height: 80px;">
+                    <div class="mvl-css-logo absolute bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl shadow-lg border-2 border-white flex items-center justify-center" style="width: 80px; height: 80px;">
+                        <div class="text-white font-bold text-base">MVL</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded shadow">
+                <p class="font-medium mb-2">Large Desktop Size (96px):</p>
+                <div class="mvl-logo-guaranteed flex items-center justify-center flex-shrink-0" style="width: 96px; height: 96px;">
+                    <div class="mvl-css-logo absolute bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl shadow-lg border-2 border-white flex items-center justify-center" style="width: 96px; height: 96px;">
+                        <div class="text-white font-bold text-lg">MVL</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load header component for Test 1
+        fetch('components/header.html')
+            .then(r => r.text())
+            .then(html => {
+                document.getElementById('header-test-1').innerHTML = html;
+            })
+            .catch(err => {
+                document.getElementById('header-test-1').innerHTML = '<p class="text-red-500">Failed to load header component</p>';
+            });
+    </script>
+</body>
+</html>

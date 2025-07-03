@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en" :class="{ 'dark': $store.app.theme === 'dark' }" x-data>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>    <script>        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',   // use with border-mvl-blue / text-mvl-blue etc.
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669',
+                        'mvl-orange': '#ea580c'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/heroicons@2.0.16/24/outline/index.js" type="module"></script>    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+    
+    <!-- Theme initialization to prevent flash -->
+    <script>
+        // Initialize theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">    <!-- MVL LMS Header -->
+    <header class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          
+          <!-- Logo and Brand -->
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <img src="assets/img/mvl-logo.png" alt="MVL Logo" class="h-10 w-auto logo-mask">
+            </div>            <div class="hidden sm:block">
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Learning Management System
+              </h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                CMMC 2.0 Training Platform
+              </p>
+            </div>
+          </div>
+
+          <!-- Navigation Links -->
+          <nav class="hidden md:flex space-x-8">
+            <a href="index.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Dashboard
+            </a>
+            <a href="courses.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Courses
+            </a>            <a href="curriculum.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Curriculum
+            </a>
+            <a href="admin.html" class="text-mvl-blue font-semibold">
+              Admin
+            </a>
+          </nav>
+
+          <!-- Right Side: Theme Toggle and User Profile -->
+          <div class="flex items-center space-x-4">
+            
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
+              <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path class="dark:hidden" fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                <path class="hidden dark:block" d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+              </svg>
+            </button>
+
+            <!-- User Profile Dropdown -->
+            <div class="relative">
+              <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mvl-blue" aria-expanded="false" aria-haspopup="true">
+                <div class="h-8 w-8 rounded-full bg-mvl-blue flex items-center justify-center">
+                  <span class="text-sm font-medium text-white">JD</span>
+                </div>
+                <span class="ml-2 text-gray-700 dark:text-gray-300 hidden sm:block">John Doe</span>
+                <svg class="ml-1 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <!-- Dropdown menu -->
+              <div id="user-menu" class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Your Profile</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Settings</a>
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</a>
+              </div>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+              <button id="mobile-menu-button" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-mvl-blue">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Dashboard</a>
+            <a href="courses.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Courses</a>
+            <a href="curriculum.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Curriculum</a>
+            <a href="admin.html" class="block px-3 py-2 text-mvl-blue font-semibold">Admin</a>
+          </div>
+        </div>
+      </div>
+    </header>    <!-- Main Content -->
+    <div class="flex min-h-screen bg-gray-50 dark:bg-gray-900" x-data="enhancedAdminData()">
+        <!-- Admin Sidebar -->
+        <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden lg:block">
+            <div class="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+                <nav class="p-4 space-y-2">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Admin Console</h2>
+                    
+                    <template x-for="section in adminSections" :key="section.id">
+                        <button 
+                            @click="activeSection = section.id"
+                            :class="activeSection === section.id ? 'bg-mvl-blue text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                            class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors text-left">
+                            <div class="w-5 h-5" x-html="section.icon"></div>
+                            <span x-text="section.title"></span>
+                        </button>
+                    </template>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Admin Content -->
+        <main class="flex-1 p-4 lg:p-8">
+            <!-- Mobile Navigation -->
+            <div class="lg:hidden mb-6">
+                <select x-model="activeSection" class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                    <template x-for="section in adminSections" :key="section.id">
+                        <option :value="section.id" x-text="section.title"></option>
+                    </template>
+                </select>
+            </div>
+
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2" x-text="getCurrentSectionTitle()"></h1>
+                <p class="text-gray-600 dark:text-gray-300" x-text="getCurrentSectionDescription()"></p>
+            </div>            <!-- Dashboard Overview -->
+            <div x-show="activeSection === 'dashboard'" class="space-y-6">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="systemStats.totalUsers"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Lessons</p>
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="systemStats.activeLessons"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Completion Rate</p>
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="systemStats.completionRate + '%'"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">System Alerts</p>
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="systemStats.alerts"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+                    <div class="space-y-4">
+                        <template x-for="activity in recentActivity" :key="activity.id">
+                            <div class="flex items-center space-x-4 p-3 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                                <div class="w-2 h-2 rounded-full" :class="activity.type === 'success' ? 'bg-green-500' : activity.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="activity.message"></p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400" x-text="activity.timestamp"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div x-show="activeSection === 'users'" class="space-y-6">
+                <!-- User Actions Bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center space-x-4">
+                        <button @click="showUserModal = true; editingUser = null" 
+                                class="bg-mvl-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Add New User
+                        </button>
+                        <button @click="bulkAction = 'export'" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            Export Users
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <select x-model="userFilter" class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                            <option value="all">All Users</option>
+                            <option value="super_admin">Super Admins</option>
+                            <option value="admin">Admins</option>
+                            <option value="instructor">Instructors</option>
+                            <option value="learner">Learners</option>
+                        </select>
+                        <input type="text" x-model="userSearch" placeholder="Search users..." 
+                               class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-750">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <input type="checkbox" @change="toggleAllUsers" class="rounded">
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Login</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progress</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <template x-for="user in filteredUsers" :key="user.id">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="checkbox" :value="user.id" x-model="selectedUsers" class="rounded">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" 
+                                                     :class="user.role === 'super_admin' ? 'bg-red-500' : user.role === 'admin' ? 'bg-blue-500' : user.role === 'instructor' ? 'bg-green-500' : 'bg-gray-500'"
+                                                     x-text="user.name.split(' ').map(n => n[0]).join('')"></div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white" x-text="user.name"></div>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400" x-text="user.email"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                                  :class="getRoleBadgeClass(user.role)"
+                                                  x-text="user.role.replace('_', ' ').toUpperCase()"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                                  :class="user.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'"
+                                                  x-text="user.status.toUpperCase()"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400" x-text="user.lastLogin"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                <div class="bg-mvl-green h-2 rounded-full transition-all duration-300" 
+                                                     :style="`width: ${user.progress}%`"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400" x-text="user.progress + '%'"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex justify-end space-x-2">
+                                                <button @click="editUser(user)" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">Edit</button>
+                                                <button @click="resetUserProgress(user)" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">Reset</button>
+                                                <button @click="deleteUser(user)" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SSO Configuration -->
+            <div x-show="activeSection === 'sso'" class="space-y-6">
+                <!-- Microsoft Entra ID Configuration -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Microsoft Entra ID Integration</h3>
+                            <p class="text-sm text-gray-600 dark:text-gray-400">Configure single sign-on with Microsoft Entra ID</p>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm" :class="ssoConfig.enabled ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'"
+                                  x-text="ssoConfig.enabled ? 'Enabled' : 'Disabled'"></span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" x-model="ssoConfig.enabled" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tenant ID</label>
+                                <input type="text" x-model="ssoConfig.tenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                                       class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Client ID</label>
+                                <input type="text" x-model="ssoConfig.clientId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                                       class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Client Secret</label>
+                                <input type="password" x-model="ssoConfig.clientSecret" placeholder="••••••••••••••••••••••••••••••••"
+                                       class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Authority URL</label>
+                                <input type="text" x-model="ssoConfig.authority" 
+                                       value="https://login.microsoftonline.com/common"
+                                       class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Redirect URI</label>
+                                <input type="text" x-model="ssoConfig.redirectUri" 
+                                       :value="window.location.origin + '/auth/callback'"
+                                       class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Scopes</label>
+                                <input type="text" x-model="ssoConfig.scopes" 
+                                       value="openid profile email User.Read"
+                                       class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-between items-center">
+                        <button @click="testSSOConnection()" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Test Connection
+                        </button>
+                        <button @click="saveSSOConfig()" 
+                                class="bg-mvl-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            Save Configuration
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Group Mapping -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Group Role Mapping</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">Map Entra ID groups to MVL-LMS roles</p>
+                    
+                    <div class="space-y-4">
+                        <template x-for="mapping in groupMappings" :key="mapping.id">
+                            <div class="flex items-center space-x-4 p-3 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                                <div class="flex-1">
+                                    <input type="text" x-model="mapping.groupId" placeholder="Entra ID Group ID"
+                                           class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                </div>
+                                <div class="w-32">
+                                    <select x-model="mapping.role" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                        <option value="learner">Learner</option>
+                                        <option value="instructor">Instructor</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="super_admin">Super Admin</option>
+                                    </select>
+                                </div>
+                                <button @click="removeGroupMapping(mapping.id)" class="text-red-600 hover:text-red-800">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </template>
+                        
+                        <button @click="addGroupMapping()" 
+                                class="w-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-600 dark:text-gray-400 hover:border-mvl-blue hover:text-mvl-blue transition-colors">
+                            + Add Group Mapping
+                        </button>
+                    </div>
+                </div>
+            </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Element ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Last Modified</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <template x-for="edit in contentEdits" :key="edit.id">
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white" x-text="edit.id">Element ID</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300" x-text="edit.modified">Date</td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <button @click="revertEdit(edit.id)" 
+                                                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded text-xs transition-colors">
+                                            Revert
+                                        </button>
+                                    </td>
+                                </tr>
+                            </template>
+                            <tr x-show="contentEdits.length === 0">
+                                <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    No content modifications found
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Information -->
+        <section class="mb-12">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">System Information</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400" x-text="systemStats.totalUsers">1</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Active Users</div>
+                    </div>
+                    
+                    <div class="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                        <div class="text-2xl font-bold text-green-600 dark:text-green-400" x-text="systemStats.completedLessons">0</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Lessons Completed</div>
+                    </div>
+                    
+                    <div class="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                        <div class="text-2xl font-bold text-purple-600 dark:text-purple-400" x-text="systemStats.storageUsed">2.4KB</div>
+                        <div class="text-sm text-gray-600 dark:text-gray-300">Storage Used</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Danger Zone -->
+        <section class="mb-12">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg border-l-4 border-red-500 p-6">
+                <h2 class="text-2xl font-bold text-red-600 dark:text-red-400 mb-4">Danger Zone</h2>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">Irreversible actions that will affect all user data</p>
+                
+                <div class="space-y-4">
+                    <button @click="confirmAction('reset')" 
+                            class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                        Reset All Progress
+                    </button>
+                    
+                    <button @click="confirmAction('clear')" 
+                            class="bg-red-800 hover:bg-red-900 text-white font-semibold py-2 px-4 rounded-lg transition-colors ml-4">
+                        Clear All Data
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Confirmation Modal -->
+    <div x-show="showConfirmModal" 
+         x-cloak
+         class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Confirm Action</h3>
+            <p class="text-gray-600 dark:text-gray-300 mb-6" x-text="confirmMessage">Are you sure?</p>
+            
+            <div class="flex items-center justify-end space-x-4">
+                <button @click="showConfirmModal = false" 
+                        class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Cancel
+                </button>
+                <button @click="executeAction()" 
+                        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors">
+                    Confirm
+                </button>
+            </div>
+        </div>
+    </div>    <!-- Footer -->
+    <footer id="footer-container"></footer>    <script defer>
+        // Header functionality
+        document.addEventListener('DOMContentLoaded', function() {          // Theme toggle
+          const themeToggle = document.getElementById('theme-toggle');
+          const html = document.documentElement;
+          
+          if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+              const isDark = html.classList.contains('dark');
+              
+              if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+              } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+              }
+              
+              // Update button icon visibility
+              updateThemeIcon();
+            });
+          }
+          
+          // Update theme icon based on current mode
+          function updateThemeIcon() {
+            const isDark = html.classList.contains('dark');
+            const sunIcon = document.querySelector('#theme-toggle .dark\\:hidden');
+            const moonIcon = document.querySelector('#theme-toggle .hidden.dark\\:block');
+            
+            if (sunIcon && moonIcon) {
+              if (isDark) {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+              } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+              }
+            }
+          }
+          
+          // Initialize theme icon
+          updateThemeIcon();
+          
+          // User menu toggle
+          const userMenuButton = document.getElementById('user-menu-button');
+          const userMenu = document.getElementById('user-menu');
+          
+          if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function() {
+              userMenu.classList.toggle('hidden');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+              if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+              }
+            });
+          }
+          
+          // Mobile menu toggle
+          const mobileMenuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          
+          if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+              mobileMenu.classList.toggle('hidden');
+            });
+          }
+        });
+    </script>
+
+    <script>
+        function adminData() {
+            return {
+                hasCustomLogo: false,
+                contentEdits: [],
+                systemStats: {
+                    totalUsers: 1,
+                    completedLessons: 0,
+                    storageUsed: '2.4KB'
+                },
+                showConfirmModal: false,
+                confirmMessage: '',
+                confirmAction: '',
+                
+                init() {
+                    this.loadContentEdits();
+                    this.updateSystemStats();
+                    this.checkCustomLogo();
+                },
+                
+                loadContentEdits() {
+                    const edits = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith('content_') && key.endsWith('_modified')) {
+                            const id = key.replace('content_', '').replace('_modified', '');
+                            const modified = localStorage.getItem(key);
+                            edits.push({
+                                id: id,
+                                modified: new Date(modified).toLocaleDateString()
+                            });
+                        }
+                    }
+                    this.contentEdits = edits;
+                },
+                
+                updateSystemStats() {
+                    let completedLessons = 0;
+                    let storageSize = 0;
+                    
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        const value = localStorage.getItem(key);
+                        storageSize += key.length + value.length;
+                        
+                        if (key.startsWith('lesson_') && !key.endsWith('_date') && value === 'completed') {
+                            completedLessons++;
+                        }
+                    }
+                    
+                    this.systemStats.completedLessons = completedLessons;
+                    this.systemStats.storageUsed = this.formatBytes(storageSize * 2); // Rough estimate
+                },
+                
+                checkCustomLogo() {
+                    this.hasCustomLogo = localStorage.getItem('custom_logo') !== null;
+                },
+                
+                uploadLogo(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        Alpine.store('app').uploadLogo(file);
+                        this.hasCustomLogo = true;
+                    }
+                },
+                
+                resetLogo() {
+                    localStorage.removeItem('custom_logo');
+                    this.hasCustomLogo = false;
+                    document.querySelectorAll('.mvl-logo').forEach(logo => {
+                        logo.src = 'https://www.mvl-group.com/assets/img/logo.png';
+                        logo.onerror = () => logo.src = 'assets/img/mvl-logo.png';
+                    });
+                    Alpine.store('app').showToast('Logo reset to default');
+                },
+                
+                importData(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        Alpine.store('app').importData(file);
+                        this.loadContentEdits();
+                        this.updateSystemStats();
+                        this.checkCustomLogo();
+                    }
+                },
+                
+                revertEdit(elementId) {
+                    localStorage.removeItem(`content_${elementId}`);
+                    localStorage.removeItem(`content_${elementId}_modified`);
+                    this.loadContentEdits();
+                    Alpine.store('app').showToast(`Reverted changes to ${elementId}`);
+                },
+                
+                confirmAction(action) {
+                    this.confirmAction = action;
+                    if (action === 'reset') {
+                        this.confirmMessage = 'This will reset all user progress but keep content modifications. This action cannot be undone.';
+                    } else if (action === 'clear') {
+                        this.confirmMessage = 'This will delete ALL data including progress and content modifications. This action cannot be undone.';
+                    }
+                    this.showConfirmModal = true;
+                },
+                
+                executeAction() {
+                    if (this.confirmAction === 'reset') {
+                        this.resetAllProgress();
+                    } else if (this.confirmAction === 'clear') {
+                        this.clearAllData();
+                    }
+                    this.showConfirmModal = false;
+                },
+                
+                resetAllProgress() {
+                    // Remove only progress-related items
+                    const keysToRemove = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key.startsWith('lesson_') || key.startsWith('course_')) {
+                            keysToRemove.push(key);
+                        }
+                    }
+                    keysToRemove.forEach(key => localStorage.removeItem(key));
+                    
+                    this.updateSystemStats();
+                    Alpine.store('app').showToast('All progress has been reset');
+                },
+                
+                clearAllData() {
+                    localStorage.clear();
+                    this.contentEdits = [];
+                    this.hasCustomLogo = false;
+                    this.updateSystemStats();
+                    Alpine.store('app').showToast('All data has been cleared');
+                },
+                
+                formatBytes(bytes, decimals = 2) {
+                    if (bytes === 0) return '0 Bytes';
+                    const k = 1024;
+                    const dm = decimals < 0 ? 0 : decimals;
+                    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                    const i = Math.floor(Math.log(bytes) / Math.log(k));
+                    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+                }
+            }
+        }
+    </script>
+</body>
+</html>

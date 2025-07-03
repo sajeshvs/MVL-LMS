@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Lesson Test</title>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body>
+    <div x-data="simpleLesson()">
+        <h1>Simple Lesson Test</h1>
+        <p>Domain: <span x-text="domain"></span></p>
+        <p>Requirement: <span x-text="requirement"></span></p>
+        <p>Lesson Key: <span x-text="lessonKey"></span></p>
+        <p>Data Available: <span x-text="dataAvailable"></span></p>
+        <p>Lesson Found: <span x-text="lessonFound"></span></p>
+        
+        <div x-show="lessonData">
+            <h2>Lesson Data:</h2>
+            <p>Title: <span x-text="lessonData?.title"></span></p>
+            <p>Status: <span x-text="lessonData?.status"></span></p>
+            <p>Format: <span x-text="lessonFormat"></span></p>
+        </div>
+        
+        <div x-show="!lessonData">
+            <h2>Debug Info:</h2>
+            <p>Available Keys: <span x-text="availableKeys"></span></p>
+            <p>Total Keys: <span x-text="totalKeys"></span></p>
+        </div>
+    </div>
+
+    <script src="assets/js/curriculum-data.js"></script>
+    <script>
+        function simpleLesson() {
+            return {
+                domain: '',
+                requirement: '',
+                lessonKey: '',
+                dataAvailable: false,
+                lessonFound: false,
+                lessonData: null,
+                lessonFormat: '',
+                availableKeys: '',
+                totalKeys: 0,
+
+                init() {
+                    // Get URL parameters
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.domain = urlParams.get('domain') || 'AC';
+                    this.requirement = urlParams.get('requirement') || '3.1.1';
+                    this.lessonKey = `${this.domain}.${this.requirement}`;
+                    
+                    // Check if data is available
+                    this.dataAvailable = !!(window.LESSONS_DATA);
+                    
+                    if (this.dataAvailable) {
+                        this.totalKeys = Object.keys(window.LESSONS_DATA).length;
+                        this.availableKeys = Object.keys(window.LESSONS_DATA).slice(0, 5).join(', ') + '...';
+                        
+                        // Try to find lesson
+                        this.lessonData = window.LESSONS_DATA[this.lessonKey];
+                        this.lessonFound = !!this.lessonData;
+                        
+                        if (this.lessonData) {
+                            const isEnhanced = Array.isArray(this.lessonData.whyMatters) && Array.isArray(this.lessonData.howMVLDoes);
+                            this.lessonFormat = isEnhanced ? 'Enhanced' : 'Legacy';
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

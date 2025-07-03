@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logo Debug Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mvl: {
+                            blue: '#1e40af',
+                            red: '#dc2626',
+                            gold: '#f59e0b',
+                            green: '#059669'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .simple-logo {
+            width: 60px !important;
+            height: 60px !important;
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+            border: 2px solid white !important;
+            border-radius: 12px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            color: white !important;
+            font-weight: bold !important;
+            font-size: 16px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+            flex-shrink: 0 !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="bg-white shadow-lg border-b-4 border-blue-600 p-4">
+        <div class="flex items-center space-x-4">
+            <!-- Simple Logo Test -->
+            <div class="simple-logo">MVL</div>
+            <div>
+                <h1 class="text-2xl font-bold text-blue-600">MVL-LMS</h1>
+                <p class="text-sm text-gray-600">CMMC 2.0 Learning Management System</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="p-4">
+        <h2 class="text-xl font-bold mb-4">Logo Visibility Tests</h2>
+        
+        <div class="space-y-4">
+            <div>
+                <h3 class="font-semibold">Test 1: Simple CSS Logo</h3>
+                <div class="simple-logo">MVL</div>
+            </div>
+            
+            <div>
+                <h3 class="font-semibold">Test 2: PNG Image (if exists)</h3>
+                <img src="assets/img/mvl-logo.png" alt="MVL Logo" style="width: 60px; height: 60px; border: 2px solid #ccc;" 
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display: none; width: 60px; height: 60px; background: red; color: white; text-align: center; line-height: 60px;">ERROR</div>
+            </div>
+            
+            <div>
+                <h3 class="font-semibold">Test 3: Current Header Component</h3>
+                <div id="header-test"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load the current header for comparison
+        fetch('components/header.html')
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('header-test').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('header-test').innerHTML = '<div style="color: red;">Failed to load header: ' + error + '</div>';
+            });
+    </script>
+</body>
+</html>
