@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - CMMC Courses</title>
+    <script src="https://cdn.tailwindcss.com"></script>    <script>        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',   // use with border-mvl-blue / text-mvl-blue etc.
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669',
+                        'mvl-orange': '#ea580c'
+                    }
+                }
+            }
+        };
+    </script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+    <style>
+        /* Ensure proper styling even if CSS fails to load */
+        .course-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s;
+        }
+        .course-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .progress-bar {
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            height: 8px;
+        }
+        .progress-fill {
+            background: linear-gradient(to right, #3b82f6, #1d4ed8);
+            height: 100%;
+            border-radius: 9999px;
+            transition: width 0.5s;
+        }    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">    <!-- MVL LMS Header -->
+    <header class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          
+          <!-- Logo and Brand -->
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <img src="assets/img/mvl-logo.png" alt="MVL Logo" class="h-10 w-auto logo-mask">
+            </div>            <div class="hidden sm:block">
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Learning Management System
+              </h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                CMMC 2.0 Training Platform
+              </p>
+            </div>
+          </div>
+
+          <!-- Navigation Links -->
+          <nav class="hidden md:flex space-x-8">
+            <a href="index.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Dashboard
+            </a>
+            <a href="courses.html" class="text-mvl-blue font-semibold">
+              Courses
+            </a>            <a href="curriculum.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Curriculum
+            </a>
+            <a href="admin.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Admin
+            </a>
+          </nav>
+
+          <!-- Right Side: Theme Toggle and User Profile -->
+          <div class="flex items-center space-x-4">
+            
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
+              <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path class="dark:hidden" fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                <path class="hidden dark:block" d="M17.293 13.293A8 8 0 716.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+              </svg>
+            </button>
+
+            <!-- User Profile Dropdown -->
+            <div class="relative">
+              <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mvl-blue" aria-expanded="false" aria-haspopup="true">
+                <div class="h-8 w-8 rounded-full bg-mvl-blue flex items-center justify-center">
+                  <span class="text-sm font-medium text-white">JD</span>
+                </div>
+                <span class="ml-2 text-gray-700 dark:text-gray-300 hidden sm:block">John Doe</span>
+                <svg class="ml-1 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <!-- Dropdown menu -->
+              <div id="user-menu" class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <a href="index.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</button>
+              </div>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+              <button id="mobile-menu-button" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-mvl-blue">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Dashboard</a>
+            <a href="courses.html" class="block px-3 py-2 text-mvl-blue font-semibold">Courses</a>
+            <a href="curriculum.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Curriculum</a>
+            <a href="admin.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Admin</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Page Header -->
+        <section class="mb-8">
+            <h1 class="text-4xl font-bold text-gray-900 mb-4">
+                CMMC 2.0 Training Courses
+            </h1>
+            <p class="text-xl text-gray-600">
+                Master cybersecurity requirements with comprehensive training modules
+            </p>
+        </section>
+
+        <!-- Search and Filter -->
+        <section class="mb-8">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+                    <!-- Search -->
+                    <div class="relative flex-1 lg:max-w-md">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                        <input type="text" 
+                               id="searchInput"
+                               placeholder="Search courses..."
+                               class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <!-- Filter Tags -->
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterCourses('all')" id="filter-all"
+                                class="filter-btn bg-blue-500 text-white px-3 py-1 text-sm rounded-full cursor-pointer transition-all duration-200 hover:bg-blue-600">
+                            All Courses
+                        </button>
+                        <button onclick="filterCourses('completed')" id="filter-completed"
+                                class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-300">
+                            Completed
+                        </button>
+                        <button onclick="filterCourses('in-progress')" id="filter-in-progress"
+                                class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-300">
+                            In Progress
+                        </button>
+                        <button onclick="filterCourses('not-started')" id="filter-not-started"
+                                class="filter-btn bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full cursor-pointer transition-all duration-200 hover:bg-gray-300">
+                            Not Started
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Course Grid -->
+        <section class="mb-12">
+            <div id="courseGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Courses will be loaded here by JavaScript -->
+                <div class="text-center py-12 col-span-full">
+                    <div class="text-6xl text-gray-300 mb-4">⏳</div>
+                    <h3 class="text-xl font-semibold text-gray-700 mb-2">Loading Courses...</h3>
+                    <p class="text-gray-500">Please wait while we load your CMMC training courses.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <p class="text-center text-gray-500 text-sm">
+                © 2024 MVL Group. All rights reserved. | CMMC 2.0 Training Platform
+            </p>
+        </div>
+    </footer>
+
+    <!-- Load curriculum data and app functionality -->
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+
+    <!-- Theme initialization to prevent flash -->
+    <script>
+        // Initialize theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+
+    <script>
+        // Course data and functionality
+        let currentFilter = 'all';
+        let courses = [];
+
+        // Course definitions
+        const COURSE_DEFINITIONS = [
+            { id: "AC", title: "Access Control", icon: "🔒", description: "Control access to systems and data through proper user management and authorization." },
+            { id: "AT", title: "Awareness & Training", icon: "📚", description: "Build security awareness and train personnel on cybersecurity best practices." },
+            { id: "AU", title: "Audit & Accountability", icon: "📋", description: "Implement comprehensive auditing and accountability measures for all system activities." },
+            { id: "CM", title: "Configuration Management", icon: "⚙️", description: "Establish and maintain secure configurations for all organizational systems." },
+            { id: "IA", title: "Identification & Authentication", icon: "🔐", description: "Implement strong identification and authentication mechanisms for users and devices." },
+            { id: "IR", title: "Incident Response", icon: "🚨", description: "Develop and maintain incident response capabilities to handle security events." },
+            { id: "MA", title: "Maintenance", icon: "🔧", description: "Ensure secure maintenance practices for all organizational systems." },
+            { id: "MP", title: "Media Protection", icon: "💽", description: "Protect sensitive media containing controlled unclassified information." },
+            { id: "PS", title: "Personnel Security", icon: "👥", description: "Implement personnel security measures and background screening processes." },
+            { id: "PE", title: "Physical Protection", icon: "🏢", description: "Establish physical security controls to protect facilities and equipment." },
+            { id: "RA", title: "Risk Assessment", icon: "🛡️", description: "Conduct regular risk assessments and vulnerability management activities." },
+            { id: "CA", title: "Security Assessment", icon: "🔍", description: "Perform security assessments and implement continuous monitoring." },
+            { id: "SC", title: "System & Comms Protection", icon: "📡", description: "Protect system communications and implement boundary protection." },
+            { id: "SI", title: "System & Info Integrity", icon: "🛠️", description: "Maintain system integrity and protect against malicious code." }
+        ];
+
+        // Initialize courses
+        function initializeCourses() {
+            console.log('Initializing courses...');
+            
+            // Use global data if available, otherwise use fallback
+            if (window.COURSES_DATA && window.COURSES_DATA.length > 0) {
+                courses = window.COURSES_DATA.map(course => {
+                    const definition = COURSE_DEFINITIONS.find(def => def.id === course.id);
+                    return {
+                        ...course,
+                        description: definition ? definition.description : 'Comprehensive cybersecurity training module.',
+                        icon: definition ? definition.icon : '📚'
+                    };
+                });
+                console.log('Loaded courses from global data:', courses.length);
+            } else {
+                courses = COURSE_DEFINITIONS;
+                console.log('Using fallback course definitions:', courses.length);
+            }
+
+            renderCourses();
+        }
+
+        // Get lesson count for a course
+        function getLessonCount(courseId) {
+            if (window.CURRICULUM_DATA && window.CURRICULUM_DATA.LESSONS && window.CURRICULUM_DATA.LESSONS[courseId]) {
+                return Object.keys(window.CURRICULUM_DATA.LESSONS[courseId]).length;
+            }
+            
+            const lessonCounts = {
+                'AC': 22, 'AT': 3, 'AU': 9, 'CM': 9, 'IA': 11, 'IR': 3,
+                'MA': 6, 'MP': 9, 'PS': 2, 'PE': 6, 'RA': 3, 'CA': 2, 'SC': 16, 'SI': 7
+            };
+            return lessonCounts[courseId] || 0;
+        }
+
+        // Get course progress
+        function getCourseProgress(courseId) {
+            const totalLessons = getLessonCount(courseId);
+            if (totalLessons === 0) return 0;
+            
+            let completedLessons = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key.startsWith(`lesson_${courseId}_`) && !key.endsWith('_date') && localStorage.getItem(key) === 'completed') {
+                    completedLessons++;
+                }
+            }
+            
+            return Math.round((completedLessons / totalLessons) * 100);
+        }
+
+        // Render courses
+        function renderCourses() {
+            const grid = document.getElementById('courseGrid');
+            
+            if (courses.length === 0) {
+                grid.innerHTML = `
+                    <div class="text-center py-12 col-span-full">
+                        <div class="text-6xl text-gray-300 mb-4">📚</div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">No Courses Found</h3>
+                        <p class="text-gray-500">There was an issue loading the course data.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const filteredCourses = getFilteredCourses();
+            
+            grid.innerHTML = filteredCourses.map(course => {
+                const lessonCount = getLessonCount(course.id);
+                const progress = getCourseProgress(course.id);
+                const isComplete = progress === 100;
+                  return `
+                    <div class="course-card p-6 hover:shadow-xl transition-all duration-200">
+                        <!-- Course Header -->
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-2 bg-blue-100 rounded-lg">
+                                    <span class="text-2xl">${course.icon || '📚'}</span>
+                                </div>
+                                <span class="text-sm font-medium text-gray-500">${course.id}</span>
+                            </div>
+                            ${isComplete ? `
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    Complete
+                                </span>
+                            ` : ''}
+                        </div>
+                        
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">${course.title}</h3>
+                        <p class="text-gray-600 text-sm mb-4">${course.description}</p>
+                        
+                        <!-- Progress Bar -->
+                        <div class="mb-4">
+                            <div class="flex items-center justify-between text-sm text-gray-600 mb-2">
+                                <span>Progress</span>
+                                <span>${progress}%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Course Stats and Action Button -->
+                        <div class="pt-4 border-t border-gray-200">
+                            <div class="flex items-center justify-between text-sm text-gray-600 mb-3">
+                                <div class="flex items-center space-x-4">
+                                    <div class="flex items-center space-x-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                        </svg>
+                                        <span>${lessonCount} lessons</span>
+                                    </div>
+                                    <div class="flex items-center space-x-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        <span>~30 min</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Action Button -->
+                            <button onclick="window.location.href='course.html?id=${course.id}'" 
+                                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2">
+                                <span>${progress > 0 ? 'Continue Course' : 'Start Course'}</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter courses
+        function getFilteredCourses() {
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = courses;
+            
+            // Apply search filter
+            if (searchQuery) {
+                filtered = filtered.filter(course => 
+                    course.title.toLowerCase().includes(searchQuery) ||
+                    course.id.toLowerCase().includes(searchQuery)
+                );
+            }
+            
+            // Apply completion filter
+            if (currentFilter === 'completed') {
+                filtered = filtered.filter(course => getCourseProgress(course.id) === 100);
+            } else if (currentFilter === 'in-progress') {
+                filtered = filtered.filter(course => {
+                    const progress = getCourseProgress(course.id);
+                    return progress > 0 && progress < 100;
+                });
+            } else if (currentFilter === 'not-started') {
+                filtered = filtered.filter(course => getCourseProgress(course.id) === 0);
+            }
+            
+            return filtered;
+        }
+
+        // Filter courses by type
+        function filterCourses(filter) {
+            currentFilter = filter;
+            
+            // Update filter button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = btn.className.replace('bg-blue-500 text-white', 'bg-gray-200 text-gray-700');
+            });
+            document.getElementById(`filter-${filter}`).className = 
+                document.getElementById(`filter-${filter}`).className.replace('bg-gray-200 text-gray-700', 'bg-blue-500 text-white');
+            
+            renderCourses();
+        }
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('searchInput').addEventListener('input', renderCourses);
+        });
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, initializing courses...');
+            
+            // Wait a moment for scripts to load
+            setTimeout(() => {
+                initializeCourses();
+            }, 500);
+        });
+
+        // Also try to initialize immediately if scripts are already loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeCourses);
+        } else {
+            initializeCourses();
+        }        console.log('Courses script loaded');
+    </script>    <!-- Footer -->    <footer id="footer-container"></footer>
+
+    <script defer>
+        // Header functionality
+        document.addEventListener('DOMContentLoaded', function() {          // Theme toggle
+          const themeToggle = document.getElementById('theme-toggle');
+          const html = document.documentElement;
+            if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+              console.log('Theme toggle clicked!'); // Debug log
+              const isDark = html.classList.contains('dark');
+              console.log('Current mode:', isDark ? 'dark' : 'light'); // Debug log
+              
+              if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                console.log('Switched to light mode'); // Debug log
+              } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                console.log('Switched to dark mode'); // Debug log
+              }
+              
+              // Update button icon visibility
+              updateThemeIcon();
+            });
+          }
+          
+          // Update theme icon based on current mode
+          function updateThemeIcon() {
+            const isDark = html.classList.contains('dark');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            if (sunIcon && moonIcon) {
+              if (isDark) {
+                // Dark mode: show sun icon (to switch to light)
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+              } else {
+                // Light mode: show moon icon (to switch to dark)
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+              }
+            }
+          }
+          
+          // Initialize theme icon
+          updateThemeIcon();
+          
+          // User menu toggle
+          const userMenuButton = document.getElementById('user-menu-button');
+          const userMenu = document.getElementById('user-menu');
+          
+          if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function() {
+              userMenu.classList.toggle('hidden');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+              if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+              }
+            });
+          }
+          
+          // Mobile menu toggle
+          const mobileMenuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          
+          if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+              mobileMenu.classList.toggle('hidden');
+            });
+          }
+        });
+    </script>
+</body>
+</html>

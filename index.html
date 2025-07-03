@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="MVL Learning Management System - Comprehensive CMMC 2.0 cybersecurity training platform">
+    <meta name="keywords" content="CMMC, cybersecurity, training, compliance, NIST">
+    <meta name="author" content="MVL Group">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#1e40af">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MVL-LMS">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/images/favicon.ico">
+    <link rel="apple-touch-icon" href="assets/images/logo-dark.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <title>MVL-LMS - Learner Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669',
+                        'mvl-orange': '#ea580c'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/heroicons@2.0.16/24/outline/index.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Enhanced MVL-LMS Scripts -->
+    <script src="config/app.config.js"></script>
+    <script src="assets/js/error-handler.js"></script>
+    <script src="assets/js/security-manager.js"></script>
+    <script src="assets/js/api-client.js"></script>
+    <script src="assets/js/app-init.js"></script>
+    
+    <!-- Legacy Scripts -->
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+    
+    <!-- Theme initialization to prevent flash -->
+    <script>
+        // Initialize theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    
+    <script>
+        // Header functionality
+        document.addEventListener('DOMContentLoaded', function() {
+          // Theme toggle
+          const themeToggle = document.getElementById('theme-toggle');
+          const html = document.documentElement;
+            if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+              console.log('Theme toggle clicked!'); // Debug log
+              const isDark = html.classList.contains('dark');
+              console.log('Current mode:', isDark ? 'dark' : 'light'); // Debug log
+              
+              if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+                console.log('Switched to light mode'); // Debug log
+              } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+                console.log('Switched to dark mode'); // Debug log
+              }
+              
+              // Update button icon visibility
+              updateThemeIcon();
+            });
+          }// Update theme icon based on current mode
+          function updateThemeIcon() {
+            const isDark = html.classList.contains('dark');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            if (sunIcon && moonIcon) {
+              if (isDark) {
+                // Dark mode: show sun icon (to switch to light)
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+              } else {
+                // Light mode: show moon icon (to switch to dark)
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+              }
+            }
+          }
+          
+          // Initialize theme icon
+          updateThemeIcon();
+          
+          // User menu toggle
+          const userMenuButton = document.getElementById('user-menu-button');
+          const userMenu = document.getElementById('user-menu');
+          
+          if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function() {
+              userMenu.classList.toggle('hidden');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+              if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+              }
+            });
+          }
+          
+          // Mobile menu toggle
+          const mobileMenuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          
+          if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+              mobileMenu.classList.toggle('hidden');
+            });
+          }
+        });
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">    <!-- MVL LMS Header -->
+    <header class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          
+          <!-- Logo and Brand -->
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <img src="assets/img/mvl-logo.png" alt="MVL Logo" class="h-10 w-auto logo-mask">
+            </div>            <div class="hidden sm:block">
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Learning Management System
+              </h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                CMMC 2.0 Training Platform
+              </p>
+            </div>
+          </div>
+
+          <!-- Navigation Links -->
+          <nav class="hidden md:flex space-x-8">
+            <a href="index.html" class="text-mvl-blue font-semibold">
+              Dashboard
+            </a>
+            <a href="courses.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Courses
+            </a>            <a href="curriculum.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Curriculum
+            </a>
+            <a href="admin.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Admin
+            </a>
+          </nav>
+
+          <!-- Right Side: Theme Toggle and User Profile -->
+          <div class="flex items-center space-x-4">
+            
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
+              <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path class="dark:hidden" fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                <path class="hidden dark:block" d="M17.293 13.293A8 8 0 716.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+              </svg>
+            </button>
+
+            <!-- User Profile Dropdown -->
+            <div class="relative">
+              <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mvl-blue" aria-expanded="false" aria-haspopup="true">
+                <div class="h-8 w-8 rounded-full bg-mvl-blue flex items-center justify-center">
+                  <span class="text-sm font-medium text-white">JD</span>
+                </div>
+                <span class="ml-2 text-gray-700 dark:text-gray-300 hidden sm:block">John Doe</span>
+                <svg class="ml-1 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <!-- Dropdown menu -->
+              <div id="user-menu" class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <a href="courses.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Courses</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</button>
+              </div>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+              <button id="mobile-menu-button" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-mvl-blue">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="block px-3 py-2 text-mvl-blue font-semibold">Dashboard</a>
+            <a href="courses.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Courses</a>
+            <a href="curriculum.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Curriculum</a>
+            <a href="admin.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Admin</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Welcome Section -->
+        <section class="mb-12">
+            <div class="editable" 
+                 id="welcome-message"
+                 :contenteditable="$store.app.edit"
+                 @blur="$store.app.saveContent('welcome-message', $event.target.innerHTML)">
+                <h1 class="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+                    Welcome to MVL-LMS
+                </h1>
+                <p class="text-xl text-gray-600 dark:text-gray-300 mb-6">
+                    Your comprehensive CMMC 2.0 compliance training platform
+                </p>
+            </div>
+        </section>
+
+        <!-- KPI Dashboard -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Learning Progress</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Total Courses -->
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-blue-100 text-sm font-medium uppercase tracking-wider">Total Courses</p>
+                            <p class="text-3xl font-bold" x-text="$store.app.getTotalCoursesCount()">14</p>
+                        </div>
+                        <div class="p-3 bg-blue-400 bg-opacity-20 rounded-full">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Completed Courses -->
+                <div class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-green-100 text-sm font-medium uppercase tracking-wider">Completed</p>
+                            <p class="text-3xl font-bold" x-text="$store.app.getCompletedCoursesCount()">0</p>
+                        </div>
+                        <div class="p-3 bg-green-400 bg-opacity-20 rounded-full">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total Lessons -->
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-purple-100 text-sm font-medium uppercase tracking-wider">Total Lessons</p>
+                            <p class="text-3xl font-bold" x-text="$store.app.getTotalLessonsCount()">110</p>
+                        </div>
+                        <div class="p-3 bg-purple-400 bg-opacity-20 rounded-full">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lessons Completed -->
+                <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-orange-100 text-sm font-medium uppercase tracking-wider">Lessons Done</p>
+                            <p class="text-3xl font-bold" x-text="$store.app.getCompletedLessonsCount()">0</p>
+                        </div>
+                        <div class="p-3 bg-orange-400 bg-opacity-20 rounded-full">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Chart -->
+        <section class="mb-12">
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-4">Learning Progress Chart</h3>
+                <div class="h-64">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Continue Learning -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Continue Where You Left Off</h2>
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between" x-data="{ nextLesson: $store.app.getNextIncompleteLesson() }">
+                    <div class="flex items-center space-x-4">
+                        <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-full">
+                            <svg class="w-8 h-8 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white" x-text="nextLesson.title">Limit System Access</h3>
+                            <p class="text-gray-600 dark:text-gray-300" x-text="`${nextLesson.domain}.${nextLesson.requirement} - Access Control`">AC.3.1.1 - Access Control</p>
+                        </div>
+                    </div>
+                    <a :href="`lesson.html?domain=${nextLesson.domain}&pr=${nextLesson.requirement}`" 
+                       class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors">
+                        Continue Learning
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Activity -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">Recent Activity</h2>
+            <div class="space-y-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center space-x-4">
+                        <div class="p-2 bg-green-100 dark:bg-green-900 rounded-full">
+                            <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-gray-900 dark:text-white font-medium">Ready to start learning!</p>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm">Begin with Access Control fundamentals</p>
+                        </div>
+                        <span class="text-gray-500 dark:text-gray-400 text-sm">Just now</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>    <!-- Footer -->
+    <footer id="footer-container"></footer>    <script>
+        // Initialize progress chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const completedLessons = Alpine.store('app').getCompletedLessonsCount();
+            const totalLessons = Alpine.store('app').getTotalLessonsCount();
+            const completedCourses = Alpine.store('app').getCompletedCoursesCount();
+            const totalCourses = Alpine.store('app').getTotalCoursesCount();
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed Lessons', 'Remaining Lessons', 'Completed Courses', 'Remaining Courses'],
+                    datasets: [{
+                        data: [completedLessons, totalLessons - completedLessons, completedCourses, totalCourses - completedCourses],
+                        backgroundColor: ['#10B981', '#E5E7EB', '#3B82F6', '#F3F4F6'],
+                        borderColor: ['#059669', '#D1D5DB', '#2563EB', '#E5E7EB'],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }            });
+        });
+    </script>    <!-- Footer -->
+    <footer id="footer-container"></footer>    <script defer>
+        (async () => {
+            const host = document.getElementById('header-container');
+            host.innerHTML = await (await fetch('components/header.html')).text();
+        })();
+    </script>
+</body>
+</html>

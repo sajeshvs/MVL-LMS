@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - Curriculum</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',   // use with border-mvl-blue / text-mvl-blue etc.
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669',
+                        'mvl-orange': '#ea580c'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/heroicons@2.0.16/24/outline/index.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+    
+    <!-- Theme initialization to prevent flash -->
+    <script>
+        // Initialize theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    
+    <script>
+        // Header functionality
+        document.addEventListener('DOMContentLoaded', function() {
+          // Theme toggle with proper icon switching
+          const themeToggle = document.getElementById('theme-toggle');
+          const html = document.documentElement;
+          
+          if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+              const isDark = html.classList.contains('dark');
+              
+              if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+              } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+              }
+              
+              // Update button icon visibility
+              updateThemeIcon();
+            });
+          }
+
+          // Update theme icon based on current mode
+          function updateThemeIcon() {
+            const isDark = html.classList.contains('dark');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            if (sunIcon && moonIcon) {
+              if (isDark) {
+                // Dark mode: show sun icon (to switch to light)
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+              } else {
+                // Light mode: show moon icon (to switch to dark)
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+              }
+            }
+          }
+          
+          // Initialize theme icon
+          updateThemeIcon();
+          
+          // User menu toggle
+          const userMenuButton = document.getElementById('user-menu-button');
+          const userMenu = document.getElementById('user-menu');
+          
+          if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function() {
+              userMenu.classList.toggle('hidden');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+              if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+              }
+            });
+          }
+          
+          // Mobile menu toggle
+          const mobileMenuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          
+          if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+              mobileMenu.classList.toggle('hidden');
+            });
+          }
+        });
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
+
+    <!-- MVL LMS Header -->
+    <header class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          
+          <!-- Logo and Brand -->
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <img src="assets/img/mvl-logo.png" alt="MVL Logo" class="h-10 w-auto">
+            </div>
+            <div class="hidden sm:block">
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Learning Management System
+              </h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                CMMC 2.0 Training Platform
+              </p>
+            </div>
+          </div>
+
+          <!-- Navigation Links -->
+          <nav class="hidden md:flex space-x-8">
+            <a href="index.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Dashboard
+            </a>
+            <a href="courses.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Courses
+            </a>
+            <a href="curriculum.html" class="text-mvl-blue font-semibold">
+              Curriculum
+            </a>
+            <a href="admin.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Admin
+            </a>
+          </nav>
+
+          <!-- Right Side: Theme Toggle and User Profile -->
+          <div class="flex items-center space-x-4">
+            
+            <!-- Theme Toggle Button with proper icons -->
+            <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
+              <!-- Sun icon for dark mode (click to go light) -->
+              <svg id="sun-icon" class="w-5 h-5 text-gray-700 dark:text-gray-300 hidden" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+              </svg>
+              <!-- Moon icon for light mode (click to go dark) -->
+              <svg id="moon-icon" class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+              </svg>
+            </button>
+
+            <!-- User Profile Dropdown -->
+            <div class="relative">
+              <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mvl-blue" aria-expanded="false" aria-haspopup="true">
+                <div class="h-8 w-8 rounded-full bg-mvl-blue flex items-center justify-center">
+                  <span class="text-sm font-medium text-white">JD</span>
+                </div>
+                <span class="ml-2 text-gray-700 dark:text-gray-300 hidden sm:block">John Doe</span>
+                <svg class="ml-1 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <!-- Dropdown menu -->
+              <div id="user-menu" class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <a href="index.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</button>
+              </div>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+              <button id="mobile-menu-button" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-mvl-blue">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Dashboard</a>
+            <a href="courses.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Courses</a>
+            <a href="curriculum.html" class="block px-3 py-2 text-mvl-blue font-semibold">Curriculum</a>
+            <a href="admin.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Admin</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="curriculumApp()">
+        <div class="flex flex-col lg:flex-row gap-8">
+            
+            <!-- Main Content Area -->
+            <div class="flex-1">
+                <!-- Title Bar -->
+                <div class="mb-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                        <div>
+                            <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                                CMMC 2.0 Curriculum
+                            </h1>
+                            <p class="text-gray-600 dark:text-gray-300 mt-2">
+                                Complete cybersecurity training for federal compliance
+                            </p>
+                        </div>
+                        
+                        <!-- Filter Pills -->
+                        <div class="flex flex-wrap gap-2">
+                            <button 
+                                @click="activeFilter = 'all'"
+                                :class="activeFilter === 'all' ? 'bg-mvl-blue text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'"
+                                class="px-4 py-2 rounded-full text-sm font-medium transition-colors hover:opacity-80">
+                                All Domains
+                            </button>
+                            <button 
+                                @click="activeFilter = 'completed'"
+                                :class="activeFilter === 'completed' ? 'bg-mvl-green text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'"
+                                class="px-4 py-2 rounded-full text-sm font-medium transition-colors hover:opacity-80">
+                                Completed
+                            </button>
+                            <button 
+                                @click="activeFilter = 'in-progress'"
+                                :class="activeFilter === 'in-progress' ? 'bg-mvl-orange text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'"
+                                class="px-4 py-2 rounded-full text-sm font-medium transition-colors hover:opacity-80">
+                                In Progress
+                            </button>
+                            <button 
+                                @click="activeFilter = 'not-started'"
+                                :class="activeFilter === 'not-started' ? 'bg-gray-500 text-white' : 'bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'"
+                                class="px-4 py-2 rounded-full text-sm font-medium transition-colors hover:opacity-80">
+                                Not Started
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Domain Accordion List -->
+                <div class="space-y-4">
+                    <template x-for="domain in filteredDomains" :key="domain.id">
+                        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm">
+                            <!-- Domain Header -->
+                            <div 
+                                @click="toggleDomain(domain.id)"
+                                class="flex items-center justify-between p-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors">
+                                <div class="flex items-center space-x-4">
+                                    <!-- Domain Icon -->
+                                    <div class="w-12 h-12 bg-mvl-blue bg-opacity-10 rounded-lg flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-mvl-blue" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" x-show="domain.id === 'AC'"></path>
+                                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" x-show="domain.id !== 'AC'"></path>
+                                        </svg>
+                                    </div>
+                                    
+                                    <!-- Domain Info -->
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white" x-text="domain.title"></h3>
+                                        <p class="text-sm text-gray-500 dark:text-gray-400">
+                                            <span x-text="getDomainStats(domain.id).completed"></span> of <span x-text="getDomainStats(domain.id).total"></span> lessons completed
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4">
+                                    <!-- Progress Bar -->
+                                    <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                        <div 
+                                            class="bg-mvl-green h-2 rounded-full transition-all duration-300"
+                                            :style="`width: ${getDomainProgress(domain.id)}%`">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Expand/Collapse Icon -->
+                                    <svg 
+                                        class="w-5 h-5 text-gray-400 transition-transform duration-200"
+                                        :class="{ 'rotate-90': expandedDomains.includes(domain.id) }"
+                                        fill="currentColor" 
+                                        viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            
+                            <!-- Domain Lessons (Collapsible) -->
+                            <div 
+                                x-show="expandedDomains.includes(domain.id)"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                x-transition:enter-end="opacity-100 transform translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 transform translate-y-0"
+                                x-transition:leave-end="opacity-0 transform -translate-y-2"
+                                class="border-t border-gray-200 dark:border-gray-700">
+                                
+                                <div class="p-6 space-y-3">
+                                    <template x-for="lesson in getDomainLessons(domain.id)" :key="lesson.id">
+                                        <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-750 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                            <div class="flex items-center space-x-4">
+                                                <!-- Lesson Status Icon -->
+                                                <div class="w-8 h-8 rounded-full flex items-center justify-center"
+                                                     :class="getLessonStatusStyle(lesson)">
+                                                    <!-- Completed -->
+                                                    <svg x-show="lesson.status === 'Complete'" class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    <!-- In Progress -->
+                                                    <svg x-show="lesson.status === 'In Progress'" class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                    <!-- Not Started -->
+                                                    <div x-show="lesson.status === 'Not Started'" class="w-2 h-2 bg-white rounded-full"></div>
+                                                </div>
+                                                
+                                                <!-- Lesson Info -->
+                                                <div>
+                                                    <h4 class="font-medium text-gray-900 dark:text-white" x-text="lesson.title"></h4>
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                                                        <span x-text="lesson.id"></span> • <span x-text="lesson.readTime"></span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Action Button -->
+                                            <button 
+                                                @click="startLesson(lesson)"
+                                                class="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
+                                                :class="lesson.status === 'Complete' ? 'bg-gray-200 dark:bg-gray-600 text-gray-700 dark:text-gray-300' : 'bg-mvl-blue text-white hover:bg-blue-700'">
+                                                <span x-text="lesson.status === 'Complete' ? 'Review' : 'Start'"></span>
+                                            </button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+            <!-- Right Rail - Sticky Progress -->
+            <div class="lg:w-80">
+                <div class="sticky top-24 space-y-6">
+                    <!-- Progress Overview Card -->
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
+                        <div class="text-center mb-6">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                                Overall Progress
+                            </h3>
+                            <div class="relative w-32 h-32 mx-auto">
+                                <canvas id="progress-donut" width="128" height="128"></canvas>
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <div class="text-center">
+                                        <div class="text-2xl font-bold text-mvl-blue" x-text="overallProgress + '%'"></div>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">Complete</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats -->
+                        <div class="space-y-4">
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-300">Completed Lessons</span>
+                                <span class="font-semibold text-gray-900 dark:text-white" x-text="completedLessons + ' / ' + totalLessons"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-300">Domains Mastered</span>
+                                <span class="font-semibold text-gray-900 dark:text-white" x-text="completedDomains + ' / ' + totalDomains"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-600 dark:text-gray-300">Study Time</span>
+                                <span class="font-semibold text-gray-900 dark:text-white">24h 15m</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Next Lesson CTA -->
+                    <div class="bg-gradient-to-r from-mvl-blue to-blue-600 rounded-lg p-6 text-white shadow-lg">
+                        <h3 class="text-lg font-semibold mb-2">Continue Learning</h3>
+                        <p class="text-blue-100 text-sm mb-4" x-text="nextLesson ? nextLesson.title : 'All lessons completed!'"></p>
+                        <button 
+                            @click="startNextLesson()"
+                            :disabled="!nextLesson"
+                            class="w-full bg-white text-mvl-blue font-semibold py-2 px-4 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span x-text="nextLesson ? 'Start Next Lesson' : 'Curriculum Complete'"></span>
+                        </button>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button class="w-full text-left p-3 rounded-lg bg-gray-50 dark:bg-gray-750 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <div class="font-medium text-gray-900 dark:text-white">Download Progress Report</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">PDF summary of your progress</div>
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg bg-gray-50 dark:bg-gray-750 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <div class="font-medium text-gray-900 dark:text-white">Schedule Review Session</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Set up practice time</div>
+                            </button>
+                            <button class="w-full text-left p-3 rounded-lg bg-gray-50 dark:bg-gray-750 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <div class="font-medium text-gray-900 dark:text-white">Take Practice Quiz</div>
+                                <div class="text-sm text-gray-500 dark:text-gray-400">Test your knowledge</div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alpine.js Curriculum App Logic -->
+    <script>
+        function curriculumApp() {
+            return {
+                activeFilter: 'all',
+                expandedDomains: ['AC'], // Start with Access Control expanded
+                courses: [],
+                lessons: {},
+                
+                // Initialize data
+                init() {
+                    // Load data from curriculum-data.js
+                    this.courses = window.COURSES_DATA || [];
+                    this.lessons = window.CURRICULUM_DATA?.LESSONS || {};
+                    
+                    // Initialize progress donut chart
+                    this.$nextTick(() => {
+                        this.initProgressChart();
+                    });
+                },
+                
+                // Computed properties
+                get filteredDomains() {
+                    return this.courses.filter(domain => {
+                        if (this.activeFilter === 'all') return true;
+                        
+                        const domainLessons = this.getDomainLessons(domain.id);
+                        const stats = this.getDomainStats(domain.id);
+                        
+                        switch (this.activeFilter) {
+                            case 'completed':
+                                return stats.completed === stats.total && stats.total > 0;
+                            case 'in-progress':
+                                return stats.completed > 0 && stats.completed < stats.total;
+                            case 'not-started':
+                                return stats.completed === 0;
+                            default:
+                                return true;
+                        }
+                    });
+                },
+                
+                get totalLessons() {
+                    return Object.keys(window.LESSONS_DATA || {}).length;
+                },
+                
+                get completedLessons() {
+                    return Object.values(window.LESSONS_DATA || {}).filter(lesson => lesson.status === 'Complete').length;
+                },
+                
+                get totalDomains() {
+                    return this.courses.length;
+                },
+                
+                get completedDomains() {
+                    return this.courses.filter(domain => {
+                        const stats = this.getDomainStats(domain.id);
+                        return stats.completed === stats.total && stats.total > 0;
+                    }).length;
+                },
+                
+                get overallProgress() {
+                    return this.totalLessons > 0 ? Math.round((this.completedLessons / this.totalLessons) * 100) : 0;
+                },
+                
+                get nextLesson() {
+                    const allLessons = Object.entries(window.LESSONS_DATA || {}).map(([id, lesson]) => ({
+                        id,
+                        ...lesson
+                    }));
+                    
+                    return allLessons.find(lesson => lesson.status !== 'Complete') || null;
+                },
+                
+                // Methods
+                toggleDomain(domainId) {
+                    const index = this.expandedDomains.indexOf(domainId);
+                    if (index > -1) {
+                        this.expandedDomains.splice(index, 1);
+                    } else {
+                        this.expandedDomains.push(domainId);
+                    }
+                },
+                
+                getDomainLessons(domainId) {
+                    const domainLessons = this.lessons[domainId] || {};
+                    return Object.entries(domainLessons).map(([id, lesson]) => ({
+                        id,
+                        ...lesson
+                    }));
+                },
+                
+                getDomainStats(domainId) {
+                    const lessons = this.getDomainLessons(domainId);
+                    const completed = lessons.filter(lesson => lesson.status === 'Complete').length;
+                    return {
+                        total: lessons.length,
+                        completed: completed,
+                        inProgress: lessons.filter(lesson => lesson.status === 'In Progress').length,
+                        notStarted: lessons.filter(lesson => lesson.status === 'Not Started').length
+                    };
+                },
+                
+                getDomainProgress(domainId) {
+                    const stats = this.getDomainStats(domainId);
+                    return stats.total > 0 ? Math.round((stats.completed / stats.total) * 100) : 0;
+                },
+                
+                getLessonStatusStyle(lesson) {
+                    switch (lesson.status) {
+                        case 'Complete':
+                            return 'bg-mvl-green';
+                        case 'In Progress':
+                            return 'bg-mvl-orange';
+                        default:
+                            return 'bg-gray-400';
+                    }
+                },
+                
+                startLesson(lesson) {
+                    // Navigate to lesson page
+                    window.location.href = `lesson.html?id=${lesson.id}`;
+                },
+                
+                startNextLesson() {
+                    if (this.nextLesson) {
+                        this.startLesson(this.nextLesson);
+                    }
+                },
+                
+                initProgressChart() {
+                    const ctx = document.getElementById('progress-donut');
+                    if (!ctx) return;
+                    
+                    new Chart(ctx, {
+                        type: 'doughnut',
+                        data: {
+                            datasets: [{
+                                data: [this.completedLessons, this.totalLessons - this.completedLessons],
+                                backgroundColor: ['#059669', '#E5E7EB'],
+                                borderWidth: 0,
+                                cutout: '70%'
+                            }]
+                        },
+                        options: {
+                            responsive: false,
+                            maintainAspectRatio: true,
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    enabled: false
+                                }
+                            }
+                        }
+                    });
+                }
+            };
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer id="footer-container"></footer>
+
+    <script defer>
+        (async () => {
+            const footerHost = document.getElementById('footer-container');
+            try {
+                const response = await fetch('components/footer.html');
+                if (response.ok) {
+                    footerHost.innerHTML = await response.text();
+                }
+            } catch (error) {
+                console.log('Footer component not found, continuing without it.');
+            }
+        })();
+    </script>
+
+</body>
+</html>

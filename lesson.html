@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - CMMC Lesson</title>
+    <script src="https://cdn.tailwindcss.com"></script>    <script>        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',   // use with border-mvl-blue / text-mvl-blue etc.
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669',
+                        'mvl-orange': '#ea580c'
+                    }
+                }
+            }
+        };
+    </script><script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Theme initialization to prevent flash -->
+    <script>
+        // Initialize theme immediately to prevent flash
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+    <style>
+        /* Custom styles for lesson content */
+        .lesson-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            overflow: hidden;
+        }
+        .section-header {
+            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .section-content {
+            padding: 1.5rem;
+        }
+        .implementation-step {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #3b82f6;
+        }
+        .quiz-option {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .quiz-option:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        .quiz-option.correct {
+            background: #dcfce7;
+            border-color: #16a34a;
+        }
+        .quiz-option.incorrect {
+            background: #fef2f2;
+            border-color: #dc2626;
+        }
+        .breadcrumb-link {
+            color: #6b7280;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .breadcrumb-link:hover {
+            color: #374151;
+        }    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">    <!-- MVL LMS Header -->
+    <header class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          
+          <!-- Logo and Brand -->
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <img src="assets/img/mvl-logo.png" alt="MVL Logo" class="h-10 w-auto logo-mask">
+            </div>            <div class="hidden sm:block">
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Learning Management System
+              </h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                CMMC 2.0 Training Platform
+              </p>
+            </div>
+          </div>
+
+          <!-- Navigation Links -->
+          <nav class="hidden md:flex space-x-8">
+            <a href="index.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Dashboard
+            </a>
+            <a href="courses.html" class="text-mvl-blue font-semibold">
+              Courses
+            </a>            <a href="curriculum.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Curriculum
+            </a>
+            <a href="admin.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Admin
+            </a>
+          </nav>
+
+          <!-- Right Side: Theme Toggle and User Profile -->
+          <div class="flex items-center space-x-4">
+            
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
+              <svg class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path class="dark:hidden" fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+                <path class="hidden dark:block" d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+              </svg>
+            </button>
+
+            <!-- User Profile Dropdown -->
+            <div class="relative">
+              <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mvl-blue" aria-expanded="false" aria-haspopup="true">
+                <div class="h-8 w-8 rounded-full bg-mvl-blue flex items-center justify-center">
+                  <span class="text-sm font-medium text-white">JD</span>
+                </div>
+                <span class="ml-2 text-gray-700 dark:text-gray-300 hidden sm:block">John Doe</span>
+                <svg class="ml-1 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <!-- Dropdown menu -->
+              <div id="user-menu" class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <a href="index.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</button>
+              </div>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+              <button id="mobile-menu-button" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-mvl-blue">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Dashboard</a>
+            <a href="courses.html" class="block px-3 py-2 text-mvl-blue font-semibold">Courses</a>
+            <a href="curriculum.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Curriculum</a>
+            <a href="admin.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Admin</a>
+          </div>
+        </div>
+      </div>
+    </header>    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="lessonData()">
+        <!-- Breadcrumb -->
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="flex items-center space-x-4">
+                <li>
+                    <a href="courses.html" class="breadcrumb-link">Courses</a>
+                </li>
+                <li>
+                    <svg class="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </li>
+                <li>
+                    <a :href="`course.html?id=${domain}`" class="breadcrumb-link" x-text="courseName">Course</a>
+                </li>
+                <li>
+                    <svg class="flex-shrink-0 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                </li>
+                <li>
+                    <span class="text-gray-900 font-medium" x-text="lessonId">Lesson</span>
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Lesson Header -->
+        <section class="lesson-section">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center space-x-3">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-500 bg-opacity-30 text-blue-100" x-text="lessonId">AC.L2-3.1.1</span>
+                        <span x-show="isComplete"
+                              class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                            </svg>
+                            Complete
+                        </span>
+                    </div>
+                    <button @click="markComplete()" 
+                            x-show="!isComplete"
+                            class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>Mark as Complete</span>
+                    </button>
+                </div>
+                
+                <h1 class="text-4xl font-bold mb-4" x-text="lesson.title">Limit System Access to Authorized Users</h1>
+                
+                <div class="flex items-center space-x-6 text-blue-100 text-sm">
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span x-text="lesson.readTime">5 min read</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        <span x-text="courseName">Access Control</span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Quiz included</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Official Requirement Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                🔑 Official Requirement
+            </div>
+            <div class="section-content">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="font-bold text-blue-900 mb-2" x-text="lessonId">CMMC v2 – AC.L2-3.1.1</h3>
+                    <p class="text-blue-800 text-lg italic" x-text="lesson.officialRequirement">
+                        "Limit system access to authorized users, processes acting on behalf of authorized users, or devices (including other systems)."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why This Matters Section -->
+        <section class="lesson-section" x-data="whyMattersSection()">
+            <div class="section-header">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                    </div>
+                    <span>Why This Matters</span>
+                </div>
+            </div>
+            <div class="section-content">
+                <!-- Business Context Overview -->
+                <div x-show="businessContext" class="mb-6 p-4 bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-900 dark:to-orange-900 rounded-lg border-l-4 border-red-500">
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-6 h-6 text-red-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-red-800 dark:text-red-200 mb-2">Business Impact</h4>
+                            <p class="text-red-700 dark:text-red-300" x-text="businessContext"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Points -->
+                <div class="space-y-4">
+                    <template x-for="(point, index) in whyPoints" :key="index">
+                        <div class="flex items-start space-x-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <div class="flex-shrink-0">
+                                <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center text-white font-bold text-sm" 
+                                     x-text="index + 1"></div>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-start space-x-2">
+                                    <svg class="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    <p class="text-gray-700 dark:text-gray-300 leading-relaxed" x-text="point"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Risk Callout -->
+                <div class="mt-6 p-4 bg-red-100 dark:bg-red-900 rounded-lg border border-red-200 dark:border-red-700">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                        </svg>
+                        <h4 class="font-semibold text-red-800 dark:text-red-200">Compliance Risk</h4>
+                    </div>
+                    <p class="text-red-700 dark:text-red-300 text-sm">
+                        Failure to implement this control properly can result in CMMC audit failures, 
+                        loss of DoD contract eligibility, and potential security incidents affecting CUI.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How MVL Does It Section -->
+        <section class="lesson-section" x-data="howMVLSection()">
+            <div class="section-header">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </div>
+                    <span>How MVL Does It</span>
+                </div>
+            </div>
+            <div class="section-content">
+                <!-- Security Stack Overview -->
+                <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg border-l-4 border-blue-500">
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                        </svg>
+                        <div>
+                            <h4 class="font-semibold text-blue-800 dark:text-blue-200 mb-2">MVL Security Architecture</h4>
+                            <p class="text-blue-700 dark:text-blue-300 text-sm">
+                                Our integrated GCC High security stack with layered defense approach
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Implementation Methods -->
+                <div class="space-y-4">
+                    <template x-for="(method, index) in mvlMethods" :key="index">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden hover:shadow-lg transition-shadow">
+                            <div class="p-4">
+                                <div class="flex items-start space-x-4">
+                                    <div class="flex-shrink-0">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold" 
+                                             x-text="index + 1"></div>
+                                    </div>
+                                    <div class="flex-1">
+                                        <div class="flex items-start space-x-2">
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-2 mb-2">
+                                                    <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                    </svg>
+                                                    <span class="font-medium text-blue-600 dark:text-blue-400 text-sm uppercase tracking-wide" x-text="method.tool || 'Tool'"></span>
+                                                </div>
+                                                <p class="text-gray-700 dark:text-gray-300 leading-relaxed" x-text="method.description || method"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- MVL Context -->
+                <div class="mt-6 p-4 bg-blue-100 dark:bg-blue-900 rounded-lg border border-blue-200 dark:border-blue-700">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h4 class="font-semibold text-blue-800 dark:text-blue-200">MVL Context</h4>
+                    </div>
+                    <p class="text-blue-700 dark:text-blue-300 text-sm" x-text="mvlContext"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Implementation Steps Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                🛠️ Implementation Steps
+            </div>
+            <div class="section-content">
+                <div class="space-y-4">
+                    <div class="implementation-step">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">1️⃣</span>
+                            <h4 class="font-semibold text-gray-900">Policy Draft</h4>
+                        </div>
+                        <p class="text-gray-700 ml-11">Write "MVL Access Control Policy" (owner: CISO).</p>
+                    </div>
+                    <div class="implementation-step">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">2️⃣</span>
+                            <h4 class="font-semibold text-gray-900">Entra Conditional Access</h4>
+                        </div>
+                        <p class="text-gray-700 ml-11">Require MFA + compliant device, deny legacy auth.</p>
+                    </div>
+                    <div class="implementation-step">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">3️⃣</span>
+                            <h4 class="font-semibold text-gray-900">Zscaler Enrollment</h4>
+                        </div>
+                        <p class="text-gray-700 ml-11">Push ZPA client via Intune; map users to apps.</p>
+                    </div>
+                    <div class="implementation-step">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">4️⃣</span>
+                            <h4 class="font-semibold text-gray-900">Least-Privilege Audit</h4>
+                        </div>
+                        <p class="text-gray-700 ml-11">Run weekly PowerShell to find elevated roles; ticket any outliers.</p>
+                    </div>
+                    <div class="implementation-step">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">5️⃣</span>
+                            <h4 class="font-semibold text-gray-900">Train Users</h4>
+                        </div>
+                        <p class="text-gray-700 ml-11">5-min Actimo micro-module + quiz.</p>
+                    </div>
+                    <div class="implementation-step">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <span class="bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">6️⃣</span>
+                            <h4 class="font-semibold text-gray-900">Doc & Sign-off</h4>
+                        </div>
+                        <p class="text-gray-700 ml-11">Capture screenshots, export CA policies JSON; COO e-signs change log.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Knowledge Check Section -->
+        <section class="lesson-section">
+            <div class="section-header">
+                🧠 Knowledge Check (5-Question Quiz)
+            </div>
+            <div class="section-content" x-data="quizData()">
+                <div class="space-y-6">
+                    <!-- Question 1 -->
+                    <div class="quiz-question">
+                        <h4 class="font-semibold text-gray-900 mb-3">1. Which combo below BEST satisfies AC.L2-3.1.1 at MVL?</h4>
+                        <div class="space-y-2">
+                            <div class="quiz-option" @click="selectAnswer(1, 'A')" :class="getAnswerClass(1, 'A')">
+                                <strong>A.</strong> Local Windows account + password-only
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(1, 'B')" :class="getAnswerClass(1, 'B')">
+                                <strong>B.</strong> Entra ID SSO + MFA ✅
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(1, 'C')" :class="getAnswerClass(1, 'C')">
+                                <strong>C.</strong> Shared admin account (no logging)
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(1, 'D')" :class="getAnswerClass(1, 'D')">
+                                <strong>D.</strong> VPN tunnel w/out MFA
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="quiz-question">
+                        <h4 class="font-semibold text-gray-900 mb-3">2. True or False: Zscaler Private Access (ZPA) automatically blocks any device that isn't enrolled or compliant, even if the user's creds are legit.</h4>
+                        <div class="space-y-2">
+                            <div class="quiz-option" @click="selectAnswer(2, 'A')" :class="getAnswerClass(2, 'A')">
+                                <strong>A.</strong> True ✅
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(2, 'B')" :class="getAnswerClass(2, 'B')">
+                                <strong>B.</strong> False
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="quiz-question">
+                        <h4 class="font-semibold text-gray-900 mb-3">3. You just off-boarded an engineer. What's the FIRST action to stay compliant with AC.L2-3.1.1?</h4>
+                        <div class="space-y-2">
+                            <div class="quiz-option" @click="selectAnswer(3, 'A')" :class="getAnswerClass(3, 'A')">
+                                <strong>A.</strong> Wipe their laptop next week
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(3, 'B')" :class="getAnswerClass(3, 'B')">
+                                <strong>B.</strong> Disable their Entra ID account within 30 minutes ✅
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(3, 'C')" :class="getAnswerClass(3, 'C')">
+                                <strong>C.</strong> Remove them from Teams chats only
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(3, 'D')" :class="getAnswerClass(3, 'D')">
+                                <strong>D.</strong> Send a "good-bye" GIF in the group channel
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="quiz-question">
+                        <h4 class="font-semibold text-gray-900 mb-3">4. Which policy element enforces the *device* part of "authorized users *or devices*"?</h4>
+                        <div class="space-y-2">
+                            <div class="quiz-option" @click="selectAnswer(4, 'A')" :class="getAnswerClass(4, 'A')">
+                                <strong>A.</strong> Azure Information Protection labels
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(4, 'B')" :class="getAnswerClass(4, 'B')">
+                                <strong>B.</strong> Entra Conditional Access "Require compliant device" ✅
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(4, 'C')" :class="getAnswerClass(4, 'C')">
+                                <strong>C.</strong> SharePoint site permissions
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(4, 'D')" :class="getAnswerClass(4, 'D')">
+                                <strong>D.</strong> Outlook Safe Senders list
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="quiz-question">
+                        <h4 class="font-semibold text-gray-900 mb-3">5. Scenario: A contractor connects via hotel Wi-Fi on their personal MacBook. They pass MFA but BitLocker isn't enabled. What happens?</h4>
+                        <div class="space-y-2">
+                            <div class="quiz-option" @click="selectAnswer(5, 'A')" :class="getAnswerClass(5, 'A')">
+                                <strong>A.</strong> Access granted; MFA alone is enough
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(5, 'B')" :class="getAnswerClass(5, 'B')">
+                                <strong>B.</strong> Login allowed but read-only rights
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(5, 'C')" :class="getAnswerClass(5, 'C')">
+                                <strong>C.</strong> ZPA blocks the session; Conditional Access flags non-compliant device ✅
+                            </div>
+                            <div class="quiz-option" @click="selectAnswer(5, 'D')" :class="getAnswerClass(5, 'D')">
+                                <strong>D.</strong> They're rerouted to a VPN fallback
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quiz Results -->
+                <div x-show="allAnswered()" class="mt-6 p-4 rounded-lg" :class="getQuizResultClass()">
+                    <div class="flex items-center space-x-2">
+                        <svg x-show="getScore() >= 4" class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <svg x-show="getScore() < 4" class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="font-semibold" x-text="getScoreText()"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Additional Resources Section -->
+        <section class="lesson-section" x-data="lessonResources()">
+            <div class="section-header">
+                📚 Additional Resources
+            </div>
+            <div class="section-content">
+                <div class="space-y-3" x-show="resources.length > 0">
+                    <template x-for="resource in resources" :key="resource.url">
+                        <div class="flex items-start space-x-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                            </svg>
+                            <div class="flex-1">
+                                <a :href="resource.url" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer"
+                                   class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium block mb-1" 
+                                   x-text="resource.title"></a>
+                                <p class="text-sm text-gray-600 dark:text-gray-400" x-text="resource.description"></p>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-400 mt-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                        </div>
+                    </template>
+                </div>
+                <div x-show="resources.length === 0" class="text-center py-6 text-gray-500 dark:text-gray-400">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    <p>No additional resources available for this lesson.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation -->
+        <section class="flex justify-between items-center mt-8">
+            <a href="course.html?id=AC" 
+               class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Course
+            </a>
+            
+            <button @click="markComplete(); nextLesson()" 
+                    class="inline-flex items-center px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors">
+                <span x-text="isComplete ? 'Next Lesson' : 'Complete & Continue'">Complete & Continue</span>
+                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <p class="text-center text-gray-500 text-sm">
+                © 2024 MVL Group. All rights reserved. | CMMC 2.0 Training Platform
+            </p>
+        </div>
+    </footer>
+
+    <!-- Load curriculum data and app functionality -->
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+
+    <script>
+        function lessonData() {
+            return {
+                domain: 'AC',
+                requirement: '3.1.1',
+                lessonId: 'AC.L2-3.1.1',
+                courseName: 'Access Control',
+                isComplete: false,
+                lesson: {
+                    title: 'Limit System Access to Authorized Users',
+                    readTime: '5 min read',
+                    officialRequirement: 'Limit system access to authorized users, processes acting on behalf of authorized users, or devices (including other systems).',
+                    whyMatters: '',
+                    howMVLDoes: ''
+                },
+
+                init() {
+                    this.loadLessonFromUrl();
+                    this.loadLessonData();
+                    this.checkCompletion();
+                },                loadLessonFromUrl() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    this.domain = urlParams.get('domain') || 'AC';
+                    
+                    // Handle both 'pr' (from course navigation) and 'requirement' (direct access) parameters
+                    const prParam = urlParams.get('pr');
+                    const requirementParam = urlParams.get('requirement');
+                    
+                    if (prParam) {
+                        // If pr param contains the full lesson ID (e.g., "AC.3.1.1"), extract the requirement part
+                        if (prParam.includes('.')) {
+                            const parts = prParam.split('.');
+                            this.requirement = parts.slice(1).join('.'); // Take everything after domain
+                        } else {
+                            this.requirement = prParam;
+                        }
+                    } else {
+                        this.requirement = requirementParam || '3.1.1';
+                    }
+                    
+                    this.lessonId = `${this.domain}.L2-3.${this.requirement}`;
+                    
+                    console.log('🔍 URL Parameters parsed:', {
+                        domain: this.domain,
+                        prParam: prParam,
+                        requirementParam: requirementParam,
+                        finalRequirement: this.requirement,
+                        lessonId: this.lessonId
+                    });
+                    
+                    // Update course name based on domain
+                    const courseNames = {
+                        'AC': 'Access Control',
+                        'AT': 'Awareness & Training',
+                        'AU': 'Audit & Accountability',
+                        'CM': 'Configuration Management',
+                        'IA': 'Identification & Authentication',
+                        'IR': 'Incident Response',
+                        'MA': 'Maintenance',
+                        'MP': 'Media Protection',
+                        'PS': 'Personnel Security',
+                        'PE': 'Physical Protection',
+                        'RA': 'Risk Assessment',
+                        'CA': 'Security Assessment',
+                        'SC': 'System & Communications Protection',
+                        'SI': 'System & Information Integrity'
+                    };
+                    this.courseName = courseNames[this.domain] || 'Course';
+                },
+
+                loadLessonData() {
+                    // Try to load from curriculum data
+                    if (window.LESSONS_DATA) {
+                        const lessonKey = Object.keys(window.LESSONS_DATA).find(key => 
+                            key.includes(this.domain) && key.includes(this.requirement)
+                        );
+                        
+                        if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                            const lessonData = window.LESSONS_DATA[lessonKey];
+                            this.lesson = {
+                                title: lessonData.title || this.lesson.title,
+                                readTime: lessonData.readTime || this.lesson.readTime,
+                                officialRequirement: lessonData.officialRequirement || this.lesson.officialRequirement,
+                                whyMatters: lessonData.why || lessonData.whyMatters || '',
+                                howMVLDoes: lessonData.howMVLDoes ? lessonData.howMVLDoes.join('<br>') : 
+                                           (lessonData.mvlTips ? lessonData.mvlTips.join('<br>') : '')
+                            };
+                            
+                            // Store lesson data for other components to access
+                            window.currentLessonData = lessonData;
+                        }
+                    }
+                },
+
+                checkCompletion() {
+                    const key = `lesson_${this.domain}_${this.requirement}`;
+                    this.isComplete = localStorage.getItem(key) === 'completed';
+                },
+
+                markComplete() {
+                    const key = `lesson_${this.domain}_${this.requirement}`;
+                    localStorage.setItem(key, 'completed');
+                    localStorage.setItem(`${key}_date`, new Date().toISOString());
+                    this.isComplete = true;
+                    
+                    // Show success message
+                    this.showToast('Lesson completed successfully! 🎉');
+                },
+
+                nextLesson() {
+                    // Navigate back to course page
+                    window.location.href = `course.html?id=${this.domain}`;
+                },
+
+                showToast(message) {
+                    // Simple toast notification
+                    const toast = document.createElement('div');
+                    toast.className = 'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+                    toast.textContent = message;
+                    document.body.appendChild(toast);
+                    
+                    setTimeout(() => {
+                        toast.remove();
+                    }, 3000);
+                }
+            }
+        }
+
+        function whyMattersSection() {
+            return {
+                whyPoints: [],
+                businessContext: '',
+
+                init() {
+                    this.loadWhyMatters();
+                },
+
+                loadWhyMatters() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const domain = urlParams.get('domain') || 'AC';
+                    const requirement = urlParams.get('requirement') || '3.1.1';
+                    
+                    if (window.LESSONS_DATA) {
+                        const lessonKey = Object.keys(window.LESSONS_DATA).find(key => 
+                            key.includes(domain) && key.includes(requirement)
+                        );
+                        
+                        if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                            const lessonData = window.LESSONS_DATA[lessonKey];
+                            this.whyPoints = lessonData.whyMatters || [];
+                            this.businessContext = lessonData.why || '';
+                        }
+                    }
+                    
+                    // Fallback data if nothing found
+                    if (this.whyPoints.length === 0) {
+                        this.whyPoints = [
+                            "Critical for CMMC Level 2 certification compliance",
+                            "Protects Controlled Unclassified Information (CUI)",
+                            "Required for DoD contract eligibility"
+                        ];
+                    }
+                }
+            }
+        }
+
+        function howMVLSection() {
+            return {
+                mvlMethods: [],
+                mvlContext: '',
+
+                init() {
+                    this.loadMVLMethods();
+                },
+
+                loadMVLMethods() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const domain = urlParams.get('domain') || 'AC';
+                    const requirement = urlParams.get('requirement') || '3.1.1';
+                    
+                    if (window.LESSONS_DATA) {
+                        const lessonKey = Object.keys(window.LESSONS_DATA).find(key => 
+                            key.includes(domain) && key.includes(requirement)
+                        );
+                        
+                        if (lessonKey && window.LESSONS_DATA[lessonKey]) {
+                            const lessonData = window.LESSONS_DATA[lessonKey];
+                            
+                            // Process howMVLDoes array to extract tool and description
+                            if (lessonData.howMVLDoes && Array.isArray(lessonData.howMVLDoes)) {
+                                this.mvlMethods = lessonData.howMVLDoes.map(method => {
+                                    if (typeof method === 'string') {
+                                        // Parse the method string to extract tool and description
+                                        const parts = method.split('→');
+                                        if (parts.length >= 2) {
+                                            return {
+                                                tool: parts[0].trim(),
+                                                description: parts.slice(1).join('→').trim()
+                                            };
+                                        } else {
+                                            // Look for patterns with strong tags or colons
+                                            const strongMatch = method.match(/^([^→–—]+?)(?:→|–|—|\s+)(.+)$/);
+                                            if (strongMatch) {
+                                                return {
+                                                    tool: strongMatch[1].replace(/\*\*/g, '').trim(),
+                                                    description: strongMatch[2].trim()
+                                                };
+                                            }
+                                            return {
+                                                tool: 'Security Control',
+                                                description: method
+                                            };
+                                        }
+                                    }
+                                    return method;
+                                });
+                            }
+                            
+                            this.mvlContext = "MVL Group operates in a Microsoft GCC High environment with integrated security tools for comprehensive CMMC compliance.";
+                        }
+                    }
+                    
+                    // Fallback data if nothing found
+                    if (this.mvlMethods.length === 0) {
+                        this.mvlMethods = [
+                            {
+                                tool: "Microsoft Entra ID",
+                                description: "Identity and access management with SSO and MFA"
+                            },
+                            {
+                                tool: "Microsoft Defender",
+                                description: "Endpoint detection and response (EDR) protection"
+                            },
+                            {
+                                tool: "Zscaler ZPA",
+                                description: "Zero Trust Network Access (ZTNA) solution"
+                            }
+                        ];
+                    }
+                }
+            }
+        }
+
+        function lessonResources() {
+            return {
+                resources: [],
+
+                init() {
+                    this.loadResources();
+                },
+
+                loadResources() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const domain = urlParams.get('domain') || 'AC';
+                    const requirement = urlParams.get('requirement') || '3.1.1';
+                    
+                    // Find the lesson data
+                    if (window.LESSONS_DATA) {
+                        const lessonKey = Object.keys(window.LESSONS_DATA).find(key => 
+                            key.includes(domain) && key.includes(requirement)
+                        );
+                        
+                        if (lessonKey && window.LESSONS_DATA[lessonKey] && window.LESSONS_DATA[lessonKey].resources) {
+                            this.resources = window.LESSONS_DATA[lessonKey].resources;
+                        }
+                    }
+                    
+                    // Fallback: Add default resources if none found
+                    if (this.resources.length === 0) {
+                        this.resources = [
+                            {
+                                title: "CMMC Model Overview",
+                                url: "https://www.acq.osd.mil/cmmc/docs/CMMC_Model_Main_20200203.pdf",
+                                description: "Official CMMC documentation and requirements"
+                            },
+                            {
+                                title: "NIST SP 800-171r3 Guide",
+                                url: "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/800-171r3/NIST.SP.800-171r3.html",
+                                description: "Detailed implementation guidance for federal requirements"
+                            }
+                        ];
+                    }
+                }
+            }
+        }
+
+        function quizData() {
+            return {
+                answers: {},
+                correctAnswers: {
+                    1: 'B',
+                    2: 'A', 
+                    3: 'B',
+                    4: 'B',
+                    5: 'C'
+                },
+
+                selectAnswer(questionNum, answer) {
+                    this.answers[questionNum] = answer;
+                },
+
+                getAnswerClass(questionNum, answer) {
+                    if (!this.answers[questionNum]) return '';
+                    
+                    if (this.answers[questionNum] === answer) {
+                        return this.correctAnswers[questionNum] === answer ? 'correct' : 'incorrect';
+                    }
+                    return '';
+                },
+
+                allAnswered() {
+                    return Object.keys(this.correctAnswers).every(q => this.answers[q]);
+                },
+
+                getScore() {
+                    let correct = 0;
+                    for (let q in this.correctAnswers) {
+                        if (this.answers[q] === this.correctAnswers[q]) {
+                            correct++;
+                        }
+                    }
+                    return correct;
+                },
+
+                getScoreText() {
+                    const score = this.getScore();
+                    const total = Object.keys(this.correctAnswers).length;
+                    return `Quiz Complete: ${score}/${total} correct`;
+                },
+
+                getQuizResultClass() {
+                    return this.getScore() >= 4 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                }
+            }
+        }
+
+        // URL parameter helper
+        function getUrlParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);        }
+    </script>    <!-- Footer -->
+    <footer id="footer-container"></footer>    <script defer>
+        // Header functionality
+        document.addEventListener('DOMContentLoaded', function() {          // Theme toggle
+          const themeToggle = document.getElementById('theme-toggle');
+          const html = document.documentElement;
+          
+          if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+              const isDark = html.classList.contains('dark');
+              
+              if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+              } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+              }
+              
+              // Update button icon visibility
+              updateThemeIcon();
+            });
+          }
+          
+          // Update theme icon based on current mode
+          function updateThemeIcon() {
+            const isDark = html.classList.contains('dark');
+            const sunIcon = document.querySelector('#theme-toggle .dark\\:hidden');
+            const moonIcon = document.querySelector('#theme-toggle .hidden.dark\\:block');
+            
+            if (sunIcon && moonIcon) {
+              if (isDark) {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+              } else {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+              }
+            }
+          }
+          
+          // Initialize theme icon
+          updateThemeIcon();
+          
+          // User menu toggle
+          const userMenuButton = document.getElementById('user-menu-button');
+          const userMenu = document.getElementById('user-menu');
+          
+          if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function() {
+              userMenu.classList.toggle('hidden');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(event) {
+              if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+              }
+            });
+          }
+          
+          // Mobile menu toggle
+          const mobileMenuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          
+          if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+              mobileMenu.classList.toggle('hidden');
+            });
+          }
+        });
+    </script>
+</body>
+</html>

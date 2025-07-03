@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Offline - MVL LMS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669',
+                        'mvl-orange': '#ea580c'
+                    }
+                }
+            }
+        };
+    </script>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+    <div class="text-center p-8 max-w-md mx-auto">
+        <div class="w-24 h-24 mx-auto mb-6 text-gray-400">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 2v20M2 12h20"/>
+            </svg>
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-4">You're Offline</h1>
+        <p class="text-gray-600 mb-6 leading-relaxed">
+            It looks like you've lost your internet connection. Don't worry - some content may still be available from your device's cache.
+        </p>
+        <div class="space-y-4">
+            <button onclick="window.location.reload()" 
+                    class="w-full bg-mvl-blue text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                Try Again
+            </button>
+            <button onclick="window.history.back()" 
+                    class="w-full bg-gray-200 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-300 transition-colors font-medium">
+                Go Back
+            </button>
+        </div>
+        
+        <div class="mt-8 p-4 bg-blue-50 rounded-lg">
+            <h3 class="font-semibold text-blue-900 mb-2">While You're Offline:</h3>
+            <ul class="text-sm text-blue-800 text-left space-y-1">
+                <li>• Previously viewed lessons may still be available</li>
+                <li>• Your progress is saved locally</li>
+                <li>• Changes will sync when you're back online</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Check online status
+        function updateOnlineStatus() {
+            if (navigator.onLine) {
+                window.location.reload();
+            }
+        }
+        
+        window.addEventListener('online', updateOnlineStatus);
+        
+        // Auto-retry every 30 seconds
+        setInterval(() => {
+            if (navigator.onLine) {
+                window.location.reload();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

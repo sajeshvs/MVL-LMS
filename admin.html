@@ -1,0 +1,2013 @@
+<!DOCTYPE html>
+<html lang="en" class="">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVL-LMS - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'mvl-blue': '#1e40af',
+                        'mvl-red' : '#dc2626',
+                        'mvl-gold': '#f59e0b',
+                        'mvl-green': '#059669',
+                        'mvl-orange': '#ea580c'
+                    }
+                }
+            }
+        };
+    </script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/heroicons@2.0.16/24/outline/index.js" type="module"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>    <link rel="stylesheet" href="assets/css/overrides.css">
+    <script src="assets/js/curriculum-data.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/components.js"></script>
+    <script src="assets/js/admin-api.js"></script>
+    <script src="assets/js/admin-data.js"></script>
+    
+    <!-- Custom styles for enhanced admin panel -->
+    <style>
+        [x-cloak] { 
+            display: none !important; 
+        }
+        
+        .admin-modal {
+            backdrop-filter: blur(4px);
+        }
+        
+        .content-editor-toolbar button:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        .quiz-question-card {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .quiz-question-card:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Custom scrollbar for modal content */
+        .modal-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        /* Dark mode scrollbar */
+        .dark .modal-content::-webkit-scrollbar-track {
+            background: #374151;
+        }
+        
+        .dark .modal-content::-webkit-scrollbar-thumb {
+            background: #6b7280;
+        }
+        
+        .dark .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #9ca3af;
+        }
+        
+        /* Enhanced table hover effects */
+        .admin-table tbody tr:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+        
+        .dark .admin-table tbody tr:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Role badge animations */
+        .role-badge {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .role-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Chart container styling */
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+        
+        /* Progress bars */
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Button hover effects */
+        .admin-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .admin-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Notification toast styling */
+        .toast-notification {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        /* Form input focus states */
+        .admin-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Sidebar active state */
+        .sidebar-active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        /* Card hover effects */
+        .admin-card {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        .admin-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .admin-card:hover {
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+    </style>
+    
+    <!-- Theme initialization to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        })();
+    </script>
+    
+    <script>
+        // Header functionality
+        document.addEventListener('DOMContentLoaded', function() {
+          const themeToggle = document.getElementById('theme-toggle');
+          const html = document.documentElement;
+          
+          if (themeToggle) {
+            themeToggle.addEventListener('click', function() {
+              const isDark = html.classList.contains('dark');
+              
+              if (isDark) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+              } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+              }
+              
+              updateThemeIcon();
+            });
+          }
+
+          function updateThemeIcon() {
+            const isDark = html.classList.contains('dark');
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+            
+            if (sunIcon && moonIcon) {
+              if (isDark) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+              } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+              }
+            }
+          }
+          
+          updateThemeIcon();
+          
+          const userMenuButton = document.getElementById('user-menu-button');
+          const userMenu = document.getElementById('user-menu');
+          
+          if (userMenuButton && userMenu) {
+            userMenuButton.addEventListener('click', function() {
+              userMenu.classList.toggle('hidden');
+            });
+            
+            document.addEventListener('click', function(event) {
+              if (!userMenuButton.contains(event.target) && !userMenu.contains(event.target)) {
+                userMenu.classList.add('hidden');
+              }
+            });
+          }
+          
+          const mobileMenuButton = document.getElementById('mobile-menu-button');
+          const mobileMenu = document.getElementById('mobile-menu');
+          
+          if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', function() {
+              mobileMenu.classList.toggle('hidden');
+            });
+          }
+        });
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white min-h-screen">
+
+    <!-- MVL LMS Header -->
+    <header class="bg-white border-b border-gray-200 dark:bg-gray-900 dark:border-gray-700 sticky top-0 z-50">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          
+          <!-- Logo and Brand -->
+          <div class="flex items-center space-x-3">
+            <div class="flex-shrink-0">
+              <img src="assets/img/mvl-logo.png" alt="MVL Logo" class="h-10 w-auto">
+            </div>
+            <div class="hidden sm:block">
+              <h1 class="text-lg font-semibold text-gray-900 dark:text-white">
+                Learning Management System
+              </h1>
+              <p class="text-xs text-gray-500 dark:text-gray-400">
+                CMMC 2.0 Training Platform
+              </p>
+            </div>
+          </div>
+
+          <!-- Navigation Links -->
+          <nav class="hidden md:flex space-x-8">
+            <a href="index.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Dashboard
+            </a>
+            <a href="courses.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Courses
+            </a>
+            <a href="curriculum.html" class="text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue transition-colors">
+              Curriculum
+            </a>
+            <a href="admin.html" class="text-mvl-blue font-semibold">
+              Admin
+            </a>
+          </nav>
+
+          <!-- Right Side: Theme Toggle and User Profile -->
+          <div class="flex items-center space-x-4">
+            
+            <!-- Theme Toggle Button -->
+            <button id="theme-toggle" class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-colors">
+              <svg id="sun-icon" class="w-5 h-5 text-gray-700 dark:text-gray-300 hidden" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clip-rule="evenodd"></path>
+              </svg>
+              <svg id="moon-icon" class="w-5 h-5 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M17.293 13.293A8 8 0 716.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+              </svg>
+            </button>
+
+            <!-- User Profile Dropdown -->
+            <div class="relative">
+              <button id="user-menu-button" class="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-mvl-blue" aria-expanded="false" aria-haspopup="true">
+                <div class="h-8 w-8 rounded-full bg-mvl-blue flex items-center justify-center">
+                  <span class="text-sm font-medium text-white">AD</span>
+                </div>
+                <span class="ml-2 text-gray-700 dark:text-gray-300 hidden sm:block">Admin User</span>
+                <svg class="ml-1 h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                </svg>
+              </button>
+              
+              <!-- Dropdown menu -->
+              <div id="user-menu" class="hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white dark:bg-gray-800 py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <a href="index.html" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Dashboard</a>
+                <button onclick="logout()" class="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">Sign out</button>
+              </div>
+            </div>
+
+            <!-- Mobile menu button -->
+            <div class="md:hidden">
+              <button id="mobile-menu-button" class="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-mvl-blue">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden">
+          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200 dark:border-gray-700">
+            <a href="index.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Dashboard</a>
+            <a href="courses.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Courses</a>
+            <a href="curriculum.html" class="block px-3 py-2 text-gray-700 hover:text-mvl-blue dark:text-gray-300 dark:hover:text-mvl-blue">Curriculum</a>
+            <a href="admin.html" class="block px-3 py-2 text-mvl-blue font-semibold">Admin</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="flex min-h-screen bg-gray-50 dark:bg-gray-900" x-data="enhancedAdminData()" x-init="init(); $watch('activeSection', () => onSectionChange())">
+        <!-- Admin Sidebar -->
+        <aside class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 hidden lg:block">
+            <div class="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto">
+                <nav class="p-4 space-y-2">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Admin Console</h2>
+                    
+                    <template x-for="section in adminSections" :key="section.id">
+                        <button 
+                            @click="activeSection = section.id"
+                            :class="activeSection === section.id ? 'bg-mvl-blue text-white' : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'"
+                            class="w-full flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors text-left">
+                            <div class="w-5 h-5" x-html="section.icon"></div>
+                            <span x-text="section.title"></span>
+                        </button>
+                    </template>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Main Admin Content -->
+        <main class="flex-1 p-4 lg:p-8">
+            <!-- Mobile Navigation -->
+            <div class="lg:hidden mb-6">
+                <select x-model="activeSection" class="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white">
+                    <template x-for="section in adminSections" :key="section.id">
+                        <option :value="section.id" x-text="section.title"></option>
+                    </template>
+                </select>
+            </div>
+
+            <!-- Page Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2" x-text="getCurrentSectionTitle()"></h1>
+                <p class="text-gray-600 dark:text-gray-300" x-text="getCurrentSectionDescription()"></p>
+            </div>
+
+            <!-- Dashboard Overview -->
+            <div x-show="activeSection === 'dashboard'" class="space-y-6">
+                <!-- Quick Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="systemStats.totalUsers"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-green-600 dark:text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Active Lessons</p>
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="systemStats.activeLessons"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-yellow-600 dark:text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Completion Rate</p>
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="systemStats.completionRate + '%'"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">System Alerts</p>
+                                <p class="text-2xl font-semibold text-gray-900 dark:text-white" x-text="systemStats.alerts"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Activity</h3>
+                    <div class="space-y-4">
+                        <template x-for="activity in recentActivity" :key="activity.id">
+                            <div class="flex items-center space-x-4 p-3 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                                <div class="w-2 h-2 rounded-full" :class="activity.type === 'success' ? 'bg-green-500' : activity.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'"></div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-white" x-text="activity.message"></p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400" x-text="activity.timestamp"></p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Content Management</h3>
+                        <div class="space-y-3">
+                            <button @click="activeSection = 'content'" class="w-full bg-mvl-blue text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                Manage Content
+                            </button>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600 dark:text-gray-400">Edit Mode</span>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" x-model="$store.app.edit" @change="$store.app.toggleEdit()" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">User Management</h3>
+                        <div class="space-y-3">
+                            <button @click="activeSection = 'users'" class="w-full bg-mvl-green text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">
+                                Manage Users
+                            </button>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                                <span x-text="users.length"></span> total users
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">System Settings</h3>
+                        <div class="space-y-3">
+                            <button @click="activeSection = 'settings'" class="w-full bg-mvl-orange text-white py-2 px-4 rounded-lg hover:bg-orange-700 transition-colors">
+                                Configure System
+                            </button>
+                            <div class="text-sm text-gray-600 dark:text-gray-400">
+                                <span :class="ssoConfig.enabled ? 'text-green-600' : 'text-red-600'" x-text="ssoConfig.enabled ? 'SSO Enabled' : 'SSO Disabled'"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Management Section -->
+            <div x-show="activeSection === 'users'" class="space-y-6">
+                <!-- User Actions Bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center space-x-4">
+                        <button @click="showUserModal = true; editingUser = null" 
+                                class="bg-mvl-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Add New User
+                        </button>
+                        <button @click="exportUsers()" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            Export Users
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <select x-model="userFilter" class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                            <option value="all">All Users</option>
+                            <option value="super_admin">Super Admins</option>
+                            <option value="admin">Admins</option>
+                            <option value="instructor">Instructors</option>
+                            <option value="learner">Learners</option>
+                        </select>
+                        <input type="text" x-model="userSearch" placeholder="Search users..." 
+                               class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                    </div>
+                </div>
+
+                <!-- Users Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-750">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                        <input type="checkbox" @change="toggleAllUsers" class="rounded">
+                                    </th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Last Login</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progress</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <template x-for="user in filteredUsers" :key="user.id">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <input type="checkbox" :value="user.id" x-model="selectedUsers" class="rounded">
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="flex items-center">
+                                                <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" 
+                                                     :class="user.role === 'super_admin' ? 'bg-red-500' : user.role === 'admin' ? 'bg-blue-500' : user.role === 'instructor' ? 'bg-green-500' : 'bg-gray-500'"
+                                                     x-text="user.name.split(' ').map(n => n[0]).join('')"></div>
+                                                <div class="ml-4">
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-white" x-text="user.name"></div>
+                                                    <div class="text-sm text-gray-500 dark:text-gray-400" x-text="user.email"></div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                                  :class="getRoleBadgeClass(user.role)"
+                                                  x-text="user.role.replace('_', ' ').toUpperCase()"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                                  :class="user.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'"
+                                                  x-text="user.status.toUpperCase()"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400" x-text="user.lastLogin"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                                <div class="bg-mvl-green h-2 rounded-full transition-all duration-300" 
+                                                     :style="`width: ${user.progress}%`"></div>
+                                            </div>
+                                            <span class="text-xs text-gray-500 dark:text-gray-400" x-text="user.progress + '%'"></span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            <div class="flex justify-end space-x-2">
+                                                <button @click="editUser(user)" class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">Edit</button>
+                                                <button @click="resetUserProgress(user)" class="text-yellow-600 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300">Reset</button>
+                                                <button @click="deleteUser(user)" class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>            <!-- Content Management Section -->
+            <div x-show="activeSection === 'content'" class="space-y-6">
+                <!-- Content Actions Bar -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div class="flex items-center space-x-4">
+                        <button @click="showContentEditor = true; editingContent = null" 
+                                class="bg-mvl-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Create New Content
+                        </button>
+                        <button @click="showQuizEditor = true; editingQuiz = null" 
+                                class="bg-mvl-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            Create Quiz
+                        </button>
+                        <button @click="importContent()" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            Import Content
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <select x-model="contentFilter" class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                            <option value="all">All Content</option>
+                            <option value="lessons">Lessons</option>
+                            <option value="quizzes">Quizzes</option>
+                            <option value="media">Media</option>
+                        </select>
+                        <input type="text" x-model="contentSearch" placeholder="Search content..." 
+                               class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                    </div>
+                </div>
+
+                <!-- Content Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <template x-for="content in filteredContent" :key="content.id">
+                        <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                      :class="content.type === 'lesson' ? 'bg-blue-100 text-blue-800' : content.type === 'quiz' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'"
+                                      x-text="content.type.toUpperCase()"></span>
+                                <div class="flex space-x-2">
+                                    <button @click="editContent(content)" class="text-blue-600 hover:text-blue-800">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"></path>
+                                        </svg>
+                                    </button>
+                                    <button @click="deleteContent(content)" class="text-red-600 hover:text-red-800">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2" x-text="content.title"></h3>
+                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-3" x-text="content.description"></p>
+                            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                                <span x-text="content.domain"></span>
+                                <span x-text="content.lastModified"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+
+            <!-- SSO Configuration Section -->
+            <div x-show="activeSection === 'sso'" class="space-y-6">
+                <!-- SSO Configuration Form -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Microsoft Entra ID Configuration</h3>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm text-gray-600 dark:text-gray-400">SSO Status:</span>
+                            <span :class="ssoConfig.enabled ? 'text-green-600' : 'text-red-600'" 
+                                  x-text="ssoConfig.enabled ? 'Enabled' : 'Disabled'"></span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" x-model="ssoConfig.enabled" class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Tenant ID</label>
+                            <input type="text" x-model="ssoConfig.tenantId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Client ID (Application ID)</label>
+                            <input type="text" x-model="ssoConfig.clientId" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Client Secret</label>
+                            <input type="password" x-model="ssoConfig.clientSecret" placeholder="Enter client secret"
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Redirect URI</label>
+                            <input type="url" x-model="ssoConfig.redirectUri" 
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                    </div>
+
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Authority URL</label>
+                        <input type="url" x-model="ssoConfig.authority" 
+                               class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                    </div>
+
+                    <div class="mt-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Required Scopes</label>
+                        <input type="text" x-model="ssoConfig.scopes" 
+                               class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                    </div>
+
+                    <div class="mt-6 flex space-x-4">
+                        <button @click="testSSOConnection()" 
+                                class="bg-mvl-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Test Connection
+                        </button>
+                        <button @click="saveSSOConfig()" 
+                                class="bg-mvl-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            Save Configuration
+                        </button>
+                        <button @click="resetSSOConfig()" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            Reset to Defaults
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Group Role Mapping -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Entra ID Group Role Mapping</h3>
+                    <div class="space-y-4">
+                        <template x-for="mapping in groupRoleMappings" :key="mapping.id">
+                            <div class="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                                <div class="flex-1">
+                                    <input type="text" x-model="mapping.groupName" placeholder="Entra ID Group Name"
+                                           class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                </div>
+                                <div class="flex-1">
+                                    <select x-model="mapping.role" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                        <option value="learner">Learner</option>
+                                        <option value="instructor">Instructor</option>
+                                        <option value="admin">Admin</option>
+                                        <option value="super_admin">Super Admin</option>
+                                    </select>
+                                </div>
+                                <button @click="removeGroupMapping(mapping)" class="text-red-600 hover:text-red-800">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </template>
+                        <button @click="addGroupMapping()" 
+                                class="w-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors">
+                            + Add Group Mapping
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics & Reports Section -->
+            <div x-show="activeSection === 'analytics'" class="space-y-6">
+                <!-- Analytics Overview -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Progress Analytics</h3>
+                        <canvas id="progressChart" width="300" height="200"></canvas>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">User Activity</h3>
+                        <canvas id="activityChart" width="300" height="200"></canvas>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Compliance Status</h3>
+                        <div class="space-y-3">
+                            <template x-for="domain in analyticsData.complianceByDomain" :key="domain.name">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400" x-text="domain.name"></span>
+                                    <span class="font-semibold" :class="domain.percentage >= 80 ? 'text-green-600' : domain.percentage >= 60 ? 'text-yellow-600' : 'text-red-600'" 
+                                          x-text="domain.percentage + '%'"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Reports -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detailed Reports</h3>
+                        <div class="flex space-x-3">
+                            <select x-model="reportType" class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="user_progress">User Progress</option>
+                                <option value="course_completion">Course Completion</option>
+                                <option value="quiz_scores">Quiz Scores</option>
+                                <option value="compliance_audit">Compliance Audit</option>
+                            </select>
+                            <button @click="generateReport()" 
+                                    class="bg-mvl-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                                Generate Report
+                            </button>
+                            <button @click="exportReport()" 
+                                    class="bg-mvl-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                                Export
+                            </button>
+                        </div>
+                    </div>
+                    <div id="reportContent" class="min-h-64">
+                        <div class="text-center text-gray-500 dark:text-gray-400 py-12">
+                            Select a report type and click "Generate Report" to view analytics data.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Settings Section -->
+            <div x-show="activeSection === 'settings'" class="space-y-6">
+                <!-- Security Settings -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Security Settings</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Two-Factor Authentication</label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Require 2FA for all admin users</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" x-model="securitySettings.require2FA" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Session Timeout</label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Auto-logout after inactivity</p>
+                                </div>
+                                <select x-model="securitySettings.sessionTimeout" class="px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                    <option value="15">15 minutes</option>
+                                    <option value="30">30 minutes</option>
+                                    <option value="60">1 hour</option>
+                                    <option value="240">4 hours</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Password Complexity</label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Enforce strong passwords</p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" x-model="securitySettings.passwordComplexity" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Login Attempt Limit</label>
+                                <input type="number" x-model="securitySettings.loginAttempts" min="3" max="10"
+                                       class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Account Lockout Duration (minutes)</label>
+                                <input type="number" x-model="securitySettings.lockoutDuration" min="5" max="60"
+                                       class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Notification Settings</h3>
+                    <div class="space-y-4">
+                        <template x-for="notification in notificationSettings" :key="notification.key">
+                            <div class="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300" x-text="notification.title"></label>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400" x-text="notification.description"></p>
+                                </div>
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" x-model="notification.enabled" class="sr-only peer">
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                </label>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Branding Settings -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Branding Customization</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Platform Name</label>
+                            <input type="text" x-model="brandingSettings.platformName" 
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Primary Color</label>
+                            <input type="color" x-model="brandingSettings.primaryColor" 
+                                   class="w-full h-10 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Logo URL</label>
+                            <input type="url" x-model="brandingSettings.logoUrl" 
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Favicon URL</label>
+                            <input type="url" x-model="brandingSettings.faviconUrl" 
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <button @click="previewBranding()" 
+                                class="bg-mvl-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Preview Changes
+                        </button>
+                        <button @click="saveBrandingSettings()" 
+                                class="bg-mvl-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors ml-3">
+                            Save Branding
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Audit & Compliance Section -->
+            <div x-show="activeSection === 'audit'" class="space-y-6">
+                <!-- Audit Log Filters -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Audit Log Filters</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Date Range</label>
+                            <select x-model="auditFilters.dateRange" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="today">Today</option>
+                                <option value="week">This Week</option>
+                                <option value="month">This Month</option>
+                                <option value="quarter">This Quarter</option>
+                                <option value="custom">Custom Range</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Action Type</label>
+                            <select x-model="auditFilters.actionType" class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="all">All Actions</option>
+                                <option value="login">User Login</option>
+                                <option value="logout">User Logout</option>
+                                <option value="content_edit">Content Edit</option>
+                                <option value="user_create">User Created</option>
+                                <option value="user_delete">User Deleted</option>
+                                <option value="settings_change">Settings Change</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">User</label>
+                            <input type="text" x-model="auditFilters.user" placeholder="Search by user..." 
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">IP Address</label>
+                            <input type="text" x-model="auditFilters.ipAddress" placeholder="Filter by IP..." 
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                    </div>
+                    <div class="mt-4 flex space-x-3">
+                        <button @click="applyAuditFilters()" 
+                                class="bg-mvl-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                            Apply Filters
+                        </button>
+                        <button @click="exportAuditLog()" 
+                                class="bg-mvl-green text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                            Export Log
+                        </button>
+                        <button @click="clearAuditFilters()" 
+                                class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors">
+                            Clear Filters
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Audit Log Table -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-750">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Timestamp</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">User</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Action</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Details</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">IP Address</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                <template x-for="log in filteredAuditLogs" :key="log.id">
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-750">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="log.timestamp"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="log.user"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white" x-text="log.action"></td>
+                                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400" x-text="log.details"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400" x-text="log.ipAddress"></td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full"
+                                                  :class="log.status === 'success' ? 'bg-green-100 text-green-800' : log.status === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'"
+                                                  x-text="log.status.toUpperCase()"></span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>        </main>
+    </div>
+
+    <!-- User Management Modal -->
+    <div x-show="showUserModal" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showUserModal = false"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full p-6 shadow-xl">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        <span x-text="editingUser ? 'Edit User' : 'Add New User'"></span>
+                    </h3>
+                    <button @click="showUserModal = false" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form @submit.prevent="saveUser">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
+                            <input type="text" required 
+                                   x-model="editingUser ? editingUser.name : ''"
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email Address</label>
+                            <input type="email" required 
+                                   x-model="editingUser ? editingUser.email : ''"
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
+                            <select x-model="editingUser ? editingUser.role : 'learner'" 
+                                    class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="learner">Learner</option>
+                                <option value="instructor">Instructor</option>
+                                <option value="admin">Admin</option>
+                                <option value="super_admin">Super Admin</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Status</label>
+                            <select x-model="editingUser ? editingUser.status : 'active'" 
+                                    class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="suspended">Suspended</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6" x-show="!editingUser">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Temporary Password</label>
+                        <input type="password" 
+                               class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">User will be required to change password on first login</p>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3 mt-8">
+                        <button type="button" @click="showUserModal = false" 
+                                class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-mvl-blue text-white rounded-lg hover:bg-blue-700">
+                            <span x-text="editingUser ? 'Update User' : 'Create User'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content Editor Modal -->
+    <div x-show="showContentEditor" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showContentEditor = false"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        <span x-text="editingContent ? 'Edit Content' : 'Create New Content'"></span>
+                    </h3>
+                    <button @click="showContentEditor = false" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form @submit.prevent="saveContent">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content Title</label>
+                            <input type="text" required 
+                                   x-model="editingContent ? editingContent.title : ''"
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Domain</label>
+                            <select x-model="editingContent ? editingContent.domain : 'AC'" 
+                                    class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="AC">Access Control</option>
+                                <option value="AT">Awareness & Training</option>
+                                <option value="AU">Audit & Accountability</option>
+                                <option value="CM">Configuration Management</option>
+                                <option value="IA">Identification & Authentication</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Description</label>
+                        <textarea x-model="editingContent ? editingContent.description : ''" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"></textarea>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Content Body</label>
+                        <div class="border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div class="flex items-center space-x-2 p-3 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-750">
+                                <button type="button" class="p-1 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM4 8a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM4 12a1 1 0 011-1h4a1 1 0 110 2H5a1 1 0 01-1-1z"></path></svg>
+                                </button>
+                                <button type="button" class="p-1 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <svg class="w-5 h-5 font-bold" fill="currentColor" viewBox="0 0 20 20"><path d="M6 4a1 1 0 011-1h6a1 1 0 011 1v14a1 1 0 01-1 1H7a1 1 0 01-1-1V4z"></path></svg>
+                                </button>
+                                <button type="button" class="p-1 text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+                                    <svg class="w-5 h-5 italic" fill="currentColor" viewBox="0 0 20 20"><path d="M8 5a1 1 0 000 2h1.586l-2.293 6.707a1 1 0 101.414.586L10 8h2a1 1 0 100-2H8z"></path></svg>
+                                </button>
+                            </div>
+                            <textarea rows="12" placeholder="Enter lesson content here..."
+                                      class="w-full px-3 py-2 border-0 bg-white dark:bg-gray-800 rounded-b-lg resize-none focus:ring-0"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" @click="showContentEditor = false" 
+                                class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-mvl-blue text-white rounded-lg hover:bg-blue-700">
+                            <span x-text="editingContent ? 'Update Content' : 'Create Content'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Editor Modal -->
+    <div x-show="showQuizEditor" x-cloak class="fixed inset-0 z-50 overflow-y-auto" style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" @click="showQuizEditor = false"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full p-6 shadow-xl max-h-[90vh] overflow-y-auto">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        <span x-text="editingQuiz ? 'Edit Quiz' : 'Create New Quiz'"></span>
+                    </h3>
+                    <button @click="showQuizEditor = false" class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <form @submit.prevent="saveQuiz">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quiz Title</label>
+                            <input type="text" required 
+                                   x-model="editingQuiz ? editingQuiz.title : ''"
+                                   class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Domain</label>
+                            <select x-model="editingQuiz ? editingQuiz.domain : 'AC'" 
+                                    class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+                                <option value="AC">Access Control</option>
+                                <option value="AT">Awareness & Training</option>
+                                <option value="AU">Audit & Accountability</option>
+                                <option value="CM">Configuration Management</option>
+                                <option value="IA">Identification & Authentication</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Quiz Description</label>
+                        <textarea x-model="editingQuiz ? editingQuiz.description : ''" rows="3"
+                                  class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"></textarea>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h4 class="text-md font-semibold text-gray-900 dark:text-white">Quiz Questions</h4>
+                            <button type="button" @click="addQuizQuestion()" 
+                                    class="bg-mvl-green text-white px-3 py-1 rounded text-sm hover:bg-green-700">
+                                Add Question
+                            </button>
+                        </div>
+                        
+                        <!-- Quiz questions would be dynamically generated here -->
+                        <div class="space-y-4">
+                            <div class="p-4 bg-gray-50 dark:bg-gray-750 rounded-lg border border-gray-200 dark:border-gray-700">
+                                <div class="mb-3">
+                                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Question 1</label>
+                                    <textarea rows="2" placeholder="Enter question text..."
+                                              class="w-full px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800"></textarea>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center space-x-3">
+                                        <input type="radio" name="q1" class="text-mvl-blue">
+                                        <input type="text" placeholder="Answer option A" 
+                                               class="flex-1 px-3 py-1 border border-gray-200 dark:border-gray-700 rounded bg-white dark:bg-gray-800">
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <input type="radio" name="q1" class="text-mvl-blue">
+                                        <input type="text" placeholder="Answer option B" 
+                                               class="flex-1 px-3 py-1 border border-gray-200 dark:border-gray-700 rounded bg-white dark:bg-gray-800">
+                                    </div>
+                                    <div class="flex items-center space-x-3">
+                                        <input type="radio" name="q1" class="text-mvl-blue">
+                                        <input type="text" placeholder="Answer option C" 
+                                               class="flex-1 px-3 py-1 border border-gray-200 dark:border-gray-700 rounded bg-white dark:bg-gray-800">
+                                    </div>
+                                </div>
+                                <div class="mt-3 flex justify-end">
+                                    <button type="button" class="text-red-600 hover:text-red-800 text-sm">Remove Question</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" @click="showQuizEditor = false" 
+                                class="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                class="px-4 py-2 bg-mvl-blue text-white rounded-lg hover:bg-blue-700">
+                            <span x-text="editingQuiz ? 'Update Quiz' : 'Create Quiz'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div><!-- Enhanced Admin Alpine.js Logic -->
+    <script>
+        function enhancedAdminData() {
+            return {
+                // Current section
+                activeSection: 'dashboard',
+                
+                // Admin sidebar navigation
+                adminSections: [
+                    {
+                        id: 'dashboard',
+                        title: 'Dashboard',
+                        icon: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"></path></svg>`
+                    },
+                    {
+                        id: 'users',
+                        title: 'User Management',
+                        icon: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"></path></svg>`
+                    },
+                    {
+                        id: 'content',
+                        title: 'Content Management',
+                        icon: `<svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 0h8v12H6V4z" clip-rule="evenodd"></path></svg>`
+                    },
+                    {
+                        id: 'sso',
+                        title: 'SSO Configuration',
+                        icon: `<svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>`
+                    },
+                    {
+                        id: 'analytics',
+                        title: 'Analytics & Reports',
+                        icon: `<svg fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"></path></svg>`
+                    },
+                    {
+                        id: 'settings',
+                        title: 'System Settings',
+                        icon: `<svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"></path></svg>`
+                    },
+                    {
+                        id: 'audit',
+                        title: 'Audit & Compliance',
+                        icon: `<svg fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1V3zm2 2V4h1v1h-1z" clip-rule="evenodd"></path></svg>`
+                    }
+                ],
+                
+                // System statistics
+                systemStats: {
+                    totalUsers: 156,
+                    activeLessons: 109,
+                    completionRate: 78,
+                    alerts: 3
+                },
+                
+                // Recent activity
+                recentActivity: [
+                    { id: 1, type: 'success', message: 'User John Doe completed Access Control module', timestamp: '2 minutes ago' },
+                    { id: 2, type: 'info', message: 'New user Sarah Wilson registered', timestamp: '15 minutes ago' },
+                    { id: 3, type: 'warning', message: 'Failed login attempt detected', timestamp: '1 hour ago' },
+                    { id: 4, type: 'success', message: 'System backup completed successfully', timestamp: '3 hours ago' },
+                    { id: 5, type: 'info', message: 'Content updated for lesson AC.3.1.1', timestamp: '5 hours ago' }
+                ],
+                
+                // User management
+                userFilter: 'all',
+                userSearch: '',
+                selectedUsers: [],
+                users: [
+                    { id: 1, name: 'John Doe', email: 'john@mvl-group.com', role: 'super_admin', status: 'active', lastLogin: '2 hours ago', progress: 100 },
+                    { id: 2, name: 'Sarah Wilson', email: 'sarah@mvl-group.com', role: 'admin', status: 'active', lastLogin: '1 day ago', progress: 85 },
+                    { id: 3, name: 'Mike Johnson', email: 'mike@mvl-group.com', role: 'instructor', status: 'active', lastLogin: '3 hours ago', progress: 92 },
+                    { id: 4, name: 'Lisa Chen', email: 'lisa@mvl-group.com', role: 'learner', status: 'active', lastLogin: '30 minutes ago', progress: 67 },
+                    { id: 5, name: 'David Brown', email: 'david@mvl-group.com', role: 'learner', status: 'inactive', lastLogin: '1 week ago', progress: 23 }
+                ],
+                
+                // Content Management
+                contentFilter: 'all',
+                contentSearch: '',
+                showContentEditor: false,
+                showQuizEditor: false,
+                editingContent: null,
+                editingQuiz: null,
+                contentItems: [
+                    { id: 1, title: 'Access Control Fundamentals', type: 'lesson', domain: 'AC', description: 'Introduction to access control principles', lastModified: '2024-01-15' },
+                    { id: 2, title: 'AC Domain Quiz', type: 'quiz', domain: 'AC', description: 'Comprehensive quiz for Access Control domain', lastModified: '2024-01-14' },
+                    { id: 3, title: 'Security Awareness Training', type: 'lesson', domain: 'AT', description: 'Basic security awareness for all users', lastModified: '2024-01-13' },
+                    { id: 4, title: 'Media Protection Guidelines', type: 'media', domain: 'MP', description: 'Video guide for media protection', lastModified: '2024-01-12' }
+                ],
+                
+                // SSO Configuration
+                ssoConfig: {
+                    enabled: false,
+                    tenantId: '',
+                    clientId: '',
+                    clientSecret: '',
+                    authority: 'https://login.microsoftonline.com/common',
+                    redirectUri: window.location.origin + '/auth/callback',
+                    scopes: 'openid profile email User.Read'
+                },
+                
+                // Group Role Mappings for SSO
+                groupRoleMappings: [
+                    { id: 1, groupName: 'MVL-Admins', role: 'admin' },
+                    { id: 2, groupName: 'MVL-Instructors', role: 'instructor' },
+                    { id: 3, groupName: 'MVL-Users', role: 'learner' }
+                ],
+                
+                // Analytics Data
+                analyticsData: {
+                    complianceByDomain: [
+                        { name: 'AC', percentage: 85 },
+                        { name: 'AT', percentage: 92 },
+                        { name: 'AU', percentage: 78 },
+                        { name: 'CM', percentage: 88 },
+                        { name: 'IA', percentage: 95 }
+                    ]
+                },
+                reportType: 'user_progress',
+                
+                // System Settings
+                securitySettings: {
+                    require2FA: true,
+                    sessionTimeout: '30',
+                    passwordComplexity: true,
+                    loginAttempts: 5,
+                    lockoutDuration: 15
+                },
+                
+                notificationSettings: [
+                    { key: 'login_alerts', title: 'Login Alerts', description: 'Notify on user login/logout', enabled: true },
+                    { key: 'content_changes', title: 'Content Changes', description: 'Notify when content is modified', enabled: true },
+                    { key: 'user_registration', title: 'User Registration', description: 'Notify on new user registrations', enabled: false },
+                    { key: 'quiz_completion', title: 'Quiz Completion', description: 'Notify on quiz completions', enabled: true },
+                    { key: 'system_alerts', title: 'System Alerts', description: 'Critical system notifications', enabled: true }
+                ],
+                
+                brandingSettings: {
+                    platformName: 'MVL Learning Management System',
+                    primaryColor: '#1e40af',
+                    logoUrl: 'assets/img/mvl-logo.png',
+                    faviconUrl: 'assets/img/mvl-favicon.ico'
+                },
+                
+                // Audit & Compliance
+                auditFilters: {
+                    dateRange: 'week',
+                    actionType: 'all',
+                    user: '',
+                    ipAddress: ''
+                },
+                
+                auditLogs: [
+                    { id: 1, timestamp: '2024-01-15 14:30:22', user: 'john@mvl-group.com', action: 'User Login', details: 'Successful login from admin panel', ipAddress: '192.168.1.100', status: 'success' },
+                    { id: 2, timestamp: '2024-01-15 14:25:15', user: 'sarah@mvl-group.com', action: 'Content Edit', details: 'Modified lesson AC.3.1.1 content', ipAddress: '192.168.1.101', status: 'success' },
+                    { id: 3, timestamp: '2024-01-15 14:20:05', user: 'mike@mvl-group.com', action: 'User Create', details: 'Created new user lisa@mvl-group.com', ipAddress: '192.168.1.102', status: 'success' },
+                    { id: 4, timestamp: '2024-01-15 14:15:45', user: 'unknown@example.com', action: 'Login Failed', details: 'Invalid credentials attempt', ipAddress: '203.0.113.10', status: 'error' },
+                    { id: 5, timestamp: '2024-01-15 14:10:30', user: 'admin@mvl-group.com', action: 'Settings Change', details: 'Updated SSO configuration', ipAddress: '192.168.1.103', status: 'success' }
+                ],
+                
+                // Modals and UI state
+                showUserModal: false,
+                editingUser: null,
+                
+                // Initialize component
+                init() {
+                    console.log('Enhanced Admin Panel initialized');
+                    this.loadSavedSettings();
+                    this.initializeCharts();
+                },
+                
+                // Load saved settings from localStorage
+                loadSavedSettings() {
+                    const savedSSO = localStorage.getItem('mvl_sso_config');
+                    if (savedSSO) {
+                        this.ssoConfig = { ...this.ssoConfig, ...JSON.parse(savedSSO) };
+                    }
+                    
+                    const savedSecurity = localStorage.getItem('mvl_security_settings');
+                    if (savedSecurity) {
+                        this.securitySettings = { ...this.securitySettings, ...JSON.parse(savedSecurity) };
+                    }
+                    
+                    const savedBranding = localStorage.getItem('mvl_branding_settings');
+                    if (savedBranding) {
+                        this.brandingSettings = { ...this.brandingSettings, ...JSON.parse(savedBranding) };
+                    }
+                },
+                
+                // Initialize analytics charts
+                initializeCharts() {
+                    this.$nextTick(() => {
+                        this.createProgressChart();
+                        this.createActivityChart();
+                    });
+                },
+                
+                createProgressChart() {
+                    const ctx = document.getElementById('progressChart');
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: ['Completed', 'In Progress', 'Not Started'],
+                                datasets: [{
+                                    data: [65, 25, 10],
+                                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false
+                            }
+                        });
+                    }
+                },
+                
+                createActivityChart() {
+                    const ctx = document.getElementById('activityChart');
+                    if (ctx) {
+                        new Chart(ctx, {
+                            type: 'line',
+                            data: {
+                                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                                datasets: [{
+                                    label: 'Active Users',
+                                    data: [65, 75, 80, 81, 78, 45, 30],
+                                    borderColor: '#1e40af',
+                                    backgroundColor: 'rgba(30, 64, 175, 0.1)'
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false
+                            }
+                        });
+                    }
+                },
+                
+                // Navigation helpers
+                getCurrentSectionTitle() {
+                    const section = this.adminSections.find(s => s.id === this.activeSection);
+                    return section ? section.title : 'Dashboard';
+                },
+                
+                getCurrentSectionDescription() {
+                    const descriptions = {
+                        dashboard: 'Overview of your MVL-LMS platform performance and activity',
+                        users: 'Manage user accounts, roles, and permissions',
+                        content: 'Edit lessons, quizzes, and manage learning materials',
+                        sso: 'Configure Microsoft Entra ID single sign-on integration',
+                        analytics: 'View reports and analytics on learning progress',
+                        settings: 'Configure system settings and preferences',
+                        audit: 'Review system activity logs and compliance reports'
+                    };
+                    return descriptions[this.activeSection] || 'Admin console';
+                },
+                
+                // User management methods
+                get filteredUsers() {
+                    let filtered = this.users;
+                    
+                    if (this.userFilter !== 'all') {
+                        filtered = filtered.filter(user => user.role === this.userFilter);
+                    }
+                    
+                    if (this.userSearch) {
+                        const search = this.userSearch.toLowerCase();
+                        filtered = filtered.filter(user => 
+                            user.name.toLowerCase().includes(search) || 
+                            user.email.toLowerCase().includes(search)
+                        );
+                    }
+                    
+                    return filtered;
+                },
+                
+                getRoleBadgeClass(role) {
+                    const classes = {
+                        'super_admin': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+                        'admin': 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
+                        'instructor': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+                        'learner': 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                    };
+                    return classes[role] || 'bg-gray-100 text-gray-800';
+                },
+                
+                toggleAllUsers() {
+                    if (this.selectedUsers.length === this.filteredUsers.length) {
+                        this.selectedUsers = [];
+                    } else {
+                        this.selectedUsers = this.filteredUsers.map(user => user.id);
+                    }
+                },
+                
+                editUser(user) {
+                    this.editingUser = user;
+                    this.showUserModal = true;
+                    Alpine.store('app').showToast(`Editing user: ${user.name}`, 'info');
+                },
+                
+                resetUserProgress(user) {
+                    if (confirm(`Reset all progress for ${user.name}?`)) {
+                        user.progress = 0;
+                        Alpine.store('app').showToast(`Progress reset for ${user.name}`, 'info');
+                        this.logAuditEvent('User Progress Reset', `Reset progress for ${user.name}`, 'success');
+                    }
+                },
+                
+                deleteUser(user) {
+                    if (confirm(`Delete user ${user.name}? This action cannot be undone.`)) {
+                        const index = this.users.findIndex(u => u.id === user.id);
+                        if (index > -1) {
+                            this.users.splice(index, 1);
+                            Alpine.store('app').showToast(`User ${user.name} deleted`, 'warning');
+                            this.logAuditEvent('User Deleted', `Deleted user ${user.name}`, 'success');
+                        }
+                    }
+                },
+                
+                exportUsers() {
+                    const data = this.users.map(user => ({
+                        name: user.name,
+                        email: user.email,
+                        role: user.role,
+                        status: user.status,
+                        progress: user.progress
+                    }));
+                    
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `mvl-lms-users-${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    Alpine.store('app').showToast('Users exported successfully!', 'success');
+                    this.logAuditEvent('Users Export', 'Exported user data', 'success');
+                },
+                
+                // Content Management methods
+                get filteredContent() {
+                    let filtered = this.contentItems;
+                    
+                    if (this.contentFilter !== 'all') {
+                        filtered = filtered.filter(content => content.type === this.contentFilter);
+                    }
+                    
+                    if (this.contentSearch) {
+                        const search = this.contentSearch.toLowerCase();
+                        filtered = filtered.filter(content => 
+                            content.title.toLowerCase().includes(search) || 
+                            content.description.toLowerCase().includes(search) ||
+                            content.domain.toLowerCase().includes(search)
+                        );
+                    }
+                    
+                    return filtered;
+                },
+                
+                editContent(content) {
+                    this.editingContent = content;
+                    if (content.type === 'quiz') {
+                        this.showQuizEditor = true;
+                    } else {
+                        this.showContentEditor = true;
+                    }
+                    Alpine.store('app').showToast(`Editing ${content.type}: ${content.title}`, 'info');
+                },
+                
+                deleteContent(content) {
+                    if (confirm(`Delete ${content.type} "${content.title}"? This action cannot be undone.`)) {
+                        const index = this.contentItems.findIndex(c => c.id === content.id);
+                        if (index > -1) {
+                            this.contentItems.splice(index, 1);
+                            Alpine.store('app').showToast(`${content.type} deleted`, 'warning');
+                            this.logAuditEvent('Content Deleted', `Deleted ${content.type}: ${content.title}`, 'success');
+                        }
+                    }
+                },
+                
+                importContent() {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = '.json';
+                    input.onchange = (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                try {
+                                    const data = JSON.parse(event.target.result);
+                                    // Process imported content
+                                    Alpine.store('app').showToast('Content imported successfully!', 'success');
+                                    this.logAuditEvent('Content Import', 'Imported content from file', 'success');
+                                } catch (error) {
+                                    Alpine.store('app').showToast('Error importing content', 'error');
+                                }
+                            };
+                            reader.readAsText(file);
+                        }
+                    };
+                    input.click();
+                },
+                
+                // SSO Configuration methods
+                testSSOConnection() {
+                    Alpine.store('app').showToast('Testing SSO connection...', 'info');
+                    
+                    // Simulate SSO connection test
+                    setTimeout(() => {
+                        if (this.ssoConfig.tenantId && this.ssoConfig.clientId) {
+                            Alpine.store('app').showToast('SSO connection test successful!', 'success');
+                            this.logAuditEvent('SSO Test', 'SSO connection test successful', 'success');
+                        } else {
+                            Alpine.store('app').showToast('SSO connection test failed - missing configuration', 'error');
+                            this.logAuditEvent('SSO Test', 'SSO connection test failed', 'error');
+                        }
+                    }, 2000);
+                },
+                
+                saveSSOConfig() {
+                    localStorage.setItem('mvl_sso_config', JSON.stringify(this.ssoConfig));
+                    Alpine.store('app').showToast('SSO configuration saved!', 'success');
+                    this.logAuditEvent('SSO Config', 'Updated SSO configuration', 'success');
+                },
+                
+                resetSSOConfig() {
+                    if (confirm('Reset SSO configuration to defaults?')) {
+                        this.ssoConfig = {
+                            enabled: false,
+                            tenantId: '',
+                            clientId: '',
+                            clientSecret: '',
+                            authority: 'https://login.microsoftonline.com/common',
+                            redirectUri: window.location.origin + '/auth/callback',
+                            scopes: 'openid profile email User.Read'
+                        };
+                        localStorage.removeItem('mvl_sso_config');
+                        Alpine.store('app').showToast('SSO configuration reset!', 'info');
+                        this.logAuditEvent('SSO Reset', 'Reset SSO configuration to defaults', 'success');
+                    }
+                },
+                
+                addGroupMapping() {
+                    const newId = Math.max(...this.groupRoleMappings.map(m => m.id)) + 1;
+                    this.groupRoleMappings.push({
+                        id: newId,
+                        groupName: '',
+                        role: 'learner'
+                    });
+                },
+                
+                removeGroupMapping(mapping) {
+                    const index = this.groupRoleMappings.findIndex(m => m.id === mapping.id);
+                    if (index > -1) {
+                        this.groupRoleMappings.splice(index, 1);
+                    }
+                },
+                
+                // Analytics methods
+                generateReport() {
+                    Alpine.store('app').showToast(`Generating ${this.reportType} report...`, 'info');
+                    
+                    setTimeout(() => {
+                        const reportContent = document.getElementById('reportContent');
+                        if (reportContent) {
+                            let content = '';
+                            switch (this.reportType) {
+                                case 'user_progress':
+                                    content = this.generateUserProgressReport();
+                                    break;
+                                case 'course_completion':
+                                    content = this.generateCourseCompletionReport();
+                                    break;
+                                case 'quiz_scores':
+                                    content = this.generateQuizScoresReport();
+                                    break;
+                                case 'compliance_audit':
+                                    content = this.generateComplianceAuditReport();
+                                    break;
+                            }
+                            reportContent.innerHTML = content;
+                        }
+                        Alpine.store('app').showToast('Report generated successfully!', 'success');
+                        this.logAuditEvent('Report Generated', `Generated ${this.reportType} report`, 'success');
+                    }, 1500);
+                },
+                
+                generateUserProgressReport() {
+                    return `
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white">User Progress Report</h4>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead><tr><th class="px-4 py-2 text-left">User</th><th class="px-4 py-2 text-left">Progress</th><th class="px-4 py-2 text-left">Last Activity</th></tr></thead>
+                                    <tbody>
+                                        ${this.users.map(user => `
+                                            <tr class="border-b border-gray-200 dark:border-gray-700">
+                                                <td class="px-4 py-2">${user.name}</td>
+                                                <td class="px-4 py-2">${user.progress}%</td>
+                                                <td class="px-4 py-2">${user.lastLogin}</td>
+                                            </tr>
+                                        `).join('')}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    `;
+                },
+                
+                generateCourseCompletionReport() {
+                    return `
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Course Completion Report</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${this.analyticsData.complianceByDomain.map(domain => `
+                                    <div class="p-4 bg-gray-50 dark:bg-gray-750 rounded-lg">
+                                        <h5 class="font-semibold">${domain.name}</h5>
+                                        <p class="text-2xl font-bold ${domain.percentage >= 80 ? 'text-green-600' : 'text-yellow-600'}">${domain.percentage}%</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                },
+                
+                generateQuizScoresReport() {
+                    return `
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Quiz Scores Report</h4>
+                            <p class="text-gray-600 dark:text-gray-400">Average quiz completion rate: 84%</p>
+                            <p class="text-gray-600 dark:text-gray-400">Domains with lowest scores require additional training focus.</p>
+                        </div>
+                    `;
+                },
+                
+                generateComplianceAuditReport() {
+                    return `
+                        <div class="space-y-4">
+                            <h4 class="text-lg font-semibold text-gray-900 dark:text-white">Compliance Audit Report</h4>
+                            <p class="text-gray-600 dark:text-gray-400">Overall compliance status: <span class="text-green-600 font-semibold">COMPLIANT</span></p>
+                            <p class="text-gray-600 dark:text-gray-400">Last audit: ${new Date().toLocaleDateString()}</p>
+                        </div>
+                    `;
+                },
+                
+                exportReport() {
+                    const reportContent = document.getElementById('reportContent');
+                    if (reportContent && reportContent.innerHTML.trim()) {
+                        const blob = new Blob([reportContent.innerHTML], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `mvl-lms-${this.reportType}-report-${new Date().toISOString().split('T')[0]}.html`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                        Alpine.store('app').showToast('Report exported successfully!', 'success');
+                    } else {
+                        Alpine.store('app').showToast('Please generate a report first', 'warning');
+                    }
+                },
+                
+                // Settings methods
+                saveSecuritySettings() {
+                    localStorage.setItem('mvl_security_settings', JSON.stringify(this.securitySettings));
+                    Alpine.store('app').showToast('Security settings saved!', 'success');
+                    this.logAuditEvent('Security Settings', 'Updated security settings', 'success');
+                },
+                
+                saveBrandingSettings() {
+                    localStorage.setItem('mvl_branding_settings', JSON.stringify(this.brandingSettings));
+                    Alpine.store('app').showToast('Branding settings saved!', 'success');
+                    this.logAuditEvent('Branding Settings', 'Updated branding settings', 'success');
+                },
+                
+                previewBranding() {
+                    Alpine.store('app').showToast('Branding preview mode activated', 'info');
+                    // Implement preview functionality
+                },
+                
+                // Audit methods
+                get filteredAuditLogs() {
+                    let filtered = this.auditLogs;
+                    
+                    if (this.auditFilters.actionType !== 'all') {
+                        filtered = filtered.filter(log => log.action.toLowerCase().includes(this.auditFilters.actionType.toLowerCase()));
+                    }
+                    
+                    if (this.auditFilters.user) {
+                        filtered = filtered.filter(log => log.user.toLowerCase().includes(this.auditFilters.user.toLowerCase()));
+                    }
+                    
+                    if (this.auditFilters.ipAddress) {
+                        filtered = filtered.filter(log => log.ipAddress.includes(this.auditFilters.ipAddress));
+                    }
+                    
+                    return filtered;
+                },
+                
+                applyAuditFilters() {
+                    Alpine.store('app').showToast('Audit filters applied', 'info');
+                },
+                
+                clearAuditFilters() {
+                    this.auditFilters = {
+                        dateRange: 'week',
+                        actionType: 'all',
+                        user: '',
+                        ipAddress: ''
+                    };
+                    Alpine.store('app').showToast('Audit filters cleared', 'info');
+                },
+                
+                exportAuditLog() {
+                    const data = this.filteredAuditLogs.map(log => ({
+                        timestamp: log.timestamp,
+                        user: log.user,
+                        action: log.action,
+                        details: log.details,
+                        ipAddress: log.ipAddress,
+                        status: log.status
+                    }));
+                    
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `mvl-lms-audit-log-${new Date().toISOString().split('T')[0]}.json`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                    
+                    Alpine.store('app').showToast('Audit log exported successfully!', 'success');
+                    this.logAuditEvent('Audit Export', 'Exported audit log data', 'success');
+                },
+                  // Utility method to log audit events
+                logAuditEvent(action, details, status = 'success') {
+                    const newLog = {
+                        id: this.auditLogs.length + 1,
+                        timestamp: new Date().toLocaleString(),
+                        user: 'admin@mvl-group.com', // Would be current user in real implementation
+                        action: action,
+                        details: details,
+                        ipAddress: '192.168.1.100', // Would be actual IP in real implementation
+                        status: status
+                    };
+                    
+                    this.auditLogs.unshift(newLog);
+                    
+                    // Keep only last 100 logs
+                    if (this.auditLogs.length > 100) {
+                        this.auditLogs = this.auditLogs.slice(0, 100);
+                    }
+                },
+                
+                // Modal and form handling methods
+                saveUser() {
+                    if (this.editingUser) {
+                        // Update existing user
+                        Alpine.store('app').showToast(`User ${this.editingUser.name} updated successfully!`, 'success');
+                        this.logAuditEvent('User Updated', `Updated user ${this.editingUser.name}`, 'success');
+                    } else {
+                        // Create new user
+                        const newUser = {
+                            id: Math.max(...this.users.map(u => u.id)) + 1,
+                            name: '', // Would be from form
+                            email: '', // Would be from form
+                            role: 'learner',
+                            status: 'active',
+                            lastLogin: 'Never',
+                            progress: 0
+                        };
+                        this.users.push(newUser);
+                        Alpine.store('app').showToast('New user created successfully!', 'success');
+                        this.logAuditEvent('User Created', `Created new user`, 'success');
+                    }
+                    this.showUserModal = false;
+                    this.editingUser = null;
+                },
+                
+                saveContent() {
+                    if (this.editingContent) {
+                        // Update existing content
+                        this.editingContent.lastModified = new Date().toISOString().split('T')[0];
+                        Alpine.store('app').showToast(`Content "${this.editingContent.title}" updated successfully!`, 'success');
+                        this.logAuditEvent('Content Updated', `Updated content: ${this.editingContent.title}`, 'success');
+                    } else {
+                        // Create new content
+                        const newContent = {
+                            id: Math.max(...this.contentItems.map(c => c.id)) + 1,
+                            title: '', // Would be from form
+                            type: 'lesson',
+                            domain: 'AC',
+                            description: '',
+                            lastModified: new Date().toISOString().split('T')[0]
+                        };
+                        this.contentItems.push(newContent);
+                        Alpine.store('app').showToast('New content created successfully!', 'success');
+                        this.logAuditEvent('Content Created', `Created new content`, 'success');
+                    }
+                    this.showContentEditor = false;
+                    this.editingContent = null;
+                },
+                
+                saveQuiz() {
+                    if (this.editingQuiz) {
+                        // Update existing quiz
+                        this.editingQuiz.lastModified = new Date().toISOString().split('T')[0];
+                        Alpine.store('app').showToast(`Quiz "${this.editingQuiz.title}" updated successfully!`, 'success');
+                        this.logAuditEvent('Quiz Updated', `Updated quiz: ${this.editingQuiz.title}`, 'success');
+                    } else {
+                        // Create new quiz
+                        const newQuiz = {
+                            id: Math.max(...this.contentItems.map(c => c.id)) + 1,
+                            title: '', // Would be from form
+                            type: 'quiz',
+                            domain: 'AC',
+                            description: '',
+                            lastModified: new Date().toISOString().split('T')[0]
+                        };
+                        this.contentItems.push(newQuiz);
+                        Alpine.store('app').showToast('New quiz created successfully!', 'success');
+                        this.logAuditEvent('Quiz Created', `Created new quiz`, 'success');
+                    }
+                    this.showQuizEditor = false;
+                    this.editingQuiz = null;
+                },
+                
+                addQuizQuestion() {
+                    Alpine.store('app').showToast('New question added to quiz', 'info');
+                    // In a real implementation, this would add to a questions array
+                }
+            }
+        }
+    </script>
+
+    <!-- Footer -->
+    <footer id="footer-container"></footer>
+
+    <script defer>
+        (async () => {
+            const footerHost = document.getElementById('footer-container');
+            try {
+                const response = await fetch('components/footer.html');
+                if (response.ok) {
+                    footerHost.innerHTML = await response.text();
+                }
+            } catch (error) {
+                console.log('Footer component not found, continuing without it.');
+            }
+        })();
+    </script>
+
+</body>
+</html>
